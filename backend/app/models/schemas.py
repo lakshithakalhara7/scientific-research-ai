@@ -1,1 +1,5 @@
-# Pydantic request/response schemas will be added here.
+from pydantic import BaseModel
+
+
+class ResearchQuery(BaseModel):
+    query: str
