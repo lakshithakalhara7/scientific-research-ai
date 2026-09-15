@@ -1,78 +1,278 @@
-from pathlib import Path
+import math
+from functools import lru_cache
+from typing import Dict, List
 
-from app.services.nlp_service import preprocess_text
-
-
-PAPERS_FOLDER = (
-    Path(__file__).resolve().parent.parent
-    / "data"
-    / "papers"
-)
+from .document_service import load_all_research_papers
+from .chunking_service import create_document_chunks
+from .indexing_service import build_inverted_index
+from .nlp_service import preprocess_text
 
 
-def load_documents():
-    documents = {}
+# --------------------------------------------------
+# Build retrieval resources once
+# --------------------------------------------------
 
-    for file_path in PAPERS_FOLDER.glob("*.txt"):
-        content = file_path.read_text(encoding="utf-8")
-        documents[file_path.name] = content
+@lru_cache(maxsize=1)
+def get_retrieval_resources():
 
-    return documents
+    documents = load_all_research_papers()
 
+    chunks = create_document_chunks(
+        documents,
+        chunk_size=250,
+        overlap=50
+    )
 
-def build_inverted_index(documents):
-    inverted_index = {}
+    inverted_index, chunk_store = (
+        build_inverted_index(chunks)
+    )
 
-    for document_name, content in documents.items():
-
-        tokens = preprocess_text(content)
-
-        for token in tokens:
-
-            if token not in inverted_index:
-                inverted_index[token] = []
-
-            if document_name not in inverted_index[token]:
-                inverted_index[token].append(document_name)
-
-    return inverted_index
+    return inverted_index, chunk_store
 
 
-def search_documents(query: str):
+# --------------------------------------------------
+# Detect reference-heavy chunks
+# --------------------------------------------------
 
-    documents = load_documents()
+def get_reference_penalty(text: str) -> float:
 
-    inverted_index = build_inverted_index(documents)
+    text_lower = text.lower()
+
+    # Strong sign that this is a reference section
+    if "references" in text_lower[:250]:
+        return 0.25
+
+    citation_count = (
+        text_lower.count(" et al")
+        + text_lower.count("http")
+        + text_lower.count("www.")
+        + text_lower.count(" doi")
+    )
+
+    # Likely bibliography/reference-heavy content
+    if citation_count >= 5:
+        return 0.35
+
+    if citation_count >= 3:
+        return 0.60
+
+    return 1.0
+
+
+# --------------------------------------------------
+# BM25 Search
+# --------------------------------------------------
+
+def search_documents(
+    query: str,
+    top_k: int = 5
+) -> List[Dict]:
+
+    inverted_index, chunk_store = (
+        get_retrieval_resources()
+    )
+
+    # ----------------------------------------------
+    # Process query
+    # ----------------------------------------------
 
     query_tokens = preprocess_text(query)
 
+    # Remove duplicates from query terms
+    query_terms = list(
+        dict.fromkeys(query_tokens)
+    )
+
+    if not query_terms:
+        return []
+
+    # ----------------------------------------------
+    # BM25 settings
+    # ----------------------------------------------
+
+    k1 = 1.5
+    b = 0.75
+
+    total_chunks = len(chunk_store)
+
+    document_lengths = {
+        chunk_id: len(
+            chunk["processed_tokens"]
+        )
+        for chunk_id, chunk
+        in chunk_store.items()
+    }
+
+    average_document_length = (
+        sum(document_lengths.values())
+        / total_chunks
+        if total_chunks > 0
+        else 0
+    )
+
     scores = {}
+    matched_terms = {}
 
-    for token in query_tokens:
+    # ----------------------------------------------
+    # Calculate BM25 score
+    # ----------------------------------------------
 
-        matching_documents = inverted_index.get(token, [])
+    for term in query_terms:
 
-        for document_name in matching_documents:
+        postings = inverted_index.get(
+            term,
+            {}
+        )
 
-            if document_name not in scores:
-                scores[document_name] = 0
+        document_frequency = len(postings)
 
-            scores[document_name] += 1
+        if document_frequency == 0:
+            continue
 
-    ranked_documents = sorted(
+        idf = math.log(
+            1
+            +
+            (
+                total_chunks
+                - document_frequency
+                + 0.5
+            )
+            /
+            (
+                document_frequency
+                + 0.5
+            )
+        )
+
+        for chunk_id, term_frequency in postings.items():
+
+            document_length = (
+                document_lengths[chunk_id]
+            )
+
+            denominator = (
+                term_frequency
+                +
+                k1
+                *
+                (
+                    1
+                    - b
+                    +
+                    b
+                    * (
+                        document_length
+                        / average_document_length
+                    )
+                )
+            )
+
+            term_score = (
+                idf
+                *
+                (
+                    term_frequency
+                    * (k1 + 1)
+                )
+                / denominator
+            )
+
+            if chunk_id not in scores:
+                scores[chunk_id] = 0.0
+                matched_terms[chunk_id] = set()
+
+            scores[chunk_id] += term_score
+
+            matched_terms[
+                chunk_id
+            ].add(term)
+
+    # ----------------------------------------------
+    # Apply query coverage bonus
+    # ----------------------------------------------
+
+    for chunk_id in scores:
+
+        coverage = (
+            len(matched_terms[chunk_id])
+            / len(query_terms)
+        )
+
+        scores[chunk_id] *= (
+            1.0
+            + 0.30 * coverage
+        )
+
+        # ------------------------------------------
+        # Penalize reference-heavy chunks
+        # ------------------------------------------
+
+        text = chunk_store[
+            chunk_id
+        ]["text"]
+
+        penalty = get_reference_penalty(
+            text
+        )
+
+        scores[chunk_id] *= penalty
+
+    # ----------------------------------------------
+    # Rank
+    # ----------------------------------------------
+
+    ranked_chunks = sorted(
         scores.items(),
         key=lambda item: item[1],
         reverse=True
     )
 
+    # ----------------------------------------------
+    # Diversify results
+    #
+    # Maximum 2 chunks from the same paper
+    # ----------------------------------------------
+
     results = []
 
-    for document_name, score in ranked_documents:
+    paper_counts = {}
+
+    for chunk_id, score in ranked_chunks:
+
+        chunk = chunk_store[
+            chunk_id
+        ]
+
+        filename = chunk[
+            "filename"
+        ]
+
+        current_count = paper_counts.get(
+            filename,
+            0
+        )
+
+        if current_count >= 2:
+            continue
 
         results.append({
-            "document": document_name,
-            "score": score,
-            "content": documents[document_name]
+            "chunk_id": chunk_id,
+            "filename": filename,
+            "category": chunk["category"],
+            "page_number": chunk["page_number"],
+            "chunk_number": chunk["chunk_number"],
+            "score": round(score, 4),
+            "matched_terms": sorted(
+                matched_terms[chunk_id]
+            ),
+            "text": chunk["text"]
         })
+
+        paper_counts[
+            filename
+        ] = current_count + 1
+
+        if len(results) >= top_k:
+            break
 
     return results
