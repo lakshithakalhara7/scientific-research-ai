@@ -1,0 +1,143 @@
+"""Persistent metadata helpers, independent of the current local BM25 pipeline."""
+
+from collections.abc import Sequence
+from datetime import datetime
+from typing import Literal
+from uuid import UUID
+
+from pydantic import BaseModel, ConfigDict, Field
+from supabase import Client
+
+from app.core.supabase_client import get_supabase_client
+
+
+DocumentStatus = Literal["uploaded", "processing", "indexed", "failed"]
+
+
+class DocumentCreate(BaseModel):
+    """Metadata only: PDF bytes belong in the private Storage bucket."""
+
+    model_config = ConfigDict(extra="forbid", frozen=True, revalidate_instances="always")
+
+    original_filename: str = Field(min_length=1)
+    storage_path: str = Field(min_length=1)
+    title: str | None = None
+    category: str | None = None
+    doi: str | None = None
+    source_url: str | None = None
+    mime_type: Literal["application/pdf"] = "application/pdf"
+    file_size_bytes: int | None = Field(default=None, ge=0)
+    page_count: int | None = Field(default=None, ge=0)
+
+
+class DocumentRecord(DocumentCreate):
+    id: UUID
+    status: DocumentStatus
+    created_at: datetime
+
+
+class DocumentChunkCreate(BaseModel):
+    """One-based page and chunk positions match the existing local chunker."""
+
+    model_config = ConfigDict(extra="forbid", frozen=True, revalidate_instances="always")
+
+    page_number: int = Field(ge=1)
+    chunk_number: int = Field(ge=1)
+    chunk_text: str = Field(min_length=1)
+    processed_text: str | None = None
+    token_count: int | None = Field(default=None, ge=0)
+
+
+class DocumentChunkRecord(DocumentChunkCreate):
+    id: UUID
+    document_id: UUID
+    created_at: datetime
+
+
+class DatabaseService:
+    """Use only from trusted backend code; construction is explicit and opt-in."""
+
+    def __init__(self, client: Client | None = None) -> None:
+        self._client = client if client is not None else get_supabase_client()
+
+    def create_document(self, document: DocumentCreate) -> DocumentRecord:
+        """Create metadata with the database's initial 'uploaded' status."""
+        payload = DocumentCreate.model_validate(document).model_dump(mode="json")
+        response = self._client.table("documents").insert(payload).execute()
+        if not response.data:
+            raise RuntimeError("Supabase did not return the created document.")
+        return DocumentRecord.model_validate(response.data[0])
+
+    def get_document(self, document_id: UUID | str) -> DocumentRecord | None:
+        response = (
+            self._client.table("documents")
+            .select("*")
+            .eq("id", str(UUID(str(document_id))))
+            .limit(1)
+            .execute()
+        )
+        return DocumentRecord.model_validate(response.data[0]) if response.data else None
+
+    def update_document_status(
+        self, document_id: UUID | str, status: DocumentStatus
+    ) -> DocumentRecord | None:
+        """Update only status; return None if the document does not exist."""
+        if status not in ("uploaded", "processing", "indexed", "failed"):
+            raise ValueError("Invalid document status.")
+        response = (
+            self._client.table("documents")
+            .update({"status": status})
+            .eq("id", str(UUID(str(document_id))))
+            .execute()
+        )
+        return DocumentRecord.model_validate(response.data[0]) if response.data else None
+
+    def create_document_chunks(
+        self,
+        document_id: UUID | str,
+        chunks: Sequence[DocumentChunkCreate],
+    ) -> None:
+        """Validate all chunks, then insert atomically without a truncated response."""
+        identifier = str(UUID(str(document_id)))
+        payloads = []
+        positions: set[tuple[int, int]] = set()
+        for item in chunks:
+            chunk = DocumentChunkCreate.model_validate(item)
+            position = (chunk.page_number, chunk.chunk_number)
+            if position in positions:
+                raise ValueError("Duplicate page_number/chunk_number in chunk batch.")
+            positions.add(position)
+            payloads.append({"document_id": identifier, **chunk.model_dump(mode="json")})
+        if payloads:
+            (
+                self._client.table("document_chunks")
+                .insert(payloads, returning="minimal")
+                .execute()
+            )
+
+    def get_document_chunks(self, document_id: UUID | str) -> list[DocumentChunkRecord]:
+        """Fetch all chunks in reading order, including beyond the server row cap.
+
+        Read a stable document after its chunk insertion completes; separate HTTP
+        pages do not share a database snapshot during concurrent writes.
+        """
+        identifier = str(UUID(str(document_id)))
+        chunks: list[DocumentChunkRecord] = []
+        offset = 0
+        page_size = 1000
+        while True:
+            response = (
+                self._client.table("document_chunks")
+                .select("*")
+                .eq("document_id", identifier)
+                .order("page_number")
+                .order("chunk_number")
+                .range(offset, offset + page_size - 1)
+                .execute()
+            )
+            rows = response.data
+            if not rows:
+                return chunks
+            chunks.extend(DocumentChunkRecord.model_validate(row) for row in rows)
+            # The project may impose a lower cap than our requested page size.
+            offset += len(rows)
