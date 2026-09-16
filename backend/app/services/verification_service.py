@@ -51,3 +51,43 @@ class VerificationService:
             "score": round(score, 2),
             "matching_words": list(matching_words)
         }
+    def verify_against_sources(self, claim, sources):
+        """
+        Verify one scientific claim against multiple research sources.
+        """
+
+        results = []
+
+        for source in sources:
+
+            verification = self.verify_claim(
+                claim,
+                source["text"]
+            )
+
+            verification["source"] = source["source"]
+
+            results.append(verification)
+
+        if len(results) == 0:
+            return {
+                "claim": claim,
+                "status": "UNSUPPORTED",
+                "best_source": None,
+                "score": 0,
+                "all_results": []
+            }
+
+        best_result = max(
+            results,
+            key=lambda result: result["score"]
+        )
+
+        return {
+            "claim": claim,
+            "status": best_result["status"],
+            "best_source": best_result["source"],
+            "score": best_result["score"],
+            "matching_words": best_result["matching_words"],
+            "all_results": results
+        }

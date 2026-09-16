@@ -22,6 +22,18 @@ class VerificationAgent:
 
         return result
 
+    def verify_with_sources(self, claim, sources):
+        """
+        Verify a claim against multiple scientific sources.
+        """
+
+        result = self.verification_service.verify_against_sources(
+            claim,
+            sources
+        )
+
+        return result
+
 
 if __name__ == "__main__":
 
@@ -31,12 +43,34 @@ if __name__ == "__main__":
         "Contrastive learning improves transferability."
     )
 
-    evidence = (
-        "The study found that contrastive learning "
-        "demonstrated improved transferability "
-        "across downstream tasks."
-    )
+    sources = [
+        {
+            "source": "paper1.txt",
+            "text": (
+                "The study found that contrastive learning "
+                "demonstrated improved transferability "
+                "across downstream tasks."
+            )
+        },
+        {
+            "source": "paper2.txt",
+            "text": (
+                "Supervised learning achieved strong results "
+                "on specialized classification tasks."
+            )
+        },
+        {
+            "source": "paper3.txt",
+            "text": (
+                "Deep neural networks require significant "
+                "computational resources for training."
+            )
+        }
+    ]
 
-    result = agent.verify(claim, evidence)
+    result = agent.verify_with_sources(
+        claim,
+        sources
+    )
 
     print(result)
