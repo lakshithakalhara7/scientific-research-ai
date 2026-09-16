@@ -34,13 +34,30 @@ class VerificationAgent:
 
         return result
 
+    def verify_answer(self, answer, sources):
+        """
+        Verify a complete AI-generated answer.
+        """
+
+        result = self.verification_service.verify_answer(
+            answer,
+            sources
+        )
+
+        return result
+
 
 if __name__ == "__main__":
 
+    from pprint import pprint
+
     agent = VerificationAgent()
 
-    claim = (
-        "Contrastive learning improves transferability."
+    answer = (
+        "Contrastive learning improves transferability. "
+        "Supervised learning achieved strong results "
+        "on specialized classification tasks. "
+        "The dataset contained one million medical images."
     )
 
     sources = [
@@ -68,9 +85,9 @@ if __name__ == "__main__":
         }
     ]
 
-    result = agent.verify_with_sources(
-        claim,
+    result = agent.verify_answer(
+        answer,
         sources
     )
 
-    print(result)
+    pprint(result)
