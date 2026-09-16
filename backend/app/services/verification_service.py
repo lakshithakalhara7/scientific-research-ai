@@ -1,5 +1,32 @@
 import re
-
+STOP_WORDS = {
+    "the",
+    "a",
+    "an",
+    "and",
+    "or",
+    "but",
+    "in",
+    "on",
+    "at",
+    "to",
+    "for",
+    "of",
+    "with",
+    "by",
+    "from",
+    "is",
+    "are",
+    "was",
+    "were",
+    "be",
+    "been",
+    "being",
+    "that",
+    "this",
+    "these",
+    "those"
+}
 
 class VerificationService:
     """
@@ -17,6 +44,25 @@ class VerificationService:
         text = re.sub(r"[^\w\s]", "", text)
 
         return text
+
+    def get_important_words(self, text):
+        """
+        Remove common stop words and return
+        the meaningful words from the text.
+        """
+
+        cleaned_text = self.clean_text(text)
+
+        words = cleaned_text.split()
+
+        important_words = {
+            word
+            for word in words
+            if word not in STOP_WORDS
+        }
+
+        return important_words
+    
     def extract_claims(self, answer):
         """
         Split an AI-generated answer into individual claims.
@@ -43,11 +89,8 @@ class VerificationService:
         Compare a claim with evidence.
         """
 
-        cleaned_claim = self.clean_text(claim)
-        cleaned_evidence = self.clean_text(evidence)
-
-        claim_words = set(cleaned_claim.split())
-        evidence_words = set(cleaned_evidence.split())
+        claim_words = self.get_important_words(claim)
+        evidence_words = self.get_important_words(evidence)
 
         matching_words = claim_words.intersection(evidence_words)
 
