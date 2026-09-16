@@ -1,5 +1,6 @@
 from fastapi import FastAPI
 
+from app.api.documents import router as documents_router
 from app.models.schemas import ResearchQuery
 from app.services.nlp_service import preprocess_text
 from app.agents.retrieval_agent import RetrievalAgent
@@ -10,6 +11,8 @@ app = FastAPI(
     description="Agentic AI system for scientific research",
     version="1.0.0"
 )
+
+app.include_router(documents_router)
 
 
 retrieval_agent = RetrievalAgent()

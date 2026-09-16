@@ -1,4 +1,4 @@
-"""Lazy server client; never imported or called by the local retrieval pipeline."""
+"""Lazy server client shared by backend persistence services."""
 
 from functools import lru_cache
 

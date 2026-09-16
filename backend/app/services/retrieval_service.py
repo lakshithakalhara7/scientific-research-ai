@@ -1,34 +1,17 @@
 import math
-from functools import lru_cache
 from typing import Dict, List
 
-from .document_service import load_all_research_papers
-from .chunking_service import create_document_chunks
-from .indexing_service import build_inverted_index
 from .nlp_service import preprocess_text
+from .retrieval_index_service import (
+    clear_retrieval_cache,
+    get_retrieval_resources,
+    refresh_retrieval_index,
+)
 
 
 # --------------------------------------------------
-# Build retrieval resources once
+# Retrieval resources are built once and explicitly refreshed after ingestion.
 # --------------------------------------------------
-
-@lru_cache(maxsize=1)
-def get_retrieval_resources():
-
-    documents = load_all_research_papers()
-
-    chunks = create_document_chunks(
-        documents,
-        chunk_size=250,
-        overlap=50
-    )
-
-    inverted_index, chunk_store = (
-        build_inverted_index(chunks)
-    )
-
-    return inverted_index, chunk_store
-
 
 # --------------------------------------------------
 # Detect reference-heavy chunks
@@ -247,8 +230,10 @@ def search_documents(
             "filename"
         ]
 
+        paper_id = chunk.get("document_id", filename)
+
         current_count = paper_counts.get(
-            filename,
+            paper_id,
             0
         )
 
@@ -256,6 +241,7 @@ def search_documents(
             continue
 
         results.append({
+            **({"document_id": chunk["document_id"]} if "document_id" in chunk else {}),
             "chunk_id": chunk_id,
             "filename": filename,
             "category": chunk["category"],
@@ -269,7 +255,7 @@ def search_documents(
         })
 
         paper_counts[
-            filename
+            paper_id
         ] = current_count + 1
 
         if len(results) >= top_k:

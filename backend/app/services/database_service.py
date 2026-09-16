@@ -8,7 +8,7 @@ from uuid import UUID
 from pydantic import BaseModel, ConfigDict, Field
 from supabase import Client
 
-from app.core.supabase_client import get_supabase_client
+from ..core.supabase_client import get_supabase_client
 
 
 DocumentStatus = Literal["uploaded", "processing", "indexed", "failed"]
@@ -60,9 +60,15 @@ class DatabaseService:
     def __init__(self, client: Client | None = None) -> None:
         self._client = client if client is not None else get_supabase_client()
 
-    def create_document(self, document: DocumentCreate) -> DocumentRecord:
+    def create_document(
+        self, document: DocumentCreate, *, document_id: UUID | None = None
+    ) -> DocumentRecord:
         """Create metadata with the database's initial 'uploaded' status."""
         payload = DocumentCreate.model_validate(document).model_dump(mode="json")
+        if document_id is not None:
+            # Allocate the PostgreSQL primary key before constructing its object
+            # path. The row returned by PostgreSQL remains the source of identity.
+            payload["id"] = str(UUID(str(document_id)))
         response = self._client.table("documents").insert(payload).execute()
         if not response.data:
             raise RuntimeError("Supabase did not return the created document.")
@@ -77,6 +83,24 @@ class DatabaseService:
             .execute()
         )
         return DocumentRecord.model_validate(response.data[0]) if response.data else None
+
+    def get_indexed_documents(self) -> list[DocumentRecord]:
+        """Read completed documents only, including beyond the Data API row cap."""
+        documents: list[DocumentRecord] = []
+        offset = 0
+        while True:
+            response = (
+                self._client.table("documents")
+                .select("*")
+                .eq("status", "indexed")
+                .order("id")
+                .range(offset, offset + 999)
+                .execute()
+            )
+            if not response.data:
+                return documents
+            documents.extend(DocumentRecord.model_validate(row) for row in response.data)
+            offset += len(response.data)
 
     def update_document_status(
         self, document_id: UUID | str, status: DocumentStatus

@@ -39,9 +39,9 @@ def build_inverted_index(
         # NLP preprocessing
         # ------------------------------------------
 
-        processed_tokens = preprocess_text(
-            chunk["text"]
-        )
+        processed_tokens = chunk.get("processed_tokens")
+        if processed_tokens is None:
+            processed_tokens = preprocess_text(chunk["text"])
 
         # Count how many times each term
         # appears inside this chunk
