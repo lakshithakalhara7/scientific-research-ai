@@ -1,19 +1,33 @@
+import re
+
+
 class VerificationService:
     """
     Contains the basic logic used to check whether
     a scientific claim is supported by retrieved evidence.
     """
 
+    def clean_text(self, text):
+        """
+        Convert text to lowercase and remove punctuation.
+        """
+
+        text = text.lower()
+
+        text = re.sub(r"[^\w\s]", "", text)
+
+        return text
+
     def verify_claim(self, claim, evidence):
         """
         Compare a claim with evidence.
-
-        For this first simple version, we check whether
-        important words from the claim appear in the evidence.
         """
 
-        claim_words = set(claim.lower().split())
-        evidence_words = set(evidence.lower().split())
+        cleaned_claim = self.clean_text(claim)
+        cleaned_evidence = self.clean_text(evidence)
+
+        claim_words = set(cleaned_claim.split())
+        evidence_words = set(cleaned_evidence.split())
 
         matching_words = claim_words.intersection(evidence_words)
 
