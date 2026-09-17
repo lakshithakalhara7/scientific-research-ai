@@ -1,4 +1,4 @@
-"""One BM25 resource snapshot shared by local compatibility data and persisted chunks.
+"""One BM25 snapshot from Supabase chunks, or the local corpus as fallback.
 
 Refreshes are serialized within one backend process. Queries reuse the completed
 snapshot. Run one worker for this prototype; other processes require a restart or
@@ -15,6 +15,7 @@ from .chunking_service import create_document_chunks
 from .database_service import DatabaseService
 from .document_service import load_all_research_papers
 from .indexing_service import build_inverted_index
+from .nlp_service import preprocess_text
 
 
 logger = logging.getLogger(__name__)
@@ -62,6 +63,37 @@ def _persistent_chunks(
     return chunks
 
 
+def _unique_chunks(chunks: list[dict]) -> list[dict]:
+    """Keep the first occurrence of an identity without comparing evidence text."""
+    seen: set[tuple] = set()
+    unique: list[dict] = []
+    for chunk in chunks:
+        if "document_id" in chunk:
+            identity = ("supabase", chunk["document_id"], chunk["chunk_id"])
+        else:
+            identity = (
+                "local", chunk["filename"], chunk["page_number"], chunk["chunk_number"]
+            )
+        if identity not in seen:
+            seen.add(identity)
+            unique.append(chunk)
+    return unique
+
+
+def _usable_persistent_chunks(chunks: list[dict]) -> list[dict]:
+    """Require evidence text and searchable tokens; reuse stored NLP when present."""
+    usable: list[dict] = []
+    for chunk in _unique_chunks(chunks):
+        if not chunk["text"].strip():
+            continue
+        tokens = chunk.get("processed_tokens")
+        if tokens is None:
+            tokens = preprocess_text(chunk["text"])
+        if tokens:
+            usable.append({**chunk, "processed_tokens": tokens})
+    return usable
+
+
 def _build_resources(
     *, database: DatabaseService | None = None,
     pending_document_id: UUID | str | None = None,
@@ -78,9 +110,19 @@ def _build_resources(
             logger.warning("Supabase chunks unavailable; using the local corpus until refresh.")
         persistent = []
 
-    # Temporary compatibility: one combined index, no automatic corpus upload.
+    # NLP/build errors must surface, rather than masquerading as cloud outages.
+    persistent = _usable_persistent_chunks(persistent)
+    if pending_document_id is not None:
+        pending_id = str(UUID(str(pending_document_id)))
+        if not any(chunk["document_id"] == pending_id for chunk in persistent):
+            raise RetrievalSourceError("No searchable chunks are available for the new document.")
+    if persistent:
+        return build_inverted_index(persistent)
+
+    # A snapshot uses exactly one source. Never read local PDFs when cloud chunks
+    # are usable, including during preparation of a newly ingested document.
     local = create_document_chunks(load_all_research_papers(), chunk_size=250, overlap=50)
-    return build_inverted_index(local + persistent)
+    return build_inverted_index(_unique_chunks(local))
 
 
 def get_retrieval_resources() -> tuple[dict, dict]:

@@ -3,7 +3,7 @@
 Member 1 owns PDF validation and ingestion, extraction, chunking, NLTK
 preprocessing, the custom inverted index, BM25 ranking, and structured evidence
 from the Retrieval Agent. The upload endpoint now connects these services to
-Supabase while retaining the existing local corpus as a compatibility source.
+Supabase while retaining the existing local corpus as a fallback source.
 
 ## Implemented ingestion and retrieval flow
 
@@ -18,8 +18,8 @@ flowchart TD
     E --> C["Existing chunking: 250 words, 50-word overlap"]
     C --> N["Existing NLTK preprocessing"]
     N --> T["PostgreSQL document_chunks: raw text, processed text and token count"]
-    T --> I["Prepare one combined inverted index / BM25 snapshot"]
-    L["Existing ignored local PDF corpus"] --> I
+    T --> I["Prepare Supabase-only inverted index / BM25 snapshot"]
+    L["Local PDF index: only when no usable cloud chunks"] -. fallback .-> B
     I --> F["Mark document indexed, then publish index snapshot"]
     F --> B["Existing BM25 ranked retrieval"]
     Q["POST /agents/retrieve"] --> R["Retrieval Agent: Member 1"]
@@ -35,6 +35,8 @@ bytes. PostgreSQL holds document metadata and extracted text; it never stores ra
 PDF binaries. PostgreSQL does not replace BM25. The existing Python inverted
 index and BM25 remain the Information Retrieval implementation, with the original
 scoring formula, query coverage adjustment, and reference penalties unchanged.
+Selecting a different corpus can change numeric scores through BM25's corpus
+statistics even though the ranking algorithm is unchanged.
 No vectors, embeddings, or external retrieval framework are introduced.
 
 ## Service boundaries
@@ -48,7 +50,7 @@ No vectors, embeddings, or external retrieval framework are introduced.
 | `app/services/nlp_service.py` | Existing NLTK tokenization, filtering, and lemmatization. |
 | `app/services/database_service.py` | Typed document/chunk persistence and indexed-document reads. |
 | `app/services/storage_service.py` | Upload/download/delete individual PDF objects in the existing private bucket. |
-| `app/services/retrieval_index_service.py` | Adapt persistent rows and local chunks into one cached index; coordinate explicit refresh and publication. |
+| `app/services/retrieval_index_service.py` | Select usable persistent rows or local fallback, remove repeated source identities, and coordinate cached index refresh and publication. |
 | `app/services/indexing_service.py` | Existing inverted index; reuse stored processed tokens when available. |
 | `app/services/retrieval_service.py` | Existing BM25 ranking and evidence selection. |
 | `app/agents/retrieval_agent.py` | Existing query validation and structured evidence interface. |
@@ -89,29 +91,39 @@ count. Persistent retrieval results use the chunk UUID as `chunk_id` and include
 `document_id`. The two-chunks-per-paper rule uses document UUIDs for uploaded
 documents, so duplicate filenames do not merge independent sources.
 
-## Index refresh and temporary local compatibility
+## Index refresh and local fallback
 
-`retrieval_index_service.py` builds one in-memory index containing both indexed
-Supabase chunks and the existing ignored local PDFs. It reuses the existing
-extraction/chunking/NLP services for local data and processed tokens for persistent
-chunks. Local chunk IDs retain `<filename>_p<page_number>_c<chunk_number>`. Local
-PDFs are not uploaded automatically, deleted, or added to Git. The intended
-persistent source is Supabase; removal of the compatibility corpus and controlled
-corpus migration remain separate work.
+`retrieval_index_service.py` uses searchable chunks from indexed Supabase
+documents as the sole primary corpus. Local PDFs are not loaded or merged when
+usable persistent chunks exist. A usable chunk has nonblank raw text and nonempty
+processed tokens: stored `processed_text` is reused, or the existing NLP service
+computes tokens when `processed_text` is null. Whitespace-only raw text or an
+explicitly empty processed-token set does not count as usable persistent evidence.
+
+When no searchable persistent chunks are available, the index uses the existing
+local extraction/chunking/NLP pipeline. Repeated source identities are removed
+before indexing: `(document_id, chunk_id)` for Supabase and
+`(filename, page_number, chunk_number)` for local chunks. IDs remain unchanged;
+this removes duplicate records, not identical text in separately identified
+documents. Local chunk IDs retain `<filename>_p<page_number>_c<chunk_number>`.
+Local PDFs are not uploaded automatically, deleted, or added to Git. Controlled
+corpus migration remains separate work.
 
 The first retrieval query builds and caches a completed snapshot. Later queries
 reuse it and do not requery Supabase or rebuild the index. If Supabase is
 unconfigured or unavailable on first load, local retrieval remains available. A
-configured database read failure emits a sanitized warning and the local-only
-snapshot remains cached until explicit refresh or restart. It does not silently
-retry database reads on every query.
+database failure other than missing/invalid configuration emits a sanitized
+warning and the local-only snapshot remains cached until explicit refresh or
+restart. It does not silently retry database reads on every query.
 
 Successful ingestion calls `refresh_retrieval_index(...)`. Refresh strictly reads
-persistent chunks, includes the pending document whose status is `processing`,
-and prepares a replacement index under a process lock. Once that build succeeds,
-the completion callback marks the document `indexed`; only then is the completed
-snapshot published. A read, build, or status-update failure preserves the previous
-snapshot and fails ingestion. Normal persistent reads include only `indexed`
+persistent chunks, requires usable chunks from the pending document whose status
+is `processing`, and prepares a Supabase-only replacement index under a process
+lock. Once that build succeeds, the completion callback marks the document
+`indexed`; only then is the completed snapshot published. A read, build, or
+status-update failure preserves the previous
+snapshot and surfaces a sanitized failure; a strict refresh error never replaces
+the cache with local fallback. Normal persistent reads include only `indexed`
 documents, so failed documents do not become evidence.
 
 `clear_retrieval_cache()` discards the snapshot for explicit reload on the next

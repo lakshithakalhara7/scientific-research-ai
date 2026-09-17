@@ -2,8 +2,9 @@
 
 The backend now supports `POST /documents/upload`: validation, private PDF
 storage, metadata and chunk persistence, and explicit refresh of the existing
-BM25 index. Local PDF retrieval remains a compatibility source in the same index.
-No local corpus migration occurs automatically.
+BM25 index. Usable indexed Supabase chunks form the primary corpus; local PDF
+retrieval remains a fallback when that corpus is empty or unavailable at first
+load. The sources are not merged. No local corpus migration occurs automatically.
 
 The existing project, tables, and private bucket can be reused as configured.
 There are no new SQL migrations or database grants for this ingestion change.
@@ -78,9 +79,9 @@ The configuration loader reads that backend file using its absolute path and
 allows process environment variables to take precedence. Missing or invalid
 configuration produces a clear configuration error when Supabase is requested.
 The first retrieval query attempts to load persistent indexed chunks, with local
-corpus fallback when configuration or Supabase is unavailable. Uploads require
-working Supabase access. Settings and the client are cached, so restart the
-backend after changing credentials.
+corpus fallback when no searchable persistent chunks exist or configuration or
+Supabase is unavailable. Uploads require working Supabase access. Settings and
+the client are cached, so restart the backend after changing credentials.
 
 Never paste actual keys or database passwords into source, documentation, logs,
 screenshots, issue reports, or chat. Never commit `backend/.env`. Never place the
@@ -189,9 +190,11 @@ Invoke-RestMethod -Method Post -Uri "http://127.0.0.1:8000/agents/retrieve" -Con
 ```
 
 Evidence for uploaded sources includes `document_id`, chunk UUID, filename,
-page/chunk position, score, matched terms, and extracted text. The same custom
-BM25 algorithm ranks local and persistent evidence in one index. Supabase stores
-data; it does not provide a replacement search algorithm.
+page/chunk position, score, matched terms, and extracted text. The existing custom
+BM25 algorithm ranks the selected corpus: usable Supabase chunks, or the local
+fallback. It does not merge local copies with persistent evidence. Changing the
+corpus can change numeric scores through BM25's corpus statistics; the algorithm
+is unchanged. Supabase provides persistence, not a replacement search algorithm.
 
 | HTTP status | Meaning |
 | --- | --- |
@@ -212,16 +215,29 @@ and storage service abstractions. It uses the existing extraction, chunking, NLP
 inverted index, and BM25 services; `RetrievalAgent` does not call Supabase directly.
 
 The index is built once on first retrieval and reused by subsequent queries.
-Successful ingestion performs an explicit strict rebuild from persistent chunks
-plus the current local corpus. It prepares the replacement before marking the
-pending document `indexed`, then publishes the new snapshot under a process
-lock. Failed builds or final status updates leave the old snapshot available.
+Usable indexed Supabase chunks are the sole primary source. Each usable chunk
+needs nonblank raw text and nonempty processed tokens; existing `processed_text`
+is reused, and NLP runs only when that field is null. If no persistent chunks are
+searchable, the index uses the local corpus. Local PDFs are not loaded when
+usable Supabase chunks exist.
+
+Repeated records are removed by `(document_id, chunk_id)` for Supabase or
+`(filename, page_number, chunk_number)` for local chunks. Identifiers remain
+unchanged, and separately identified documents are not deduplicated by their text.
+
+Successful ingestion performs an explicit strict rebuild from persistent chunks,
+including usable chunks from the pending document. It prepares the replacement
+before marking that document `indexed`, then atomically publishes the snapshot
+under a process lock. Failed reads, builds, or final status updates preserve the
+old snapshot and surface a sanitized failure; strict refresh errors do not switch
+to local fallback.
 
 If the first retrieval load cannot reach Supabase, it falls back to local PDFs
-and caches that snapshot until restart or explicit refresh. A configured database
-failure produces a sanitized warning. Run one backend process; multiple workers
-or instances do not share refresh notifications. A direct database edit or an
-upload made by another process requires refresh or restart in each consumer.
+and caches that snapshot until restart or explicit refresh. Database failures
+other than missing/invalid configuration produce a sanitized warning. Run one
+backend process; multiple workers or instances do not share refresh notifications.
+A direct database edit or an upload made by another process requires refresh or
+restart in each consumer.
 
 On failure after metadata creation, ingestion attempts to mark the row `failed`
 and delete only this attempt's successfully uploaded Storage object. Any already
@@ -245,8 +261,9 @@ When explicitly enabled, it generates one small original PDF in memory, uploads
 it through the API, verifies private Storage bytes, metadata, chunks and indexed
 status, then retrieves its unique phrase through the Retrieval Agent. It also
 checks retrieval after clearing the cache. Only the generated fixture is uploaded;
-index rebuilding still reads the local corpus for compatibility. No local research
-PDFs are uploaded and no cloud resources are created.
+index rebuilding uses persistent chunks once usable Supabase data exists. A cold
+index can use local fallback before any searchable cloud chunks exist. No local
+research PDFs are uploaded and no cloud resources are created.
 
 Each enabled run uploads one new test document, retained as `indexed` for dashboard
 review. The test prints its document UUID, never credentials. Avoid repeatedly
@@ -267,4 +284,4 @@ does not recreate tables/buckets or upload a fallback research paper. An existin
 backend running separately must refresh/restart to see the retained test document.
 
 See [architecture.md](architecture.md) for service boundaries, persistent IDs,
-temporary local compatibility, and the evidence handoff to future team agents.
+local fallback behavior, and the evidence handoff to future team agents.
