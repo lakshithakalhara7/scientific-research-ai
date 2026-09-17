@@ -183,12 +183,15 @@ class IngestionService:
             persisted_chunks = []
             searchable = False
             for chunk in chunks:
-                tokens = preprocess_text(chunk["text"])
+                # Normalize PostgreSQL-incompatible PDF NUL artifacts before NLP
+                # so persisted evidence, processed tokens and token_count agree.
+                chunk_text = chunk["text"].replace("\x00", "")
+                tokens = preprocess_text(chunk_text)
                 searchable = searchable or bool(tokens)
                 persisted_chunks.append(DocumentChunkCreate(
                     page_number=chunk["page_number"],
                     chunk_number=chunk["chunk_number"],
-                    chunk_text=chunk["text"],
+                    chunk_text=chunk_text,
                     processed_text=" ".join(tokens),
                     token_count=len(tokens),
                 ))

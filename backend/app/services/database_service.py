@@ -2,16 +2,20 @@
 
 from collections.abc import Sequence
 from datetime import datetime
+import logging
+import re
 from typing import Literal
 from uuid import UUID
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, field_validator
+from postgrest.exceptions import APIError
 from supabase import Client
 
 from ..core.supabase_client import get_supabase_client
 
 
 DocumentStatus = Literal["uploaded", "processing", "indexed", "failed"]
+logger = logging.getLogger(__name__)
 
 
 class DocumentCreate(BaseModel):
@@ -46,6 +50,13 @@ class DocumentChunkCreate(BaseModel):
     chunk_text: str = Field(min_length=1)
     processed_text: str | None = None
     token_count: int | None = Field(default=None, ge=0)
+
+    @field_validator("chunk_text", "processed_text", mode="before")
+    @classmethod
+    def remove_nul_characters(cls, value: object) -> object:
+        # PDF extraction can emit U+0000. It is valid in JSON strings but cannot
+        # be converted to PostgreSQL text. Preserve all other scientific Unicode.
+        return value.replace("\x00", "") if isinstance(value, str) else value
 
 
 class DocumentChunkRecord(DocumentChunkCreate):
@@ -133,11 +144,27 @@ class DatabaseService:
             positions.add(position)
             payloads.append({"document_id": identifier, **chunk.model_dump(mode="json")})
         if payloads:
-            (
-                self._client.table("document_chunks")
-                .insert(payloads, returning="minimal")
-                .execute()
-            )
+            try:
+                (
+                    self._client.table("document_chunks")
+                    .insert(payloads, returning="minimal")
+                    .execute()
+                )
+            except APIError as error:
+                # Code-only diagnostics with a fixed explanation: SDK messages,
+                # details, hints and request headers can contain private data.
+                code = error.code
+                if not isinstance(code, str) or not re.fullmatch(r"(?:[A-Z0-9]{5}|PGRST[0-9]{3})", code):
+                    code = "unknown"
+                reason = (
+                    "unsupported Unicode escape sequence"
+                    if code == "22P05" else "database rejected chunk insert"
+                )
+                logger.warning(
+                    "Chunk insert rejected: type=APIError code=%s reason=%s document_id=%s rows=%d",
+                    code, reason, identifier, len(payloads),
+                )
+                raise
 
     def get_document_chunks(self, document_id: UUID | str) -> list[DocumentChunkRecord]:
         """Fetch all chunks in reading order, including beyond the server row cap.
