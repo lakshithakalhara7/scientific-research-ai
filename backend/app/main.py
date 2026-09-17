@@ -1,4 +1,6 @@
 from fastapi import FastAPI
+from fastapi import HTTPException
+from google.genai import errors
 
 from app.models.schemas import (
     AnalysisRequest,
@@ -21,15 +23,14 @@ def home():
     }
 
 
-@app.post("/analyze",
-          response_model=AnalysisResponse)
+
+
+@app.post("/analyze", response_model=AnalysisResponse)
 def analyze(request: AnalysisRequest):
-
-    result = analysis_agent.analyze(
-        request.question,
-        request.chunks
-    )
-
-    return AnalysisResponse(
-        analysis=result
-    )
+    try:
+        result = analysis_agent.analyze(request.question, request.chunks)
+    except errors.ServerError:
+        raise HTTPException(status_code=503, detail="The AI model is temporarily overloaded. Please try again shortly.")
+    except (json.JSONDecodeError, KeyError):
+        raise HTTPException(status_code=502, detail="Model returned an unexpected format.")
+    return result

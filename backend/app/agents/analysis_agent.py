@@ -1,3 +1,5 @@
+# analysis_agent.py
+import json
 from app.services.llm_service import LLMService
 
 
@@ -7,7 +9,6 @@ class AnalysisAgent:
         self.llm = LLMService()
 
     def analyze(self, question, chunks):
-
         context = "\n\n".join(chunks)
 
         prompt = f"""
@@ -20,17 +21,21 @@ Research Context:
 {context}
 
 Instructions:
-
 1. Summarize the research findings.
 2. Extract key findings.
 3. Identify methods/models used.
 4. Only use the provided research context.
-5. If information is missing from the context, clearly say so.
+5. If information is missing from the context, clearly say so in the conclusion.
 6. Avoid unsupported claims or assumptions.
-7. Base the analysis strictly on the provided context.
-8. Provide a clear, concise, and academic response.
 
-Your response should be structured and easy to understand.
+Respond ONLY with valid JSON, no markdown formatting, no code fences, matching exactly this shape:
+{{
+  "summary": "string",
+  "key_findings": ["string", "string"],
+  "methods": ["string", "string"],
+  "conclusion": "string"
+}}
 """
-
-        return self.llm.generate_response(prompt)
+        raw = self.llm.generate_response(prompt)
+        cleaned = raw.strip().removeprefix("```json").removeprefix("```").removesuffix("```").strip()
+        return json.loads(cleaned)

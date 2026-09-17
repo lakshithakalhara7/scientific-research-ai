@@ -8,4 +8,7 @@ class AnalysisRequest(BaseModel):
 
 
 class AnalysisResponse(BaseModel):
-    analysis: str
+    summary: str
+    key_findings: List[str]
+    methods: List[str]
+    conclusion: str
