@@ -1,4 +1,5 @@
 from typing import Dict, Any
+from uuid import UUID
 
 from app.services.nlp_service import preprocess_text
 from app.services.retrieval_service import search_documents
@@ -19,7 +20,9 @@ class RetrievalAgent:
     def run(
         self,
         query: str,
-        top_k: int = 5
+        top_k: int = 5,
+        *,
+        document_id: UUID | str | None = None,
     ) -> Dict[str, Any]:
 
         # ------------------------------------------
@@ -59,7 +62,8 @@ class RetrievalAgent:
 
         results = search_documents(
             query=clean_query,
-            top_k=top_k
+            top_k=top_k,
+            document_id=document_id,
         )
 
         # ------------------------------------------

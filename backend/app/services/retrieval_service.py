@@ -1,9 +1,11 @@
 import math
 from typing import Dict, List
+from uuid import UUID
 
 from .nlp_service import preprocess_text
 from .retrieval_index_service import (
     clear_retrieval_cache,
+    get_document_retrieval_resources,
     get_retrieval_resources,
     refresh_retrieval_index,
 )
@@ -48,11 +50,14 @@ def get_reference_penalty(text: str) -> float:
 
 def search_documents(
     query: str,
-    top_k: int = 5
+    top_k: int = 5,
+    *,
+    document_id: UUID | str | None = None,
 ) -> List[Dict]:
 
     inverted_index, chunk_store = (
-        get_retrieval_resources()
+        get_retrieval_resources() if document_id is None
+        else get_document_retrieval_resources(document_id)
     )
 
     # ----------------------------------------------

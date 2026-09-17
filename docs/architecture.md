@@ -19,11 +19,12 @@ flowchart TD
     C --> N["Existing NLTK preprocessing"]
     N --> T["PostgreSQL document_chunks: raw text, processed text and token count"]
     T --> I["Prepare Supabase-only inverted index / BM25 snapshot"]
-    L["Local PDF index: only when no usable cloud chunks"] -. fallback .-> B
+    L["Local PDF index: query-only fallback when no usable cloud chunks"] -. fallback .-> RS
     I --> F["Mark document indexed, then publish index snapshot"]
-    F --> B["Existing BM25 ranked retrieval"]
-    Q["POST /agents/retrieve"] --> R["Retrieval Agent: Member 1"]
-    R --> B
+    F --> RS["Select whole corpus or one document's chunks and postings"]
+    Q["POST /agents/retrieve: query, optional document_id"] --> R["Retrieval Agent: Member 1"]
+    R --> RS
+    RS --> B["Existing BM25 ranked retrieval"]
     B --> J["Structured evidence JSON"]
     J -. future handoff .-> AN["Analysis Agent: Member 2"]
     AN -. future handoff .-> VE["Verification Agent: Member 3"]
@@ -50,7 +51,7 @@ No vectors, embeddings, or external retrieval framework are introduced.
 | `app/services/nlp_service.py` | Existing NLTK tokenization, filtering, and lemmatization. |
 | `app/services/database_service.py` | Typed document/chunk persistence and indexed-document reads. |
 | `app/services/storage_service.py` | Upload/download/delete individual PDF objects in the existing private bucket. |
-| `app/services/retrieval_index_service.py` | Select usable persistent rows or local fallback, remove repeated source identities, and coordinate cached index refresh and publication. |
+| `app/services/retrieval_index_service.py` | Select usable persistent rows or local fallback for whole-corpus retrieval; validate and prepare a single-document view for scoped retrieval; coordinate cached index refresh and publication. |
 | `app/services/indexing_service.py` | Existing inverted index; reuse stored processed tokens when available. |
 | `app/services/retrieval_service.py` | Existing BM25 ranking and evidence selection. |
 | `app/agents/retrieval_agent.py` | Existing query validation and structured evidence interface. |
@@ -109,9 +110,10 @@ documents. Local chunk IDs retain `<filename>_p<page_number>_c<chunk_number>`.
 Local PDFs are not uploaded automatically, deleted, or added to Git. Controlled
 corpus migration remains separate work.
 
-The first retrieval query builds and caches a completed snapshot. Later queries
-reuse it and do not requery Supabase or rebuild the index. If Supabase is
-unconfigured or unavailable on first load, local retrieval remains available. A
+The first query without `document_id` builds and caches a completed snapshot.
+Later queries without `document_id` reuse it and do not requery Supabase or rebuild
+the index. If Supabase is unconfigured or unavailable on first load, local
+retrieval remains available. A
 database failure other than missing/invalid configuration emits a sanitized
 warning and the local-only snapshot remains cached until explicit refresh or
 restart. It does not silently retry database reads on every query.
@@ -127,10 +129,49 @@ the cache with local fallback. Normal persistent reads include only `indexed`
 documents, so failed documents do not become evidence.
 
 `clear_retrieval_cache()` discards the snapshot for explicit reload on the next
-query. Use one backend worker for this academic prototype. Index state and locks
-are per process: separate workers or backend instances need their own explicit
-refresh or restart to observe changes made elsewhere. Distributed cache
+query without `document_id`. Use one backend worker for this academic prototype.
+Index state and locks are per process: separate workers or backend instances need
+their own explicit refresh or restart to observe changes made elsewhere. Distributed cache
 invalidation and concurrent corpus administration are not implemented.
+
+## Retrieval within a selected document
+
+`POST /agents/retrieve` accepts the existing `query` string and an optional UUID
+`document_id`. Omitting the ID retains whole-corpus retrieval and its existing
+Supabase-primary/local-fallback behavior. Supplying it restricts evidence to that
+uploaded document, independently of filename or similarly worded passages in
+other papers.
+
+For a nonempty query with searchable terms, each scoped request reads the selected
+document's current metadata through the database service. The document must exist
+and have status `indexed`, even if its chunks are in the process's active snapshot.
+If that snapshot contains the document, retrieval filters both its chunk store and
+its inverted-index postings before BM25 computes corpus statistics and ranks
+results. It does not rank the full corpus and filter the top results afterward.
+
+If the document is absent from the active snapshot, or the cache is cold, retrieval
+reads only that document's persistent chunks and builds an index for this request.
+It neither rebuilds the global corpus nor publishes this smaller index into the
+shared cache. No separate document cache is added. Subsequent scoped requests for
+an uncached document read its chunks again; cached documents reuse their existing
+tokens and postings after the metadata check. Ingestion's global snapshot refresh
+and atomic publication are unchanged.
+
+Scoped requests never load local PDFs or substitute evidence from other documents.
+Missing metadata returns HTTP 404; a document not yet indexed, or an indexed
+document without usable chunks, returns 409. Configuration or cloud-read failures
+return a sanitized 503. An invalid UUID or malformed request receives FastAPI's
+422 validation response. Existing agent responses for empty or stopword-only
+queries remain unchanged and occur before document metadata lookup; request schema
+validation still happens first. Unexpected retrieval processing failures return
+a sanitized 500. An indexed document with usable chunks but no
+matching terms returns successful retrieval with an empty results list.
+
+The BM25 formula is unchanged. Scores may differ between whole-corpus and scoped
+queries because the corpus statistics are computed from different chunks. The
+existing two-chunks-per-paper limit still applies, including when one document is
+selected. This supports upload, questions about the selected paper, and structured
+evidence for Member 2; it does not generate an analysis or summary.
 
 ## Lifecycle and partial failures
 
@@ -157,8 +198,9 @@ incomplete records.
 
 ## Evidence handoff and team scope
 
-`POST /agents/retrieve` retains its existing `ResearchQuery` request. The success
-response contains `agent`, `status`, `original_query`, `processed_query`,
+`POST /agents/retrieve` extends `ResearchQuery` with optional `document_id` while
+retaining query-only requests. The success response shape is unchanged and contains
+`agent`, `status`, `original_query`, `processed_query`,
 `total_results`, and `results`. Each result preserves `chunk_id`, `filename`,
 `category`, `page_number`, `chunk_number`, `score`, `matched_terms`, and original
 `text`. Uploaded sources additionally include the stable `document_id`.

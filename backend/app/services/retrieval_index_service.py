@@ -12,7 +12,7 @@ from uuid import UUID
 
 from ..core.config import SupabaseConfigurationError
 from .chunking_service import create_document_chunks
-from .database_service import DatabaseService
+from .database_service import DatabaseService, DocumentChunkRecord, DocumentRecord
 from .document_service import load_all_research_papers
 from .indexing_service import build_inverted_index
 from .nlp_service import preprocess_text
@@ -25,6 +25,35 @@ _resources: tuple[dict, dict] | None = None
 
 class RetrievalSourceError(RuntimeError):
     """Persistent chunks could not be read; excludes raw SDK request details."""
+
+
+class DocumentRetrievalError(RuntimeError):
+    """Safe document-scope failure that the API can map to an HTTP response."""
+
+    def __init__(self, status_code: int, message: str) -> None:
+        super().__init__(message)
+        self.status_code = status_code
+        self.message = message
+
+
+def _adapt_document_chunks(
+    document: DocumentRecord, records: list[DocumentChunkRecord]
+) -> list[dict]:
+    chunks: list[dict] = []
+    for record in records:
+        chunk = {
+            "chunk_id": str(record.id),
+            "document_id": str(document.id),
+            "filename": document.original_filename,
+            "category": document.category or "uncategorized",
+            "page_number": record.page_number,
+            "chunk_number": record.chunk_number,
+            "text": record.chunk_text,
+        }
+        if record.processed_text is not None:
+            chunk["processed_tokens"] = record.processed_text.split()
+        chunks.append(chunk)
+    return chunks
 
 
 def _persistent_chunks(
@@ -47,19 +76,7 @@ def _persistent_chunks(
         records = database.get_document_chunks(document.id)
         if str(document.id) == pending_id and not records:
             raise RetrievalSourceError("No persisted chunks are available for the new document.")
-        for record in records:
-            chunk = {
-                "chunk_id": str(record.id),
-                "document_id": str(document.id),
-                "filename": document.original_filename,
-                "category": document.category or "uncategorized",
-                "page_number": record.page_number,
-                "chunk_number": record.chunk_number,
-                "text": record.chunk_text,
-            }
-            if record.processed_text is not None:
-                chunk["processed_tokens"] = record.processed_text.split()
-            chunks.append(chunk)
+        chunks.extend(_adapt_document_chunks(document, records))
     return chunks
 
 
@@ -132,6 +149,62 @@ def get_retrieval_resources() -> tuple[dict, dict]:
         if _resources is None:
             _resources = _build_resources(allow_local_fallback=True)
         return _resources
+
+
+def get_document_retrieval_resources(document_id: UUID | str) -> tuple[dict, dict]:
+    """Select a persistent document before scoring, without using local fallback.
+
+    Check current metadata even for a cached document. Reuse its cached postings
+    when present; otherwise read only this document into a request-local index.
+    Neither path modifies the shared corpus snapshot or its publication lifecycle.
+    """
+    try:
+        identifier = str(UUID(str(document_id)))
+    except (ValueError, TypeError, AttributeError):
+        raise DocumentRetrievalError(422, "document_id must be a valid UUID.") from None
+
+    # Coordinate with ingestion's status callback and atomic index publication.
+    with _lock:
+        try:
+            database = DatabaseService()
+            document = database.get_document(identifier)
+        except Exception:
+            raise DocumentRetrievalError(503, "The persistent retrieval source is unavailable.") from None
+        if document is None:
+            raise DocumentRetrievalError(404, "The selected document does not exist.")
+        if str(document.id) != identifier:
+            raise DocumentRetrievalError(503, "The persistent retrieval source is unavailable.")
+        if document.status != "indexed":
+            raise DocumentRetrievalError(409, "The selected document is not indexed yet.")
+
+        if _resources is not None:
+            inverted_index, chunk_store = _resources
+            selected = {
+                chunk_id: chunk for chunk_id, chunk in chunk_store.items()
+                if chunk.get("document_id") == identifier
+            }
+            if selected:
+                # Both postings and corpus statistics must use the chosen scope.
+                scoped_index = {}
+                for term, postings in inverted_index.items():
+                    scoped_postings = {
+                        chunk_id: frequency for chunk_id, frequency in postings.items()
+                        if chunk_id in selected
+                    }
+                    if scoped_postings:
+                        scoped_index[term] = scoped_postings
+                return scoped_index, selected
+
+        try:
+            records = database.get_document_chunks(identifier)
+        except Exception:
+            raise DocumentRetrievalError(503, "The persistent retrieval source is unavailable.") from None
+        if any(str(record.document_id) != identifier for record in records):
+            raise DocumentRetrievalError(503, "The persistent retrieval source is unavailable.")
+        chunks = _usable_persistent_chunks(_adapt_document_chunks(document, records))
+        if not chunks:
+            raise DocumentRetrievalError(409, "The indexed document has no searchable chunks.")
+        return build_inverted_index(chunks)
 
 
 def refresh_retrieval_index(

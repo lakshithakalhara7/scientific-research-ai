@@ -1,13 +1,17 @@
-# Supabase setup and PDF ingestion
+# Supabase setup, PDF ingestion, and retrieval
 
 The backend now supports `POST /documents/upload`: validation, private PDF
 storage, metadata and chunk persistence, and explicit refresh of the existing
 BM25 index. Usable indexed Supabase chunks form the primary corpus; local PDF
 retrieval remains a fallback when that corpus is empty or unavailable at first
 load. The sources are not merged. No local corpus migration occurs automatically.
+`POST /agents/retrieve` also accepts an optional `document_id` to search only one
+indexed uploaded document. These scoped requests require Supabase access and
+never use local fallback.
 
 The existing project, tables, and private bucket can be reused as configured.
-There are no new SQL migrations or database grants for this ingestion change.
+There are no new SQL migrations or database grants for these ingestion and
+retrieval changes.
 Steps 1 and 2 below document initial setup for a new project; do not recreate
 resources that already exist. All cloud provisioning remains manual.
 
@@ -78,10 +82,11 @@ SUPABASE_SECRET_KEY=
 The configuration loader reads that backend file using its absolute path and
 allows process environment variables to take precedence. Missing or invalid
 configuration produces a clear configuration error when Supabase is requested.
-The first retrieval query attempts to load persistent indexed chunks, with local
-corpus fallback when no searchable persistent chunks exist or configuration or
-Supabase is unavailable. Uploads require working Supabase access. Settings and
-the client are cached, so restart the backend after changing credentials.
+The first query without `document_id` attempts to load persistent indexed chunks,
+with local corpus fallback when no searchable persistent chunks exist or
+configuration or Supabase is unavailable. Uploads and scoped queries require
+working Supabase access. Settings and the client are cached, so restart the backend
+after changing credentials.
 
 Never paste actual keys or database passwords into source, documentation, logs,
 screenshots, issue reports, or chat. Never commit `backend/.env`. Never place the
@@ -112,12 +117,14 @@ Use the existing backend virtual environment. From the repository root:
 .\backend\.venv\Scripts\python.exe -m unittest discover -s backend/tests -p test_ingestion*.py -v
 .\backend\.venv\Scripts\python.exe -m unittest discover -s backend/tests -p test_document_upload_api.py -v
 .\backend\.venv\Scripts\python.exe -m unittest discover -s backend/tests -p test_retrieval_index.py -v
+.\backend\.venv\Scripts\python.exe -m unittest discover -s backend/tests -p test_document_retrieval.py -v
+.\backend\.venv\Scripts\python.exe -m unittest discover -s backend/tests -p test_document_retrieval_api.py -v
 .\backend\.venv\Scripts\python.exe test_pdf.py
 .\backend\.venv\Scripts\python.exe test_retrieval_agent.py
 .\backend\.venv\Scripts\python.exe -m pip check
 ```
 
-The foundation, ingestion, upload API, and retrieval-index tests run offline with
+The foundation, ingestion, upload API, retrieval-index, and scoped retrieval tests run offline with
 fake cloud services. Their generated PDFs contain original test text; they do not
 upload existing research papers. The connection test loads configuration,
 initializes the official Supabase client, and queries `documents` without inserting
@@ -183,18 +190,59 @@ uses `documents/{document_id}/{sanitized_filename}`, so duplicate filenames do
 not collide. Chunk UUIDs are assigned by PostgreSQL. Page count is measured before
 the initial metadata insert; the existing status-only update grant is sufficient.
 
-Query a distinctive phrase from the PDF through the existing agent endpoint:
+Query across the current corpus by sending only `query`, as before:
 
 ```powershell
-Invoke-RestMethod -Method Post -Uri "http://127.0.0.1:8000/agents/retrieve" -ContentType "application/json" -Body '{"query":"distinctive phrase from your test PDF"}'
+Invoke-RestMethod -Method Post -Uri "http://127.0.0.1:8000/agents/retrieve" -ContentType "application/json" -Body '{"query":"What classifier was used for breast cancer classification?"}'
 ```
+
+To ask about one uploaded paper, include the `document.id` returned by its upload.
+For the existing document `527aacbb-fe7b-459d-b2a9-5771e90ff989`, send:
+
+```json
+{
+  "query": "What classifier was used for breast cancer classification?",
+  "document_id": "527aacbb-fe7b-459d-b2a9-5771e90ff989"
+}
+```
+
+```powershell
+Invoke-RestMethod -Method Post -Uri "http://127.0.0.1:8000/agents/retrieve" -ContentType "application/json" -Body '{"query":"What classifier was used for breast cancer classification?","document_id":"527aacbb-fe7b-459d-b2a9-5771e90ff989"}'
+```
+
+Both requests use the same endpoint and success-response shape. The first can
+return evidence from any indexed document in the active corpus. The second can
+return evidence only from the selected document; it does not substitute a local
+copy or a different paper. Use a different uploaded UUID when asking about another
+paper. A valid indexed paper with no matching terms produces an empty results list.
 
 Evidence for uploaded sources includes `document_id`, chunk UUID, filename,
 page/chunk position, score, matched terms, and extracted text. The existing custom
-BM25 algorithm ranks the selected corpus: usable Supabase chunks, or the local
-fallback. It does not merge local copies with persistent evidence. Changing the
+BM25 algorithm ranks the chosen corpus: usable Supabase chunks or local fallback
+for query-only requests, and the chosen document's chunks for scoped requests.
+It does not merge local copies with persistent evidence. Changing the
 corpus can change numeric scores through BM25's corpus statistics; the algorithm
-is unchanged. Supabase provides persistence, not a replacement search algorithm.
+is unchanged. The existing two-chunks-per-paper limit applies in either mode, so
+a scoped query returns at most two matching chunks. Supabase provides persistence,
+not a replacement search algorithm. This is evidence retrieval for Member 2's
+future Analysis Agent; it does not generate an answer, analysis, or summary.
+
+For scoped requests with searchable query terms:
+
+| HTTP status | Meaning |
+| --- | --- |
+| 200 | Retrieval completed; all results belong to the selected document, or no terms matched. |
+| 404 | The selected document does not exist. |
+| 409 | The document is not indexed, or it has no usable chunks. |
+| 422 | The UUID or request body is invalid. |
+| 500 | An unexpected retrieval processing failure occurred. |
+| 503 | Configuration or Supabase reads are unavailable. |
+
+Empty or whitespace-only queries retain the existing agent `error` response;
+stopword-only queries retain `no_valid_terms`. These return before a document
+lookup. FastAPI request validation, including UUID validation, still runs first.
+
+Upload status codes remain:
 
 | HTTP status | Meaning |
 | --- | --- |
@@ -214,12 +262,26 @@ Ingestion coordinates `uploaded -> processing -> indexed` through the database
 and storage service abstractions. It uses the existing extraction, chunking, NLP,
 inverted index, and BM25 services; `RetrievalAgent` does not call Supabase directly.
 
-The index is built once on first retrieval and reused by subsequent queries.
+For requests without `document_id`, the index is built once on first retrieval
+and reused by subsequent queries.
 Usable indexed Supabase chunks are the sole primary source. Each usable chunk
 needs nonblank raw text and nonempty processed tokens; existing `processed_text`
 is reused, and NLP runs only when that field is null. If no persistent chunks are
 searchable, the index uses the local corpus. Local PDFs are not loaded when
 usable Supabase chunks exist.
+
+Each scoped request with searchable terms first reads the selected document's
+metadata and requires `indexed` status. If its chunks are already in the active
+snapshot, both the chunk store and postings are filtered to that document before
+BM25 calculates corpus statistics or ranking. This preserves relevant evidence
+that could otherwise be lost by ranking other papers first.
+
+If the snapshot does not contain that document, including when the global cache
+is cold, retrieval reads only the selected document's chunks and prepares an
+index for that request. It never rebuilds the whole corpus or replaces the shared
+snapshot with a one-document index. There is no additional document cache;
+uncached scoped requests read their chunks again. Scoped failures return the
+status codes above without falling back to local PDFs or other documents.
 
 Repeated records are removed by `(document_id, chunk_id)` for Supabase or
 `(filename, page_number, chunk_number)` for local chunks. Identifiers remain
@@ -232,12 +294,15 @@ under a process lock. Failed reads, builds, or final status updates preserve the
 old snapshot and surface a sanitized failure; strict refresh errors do not switch
 to local fallback.
 
-If the first retrieval load cannot reach Supabase, it falls back to local PDFs
-and caches that snapshot until restart or explicit refresh. Database failures
+If the first query-only retrieval load cannot reach Supabase, it falls back to
+local PDFs and caches that snapshot until restart or explicit refresh. Database failures
 other than missing/invalid configuration produce a sanitized warning. Run one
 backend process; multiple workers or instances do not share refresh notifications.
 A direct database edit or an upload made by another process requires refresh or
-restart in each consumer.
+restart in each consumer to update its global snapshot. A scoped request can read
+an indexed document absent from that snapshot directly without changing the
+query-only cache. Scoped metadata checks observe status changes on every request;
+cached chunk content still follows the global snapshot's refresh lifecycle.
 
 On failure after metadata creation, ingestion attempts to mark the row `failed`
 and delete only this attempt's successfully uploaded Storage object. Any already

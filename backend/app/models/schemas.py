@@ -6,6 +6,7 @@ from pydantic import BaseModel, Field
 
 class ResearchQuery(BaseModel):
     query: str
+    document_id: UUID | None = None
 
 
 class UploadedDocument(BaseModel):
