@@ -1,0 +1,5 @@
+Title: Artificial Intelligence in Cancer Detection
+
+Artificial intelligence has been applied to medical imaging for cancer detection. Deep learning models such as convolutional neural networks can analyze medical images and identify patterns associated with cancer.
+
+These systems can support healthcare professionals during diagnosis.
