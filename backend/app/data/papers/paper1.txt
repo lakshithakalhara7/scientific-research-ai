@@ -1,0 +1,5 @@
+Title: Machine Learning for Diabetes Prediction
+
+Machine learning techniques can be used to analyze patient health data and predict the risk of diabetes. Common approaches include logistic regression, decision trees, random forests, and neural networks.
+
+Patient features such as glucose level, age, body mass index, and blood pressure can be used as inputs for diabetes prediction models.
