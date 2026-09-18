@@ -248,6 +248,9 @@ class VerificationService:
             "best_source": best_source,
             "score": best_result["score"],
             "matching_words": best_result["matching_words"],
+            "matched_evidence": best_result.get(
+                "matched_evidence"
+            ),
             "all_results": results
         }
     def verify_answer(self, answer, sources):
@@ -591,10 +594,13 @@ class VerificationService:
             "decision_method": decision_method,
 
             "rule_based": {
-                "status": rule_result["status"],
-                "score": rule_result["score"],
-                "best_source": rule_result["best_source"]
-            },
+            "status": rule_result["status"],
+            "score": rule_result["score"],
+            "best_source": rule_result["best_source"],
+            "matched_evidence": rule_result.get(
+                "matched_evidence"
+            )
+        },
 
             "semantic": semantic_result
         }
@@ -861,18 +867,39 @@ class VerificationService:
         else:
             overall_status = "PARTIALLY_VERIFIED"
 
+        responsible_ai_metadata = (
+            self.build_responsible_ai_metadata(
+                results
+            )
+        )
+
+        warnings = self.build_verification_warnings(
+            results
+        )
         return {
             "overall_status": overall_status,
+
             "total_claims": len(results),
+
             "verified_claims": verified_claims,
+
             "partially_supported_claims":
                 partially_supported_claims,
+
             "contradicted_claims":
                 contradicted_claims,
+
             "insufficient_evidence_claims":
                 insufficient_claims,
+
             "conflicting_claims":
                 conflicting_claims,
+
+            "warnings": warnings,
+
+            "responsible_ai_metadata":
+                responsible_ai_metadata,
+
             "claims": results
         }
 
@@ -960,3 +987,178 @@ class VerificationService:
                 })
 
         return hallucinations
+
+    def build_responsible_ai_metadata(
+        self,
+        verification_results
+    ):
+        """
+        Build transparency and Responsible AI metadata
+        for the final verification response.
+        """
+
+        fallback_count = sum(
+            1
+            for result in verification_results
+            if result.get("decision_method")
+            == "RULE_BASED_FALLBACK"
+        )
+
+        semantic_count = sum(
+            1
+            for result in verification_results
+            if result.get("decision_method")
+            == "SEMANTIC"
+        )
+
+        unsupported_or_uncertain = sum(
+            1
+            for result in verification_results
+            if result.get("final_status") in {
+                "UNSUPPORTED",
+                "NOT_ENOUGH_EVIDENCE",
+                "PARTIALLY_SUPPORTED",
+                "CONFLICTING_EVIDENCE"
+            }
+        )
+
+        contradicted_count = sum(
+            1
+            for result in verification_results
+            if result.get("final_status")
+            == "CONTRADICTED"
+        )
+
+        limitations = []
+
+        if fallback_count > 0:
+            limitations.append(
+                "Semantic verification was unavailable for "
+                "one or more claims. Rule-based verification "
+                "was used as a fallback."
+            )
+
+        if unsupported_or_uncertain > 0:
+            limitations.append(
+                "One or more claims were not fully supported "
+                "by the retrieved evidence."
+            )
+
+        if contradicted_count > 0:
+            limitations.append(
+                "One or more generated claims were contradicted "
+                "by retrieved research evidence."
+            )
+
+        limitations.append(
+            "Verification is limited to the research evidence "
+            "retrieved by the system and does not prove that a "
+            "claim is universally true or false."
+        )
+
+        return {
+            "transparency": {
+                "semantic_verification_used":
+                    semantic_count > 0,
+
+                "rule_based_fallback_used":
+                    fallback_count > 0,
+
+                "semantic_verified_claims":
+                    semantic_count,
+
+                "fallback_verified_claims":
+                    fallback_count
+            },
+
+            "explainability": {
+                "source_attribution_available": True,
+                "matched_evidence_available": True,
+                "verification_reason_available": True
+            },
+
+            "responsible_ai": {
+                "uses_only_retrieved_evidence": True,
+
+                "unsupported_claims_are_flagged": True,
+
+                "contradictions_are_reported": True,
+
+                "uncertainty_is_disclosed": True,
+
+                "external_ai_failure_is_disclosed": True
+            },
+
+            "limitations": limitations
+        }
+    def build_verification_warnings(
+        self,
+        verification_results
+    ):
+        """
+        Create clear warnings for claims that should
+        not be presented as fully verified.
+        """
+
+        warnings = []
+
+        for result in verification_results:
+
+            status = result.get("final_status")
+
+            if status == "UNSUPPORTED":
+
+                warnings.append({
+                    "claim": result["claim"],
+                    "type": "UNSUPPORTED_CLAIM",
+                    "message": (
+                        "This claim is not supported by "
+                        "the retrieved research evidence."
+                    )
+                })
+
+            elif status == "NOT_ENOUGH_EVIDENCE":
+
+                warnings.append({
+                    "claim": result["claim"],
+                    "type": "INSUFFICIENT_EVIDENCE",
+                    "message": (
+                        "The retrieved evidence is insufficient "
+                        "to verify this claim."
+                    )
+                })
+
+            elif status == "CONTRADICTED":
+
+                warnings.append({
+                    "claim": result["claim"],
+                    "type": "CONTRADICTED_CLAIM",
+                    "message": (
+                        "Retrieved research evidence contradicts "
+                        "this claim."
+                    )
+                })
+
+            elif status == "PARTIALLY_SUPPORTED":
+
+                warnings.append({
+                    "claim": result["claim"],
+                    "type": "PARTIAL_SUPPORT",
+                    "message": (
+                        "Only part of this claim is supported "
+                        "by the retrieved evidence."
+                    )
+                })
+
+            elif status == "CONFLICTING_EVIDENCE":
+
+                warnings.append({
+                    "claim": result["claim"],
+                    "type": "CONFLICTING_EVIDENCE",
+                    "message": (
+                        "Retrieved research sources disagree "
+                        "about this claim."
+                    )
+                })
+
+        return warnings    
