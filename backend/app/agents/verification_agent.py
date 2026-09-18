@@ -45,27 +45,57 @@ class VerificationAgent:
         )
 
         return result
+    def hybrid_verify_answer(self, answer, sources):
+        """
+        Run hybrid verification on a complete AI-generated answer.
+        """
 
+        return self.verification_service.hybrid_verify_answer(
+            answer,
+            sources
+        )
 
 if __name__ == "__main__":
 
+    from pprint import pprint
+
     agent = VerificationAgent()
 
-    claim = (
-        "The technique increases predictive performance."
+    answer = (
+        "Contrastive learning improves transferability. "
+        "Supervised learning performs strongly on "
+        "specialized classification tasks. "
+        "The dataset contained one million medical images."
     )
 
-    evidence = (
-        "The experiment used a ResNet-50 architecture "
-        "and was trained for 100 epochs."
+    sources = [
+        {
+            "source": "paper1.txt",
+            "text": (
+                "The proposed contrastive learning approach "
+                "showed improved transfer performance across "
+                "multiple downstream datasets."
+            )
+        },
+        {
+            "source": "paper2.txt",
+            "text": (
+                "Supervised learning achieved strong performance "
+                "on specialized classification tasks."
+            )
+        },
+        {
+            "source": "paper3.txt",
+            "text": (
+                "The experiments used a ResNet-50 architecture "
+                "trained for 100 epochs."
+            )
+        }
+    ]
+
+    result = agent.hybrid_verify_answer(
+        answer,
+        sources
     )
 
-    result = (
-        agent.verification_service
-        .semantic_verify_claim(
-            claim,
-            evidence
-        )
-    )
-
-    print(result)
+    pprint(result)

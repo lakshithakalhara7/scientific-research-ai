@@ -383,6 +383,250 @@ class VerificationService:
             )
         }
 
+    def semantic_verify_against_sources(self, claim, sources):
+        """
+        Semantically verify one claim against all retrieved
+        scientific sources in a single Gemini request.
+        """
+
+        if not sources:
+            return {
+                "claim": claim,
+                "status": "NOT_ENOUGH_EVIDENCE",
+                "supported_sources": [],
+                "contradicted_sources": [],
+                "reason": "No research sources were provided."
+            }
+
+        evidence_sections = []
+
+        for source in sources:
+            evidence_sections.append(
+                f"""
+    SOURCE: {source["source"]}
+    EVIDENCE:
+    {source["text"]}
+    """
+            )
+
+        combined_evidence = "\n".join(evidence_sections)
+
+        prompt = f"""
+    You are a Scientific Research Verification Agent.
+
+    Verify the scientific claim using ONLY the research
+    evidence supplied below.
+
+    CLAIM:
+    {claim}
+
+    RESEARCH SOURCES:
+    {combined_evidence}
+
+    Classify the claim as exactly one of:
+
+    SUPPORTED
+    - One or more sources clearly support the claim and
+    there is no clear contradictory source.
+
+    CONTRADICTED
+    - One or more sources clearly contradict the claim and
+    there is no clear supporting source.
+
+    CONFLICTING_EVIDENCE
+    - At least one source supports the claim and at least
+    one other source contradicts it.
+
+    NOT_ENOUGH_EVIDENCE
+    - The sources do not provide enough information.
+
+    Rules:
+    1. Use ONLY the provided evidence.
+    2. Do not use outside knowledge.
+    3. Do not invent source names.
+    4. Do not assume missing information.
+    5. Be conservative when evidence is unclear.
+    6. Return ONLY valid JSON.
+    7. Do not use markdown code fences.
+
+    Return exactly:
+
+    {{
+        "status": "SUPPORTED | CONTRADICTED | CONFLICTING_EVIDENCE | NOT_ENOUGH_EVIDENCE",
+        "supported_sources": [],
+        "contradicted_sources": [],
+        "reason": "short evidence-based explanation"
+    }}
+    """
+
+        try:
+            raw_response = self.llm.generate_response(prompt)
+
+        except Exception as error:
+            return {
+                "claim": claim,
+                "status": "VERIFICATION_UNAVAILABLE",
+                "supported_sources": [],
+                "contradicted_sources": [],
+                "reason": (
+                    "Semantic verification is temporarily unavailable. "
+                    f"Error: {type(error).__name__}"
+                )
+            }
+
+        cleaned_response = (
+            raw_response
+            .strip()
+            .removeprefix("```json")
+            .removeprefix("```")
+            .removesuffix("```")
+            .strip()
+        )
+
+        try:
+            result = json.loads(cleaned_response)
+
+        except json.JSONDecodeError:
+            return {
+                "claim": claim,
+                "status": "VERIFICATION_UNAVAILABLE",
+                "supported_sources": [],
+                "contradicted_sources": [],
+                "reason": (
+                    "The semantic verification model returned "
+                    "an invalid JSON response."
+                )
+            }
+
+        allowed_statuses = {
+            "SUPPORTED",
+            "CONTRADICTED",
+            "CONFLICTING_EVIDENCE",
+            "NOT_ENOUGH_EVIDENCE"
+        }
+
+        status = result.get("status")
+
+        if status not in allowed_statuses:
+            status = "VERIFICATION_UNAVAILABLE"
+
+        return {
+            "claim": claim,
+            "status": status,
+            "supported_sources": result.get(
+                "supported_sources",
+                []
+            ),
+            "contradicted_sources": result.get(
+                "contradicted_sources",
+                []
+            ),
+            "reason": result.get(
+                "reason",
+                "No explanation was provided."
+            )
+        }
+    def hybrid_verify_against_sources(self, claim, sources):
+        """
+        Combine rule-based and semantic verification.
+        """
+
+        rule_result = self.verify_against_sources(
+            claim,
+            sources
+        )
+
+        semantic_result = self.semantic_verify_against_sources(
+            claim,
+            sources
+        )
+
+        if semantic_result["status"] == "VERIFICATION_UNAVAILABLE":
+            final_status = rule_result["status"]
+            decision_method = "RULE_BASED_FALLBACK"
+
+        else:
+            final_status = semantic_result["status"]
+            decision_method = "SEMANTIC"
+
+        return {
+            "claim": claim,
+            "final_status": final_status,
+            "decision_method": decision_method,
+
+            "rule_based": {
+                "status": rule_result["status"],
+                "score": rule_result["score"],
+                "best_source": rule_result["best_source"]
+            },
+
+            "semantic": semantic_result
+        }
+
+    def hybrid_verify_answer(self, answer, sources):
+        """
+        Verify every claim in a complete AI-generated answer
+        using rule-based and semantic verification.
+        """
+
+        claims = self.extract_claims(answer)
+
+        results = []
+
+        for claim in claims:
+
+            result = self.hybrid_verify_against_sources(
+                claim,
+                sources
+            )
+
+            results.append(result)
+
+        verified_claims = sum(
+            1
+            for result in results
+            if result["final_status"] == "SUPPORTED"
+        )
+
+        contradicted_claims = sum(
+            1
+            for result in results
+            if result["final_status"] == "CONTRADICTED"
+        )
+
+        insufficient_claims = sum(
+            1
+            for result in results
+            if result["final_status"] == "NOT_ENOUGH_EVIDENCE"
+        )
+
+        conflicting_claims = sum(
+            1
+            for result in results
+            if result["final_status"] == "CONFLICTING_EVIDENCE"
+        )
+
+        if len(results) == 0:
+            overall_status = "UNVERIFIED"
+
+        elif verified_claims == len(results):
+            overall_status = "VERIFIED"
+
+        else:
+            overall_status = "PARTIALLY_VERIFIED"
+
+        return {
+            "answer": answer,
+            "overall_status": overall_status,
+            "total_claims": len(results),
+
+            "verified_claims": verified_claims,
+            "contradicted_claims": contradicted_claims,
+            "insufficient_evidence_claims": insufficient_claims,
+            "conflicting_claims": conflicting_claims,
+
+            "claims": results
+        }
     #hallucination detection method
     def detect_hallucinations(self, verification_results):
         """
