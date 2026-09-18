@@ -54,7 +54,20 @@ class VerificationAgent:
             answer,
             sources
         )
+    def verify_analysis(
+        self,
+        analysis_output,
+        retrieval_output
+    ):
+        """
+        Verify the Analysis Agent output against
+        Retrieval Agent evidence.
+        """
 
+        return self.verification_service.verify_analysis_output(
+            analysis_output,
+            retrieval_output
+        )
 if __name__ == "__main__":
 
     from pprint import pprint

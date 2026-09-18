@@ -127,36 +127,71 @@ class VerificationService:
 
     def verify_claim(self, claim, evidence):
         """
-        Compare a claim with evidence.
+        Rule-based verification using the most relevant
+        evidence sentence instead of the whole source chunk.
         """
 
-        claim_words = self.get_important_words(claim)
-        evidence_words = self.get_important_words(evidence)
-
-        matching_words = claim_words.intersection(evidence_words)
-
-        if len(claim_words) == 0:
-            score = 0
-        else:
-            score = len(matching_words) / len(claim_words)
-
-        has_negation_difference = self.detect_contradiction(
-            claim,
+        evidence_sentences = self.split_into_sentences(
             evidence
+        )
+
+        if not evidence_sentences:
+            return {
+                "claim": claim,
+                "status": "UNSUPPORTED",
+                "score": 0.0,
+                "matching_words": [],
+                "contradiction": False,
+                "matched_evidence": None
+            }
+
+        best_sentence = None
+        best_score = 0.0
+        best_matching_words = []
+
+        for sentence in evidence_sentences:
+
+            score, matching_words = (
+                self.calculate_overlap_score(
+                    claim,
+                    sentence
+                )
+            )
+
+            if score > best_score:
+                best_score = score
+                best_sentence = sentence
+                best_matching_words = matching_words
+
+        if best_sentence is None:
+            return {
+                "claim": claim,
+                "status": "UNSUPPORTED",
+                "score": 0.0,
+                "matching_words": [],
+                "contradiction": False,
+                "matched_evidence": None
+            }
+
+        has_negation_difference = (
+            self.detect_contradiction(
+                claim,
+                best_sentence
+            )
         )
 
         is_contradiction = (
             has_negation_difference
-            and score >= 0.3
-)   
+            and best_score >= 0.6
+        )
 
-        if is_contradiction and score >= 0.3:
+        if is_contradiction:
             status = "CONTRADICTED"
 
-        elif score >= 0.6:
+        elif best_score >= 0.6:
             status = "SUPPORTED"
 
-        elif score >= 0.3:
+        elif best_score >= 0.3:
             status = "PARTIALLY_SUPPORTED"
 
         else:
@@ -165,9 +200,10 @@ class VerificationService:
         return {
             "claim": claim,
             "status": status,
-            "score": round(score, 2),
-            "matching_words": list(matching_words),
-            "contradiction": is_contradiction
+            "score": best_score,
+            "matching_words": best_matching_words,
+            "contradiction": is_contradiction,
+            "matched_evidence": best_sentence
         }
     def verify_against_sources(self, claim, sources):
         """
@@ -627,6 +663,261 @@ class VerificationService:
 
             "claims": results
         }
+
+    def prepare_sources_from_retrieval(self, retrieval_output):
+        """
+        Convert the Retrieval Agent output into the source
+        format required by the Verification Agent.
+        """
+
+        sources = []
+
+        if not isinstance(retrieval_output, dict):
+            return sources
+
+        retrieval_results = retrieval_output.get(
+            "results",
+            []
+        )
+
+        for result in retrieval_results:
+
+            text = result.get("text", "").strip()
+
+            if not text:
+                continue
+
+            filename = result.get(
+                "filename",
+                "unknown_source"
+            )
+
+            page_number = result.get(
+                "page_number",
+                "unknown"
+            )
+
+            chunk_number = result.get(
+                "chunk_number",
+                "unknown"
+            )
+
+            source_name = (
+                f"{filename} "
+                f"(page {page_number}, chunk {chunk_number})"
+            )
+
+            sources.append({
+                "source": source_name,
+                "text": text,
+                "filename": filename,
+                "page_number": page_number,
+                "chunk_number": chunk_number,
+                "chunk_id": result.get("chunk_id"),
+                "retrieval_score": result.get("score")
+            })
+
+        return sources
+
+    def extract_analysis_claims(self, analysis_output):
+        """
+        Extract verifiable claims from the structured
+        output produced by the Analysis Agent.
+        """
+
+        claims = []
+
+        if not isinstance(analysis_output, dict):
+            return claims
+
+        summary = analysis_output.get(
+            "summary",
+            ""
+        )
+
+        for claim in self.extract_claims(summary):
+            claims.append({
+                "section": "summary",
+                "claim": claim
+            })
+
+        key_findings = analysis_output.get(
+            "key_findings",
+            []
+        )
+
+        for finding in key_findings:
+
+            for claim in self.extract_claims(finding):
+                claims.append({
+                    "section": "key_findings",
+                    "claim": claim
+                })
+
+        methods = analysis_output.get(
+            "methods",
+            []
+        )
+
+        for method in methods:
+
+            if method and method.strip():
+                claims.append({
+                    "section": "methods",
+                    "claim": method.strip()
+                })
+
+        conclusion = analysis_output.get(
+            "conclusion",
+            ""
+        )
+
+        for claim in self.extract_claims(conclusion):
+            claims.append({
+                "section": "conclusion",
+                "claim": claim
+            })
+
+        return claims
+
+    def verify_analysis_output(
+        self,
+        analysis_output,
+        retrieval_output
+    ):
+        """
+        Verify the actual Analysis Agent output against
+        evidence returned by the Retrieval Agent.
+        """
+
+        sources = self.prepare_sources_from_retrieval(
+            retrieval_output
+        )
+
+        analysis_claims = self.extract_analysis_claims(
+            analysis_output
+        )
+
+        results = []
+
+        for item in analysis_claims:
+
+            verification = (
+                self.hybrid_verify_against_sources(
+                    item["claim"],
+                    sources
+                )
+            )
+
+            verification["section"] = item["section"]
+
+            results.append(verification)
+
+        verified_claims = sum(
+            1
+            for result in results
+            if result["final_status"] == "SUPPORTED"
+        )
+
+        partially_supported_claims = sum(
+            1
+            for result in results
+            if result["final_status"]
+            == "PARTIALLY_SUPPORTED"
+        )
+
+        contradicted_claims = sum(
+            1
+            for result in results
+            if result["final_status"]
+            == "CONTRADICTED"
+        )
+
+        insufficient_claims = sum(
+            1
+            for result in results
+            if result["final_status"] in {
+                "UNSUPPORTED",
+                "NOT_ENOUGH_EVIDENCE"
+            }
+        )
+
+        conflicting_claims = sum(
+            1
+            for result in results
+            if result["final_status"]
+            == "CONFLICTING_EVIDENCE"
+        )
+
+        if not results:
+            overall_status = "UNVERIFIED"
+
+        elif verified_claims == len(results):
+            overall_status = "VERIFIED"
+
+        elif verified_claims == 0:
+            overall_status = "UNVERIFIED"
+
+        else:
+            overall_status = "PARTIALLY_VERIFIED"
+
+        return {
+            "overall_status": overall_status,
+            "total_claims": len(results),
+            "verified_claims": verified_claims,
+            "partially_supported_claims":
+                partially_supported_claims,
+            "contradicted_claims":
+                contradicted_claims,
+            "insufficient_evidence_claims":
+                insufficient_claims,
+            "conflicting_claims":
+                conflicting_claims,
+            "claims": results
+        }
+
+    def split_into_sentences(self, text):
+        """
+        Split evidence into smaller sentences for
+        more reliable rule-based verification.
+        """
+
+        if not text:
+            return []
+
+        sentences = re.split(
+            r'(?<=[.!?])\s+',
+            text.strip()
+        )
+
+        return [
+            sentence.strip()
+            for sentence in sentences
+            if sentence.strip()
+        ]
+    def calculate_overlap_score(self, claim, evidence):
+        """
+        Calculate lexical overlap between a claim
+        and one piece of evidence.
+        """
+
+        claim_words = self.get_important_words(claim)
+        evidence_words = self.get_important_words(evidence)
+
+        if not claim_words:
+            return 0.0, []
+
+        matching_words = claim_words.intersection(
+            evidence_words
+        )
+
+        score = (
+            len(matching_words)
+            / len(claim_words)
+        )
+
+        return round(score, 2), list(matching_words)
+
     #hallucination detection method
     def detect_hallucinations(self, verification_results):
         """
