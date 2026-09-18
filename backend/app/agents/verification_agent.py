@@ -56,8 +56,8 @@ if __name__ == "__main__":
     )
 
     evidence = (
-    "The proposed approach did not improve "
-    "predictive performance compared with the baseline."
+        "The experiment used a ResNet-50 architecture "
+        "and was trained for 100 epochs."
     )
 
     result = (
