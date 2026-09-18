@@ -1,8 +1,12 @@
-from typing import Literal
+from typing import List, Literal
 from uuid import UUID
 
 from pydantic import BaseModel, Field
 
+
+# =========================
+# Member 1 - Retrieval
+# =========================
 
 class ResearchQuery(BaseModel):
     query: str
@@ -24,3 +28,19 @@ class UploadedDocument(BaseModel):
 class DocumentUploadResponse(BaseModel):
     status: Literal["success"]
     document: UploadedDocument
+
+
+# =========================
+# Member 2 - Analysis Agent
+# =========================
+
+class AnalysisRequest(BaseModel):
+    question: str
+    chunks: List[str]
+
+
+class AnalysisResponse(BaseModel):
+    summary: str
+    key_findings: List[str]
+    methods: List[str]
+    conclusion: str
