@@ -49,45 +49,23 @@ class VerificationAgent:
 
 if __name__ == "__main__":
 
-    from pprint import pprint
-
     agent = VerificationAgent()
 
-    answer = (
-        "Contrastive learning improves transferability. "
-        "Supervised learning achieved strong results "
-        "on specialized classification tasks. "
-        "The dataset contained one million medical images."
+    claim = (
+        "The technique increases predictive performance."
     )
 
-    sources = [
-        {
-            "source": "paper1.txt",
-            "text": (
-                "The study found that contrastive learning "
-                "demonstrated improved transferability "
-                "across downstream tasks."
-            )
-        },
-        {
-            "source": "paper2.txt",
-            "text": (
-                "Supervised learning achieved strong results "
-                "on specialized classification tasks."
-            )
-        },
-        {
-            "source": "paper3.txt",
-            "text": (
-                "Deep neural networks require significant "
-                "computational resources for training."
-            )
-        }
-    ]
-
-    result = agent.verify_answer(
-        answer,
-        sources
+    evidence = (
+    "The proposed approach did not improve "
+    "predictive performance compared with the baseline."
     )
 
-    pprint(result)
+    result = (
+        agent.verification_service
+        .semantic_verify_claim(
+            claim,
+            evidence
+        )
+    )
+
+    print(result)

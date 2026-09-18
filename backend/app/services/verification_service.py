@@ -1,4 +1,8 @@
 import re
+import json
+
+from app.services.llm_service import LLMService
+
 STOP_WORDS = {
     "the",
     "a",
@@ -43,6 +47,8 @@ class VerificationService:
     Contains the basic logic used to check whether
     a scientific claim is supported by retrieved evidence.
     """
+    def __init__(self):
+        self.llm = LLMService()
 
     def clean_text(self, text):
         """
@@ -281,6 +287,100 @@ class VerificationService:
             "hallucination_detected": len(hallucinations) > 0,
             "hallucinations": hallucinations,
             "claims": verification_results
+        }
+
+    def semantic_verify_claim(self, claim, evidence):
+        """
+        Use Gemini to semantically verify a scientific claim
+        against provided research evidence.
+        """
+
+        prompt = f"""
+    You are a Scientific Research Verification Agent.
+
+    Your task is to verify a generated scientific claim using
+    ONLY the provided research evidence.
+
+    CLAIM:
+    {claim}
+
+    EVIDENCE:
+    {evidence}
+
+    Classify the claim as exactly one of:
+
+    SUPPORTED
+    - The evidence clearly supports the claim.
+
+    CONTRADICTED
+    - The evidence clearly conflicts with the claim.
+
+    NOT_ENOUGH_EVIDENCE
+    - The evidence does not provide enough information to verify
+    or contradict the claim.
+
+    Important rules:
+    1. Use ONLY the provided evidence.
+    2. Do not use outside knowledge.
+    3. Do not assume missing information.
+    4. Be conservative when evidence is unclear.
+    5. Return ONLY valid JSON.
+    6. Do not use markdown or code fences.
+
+    Return exactly this structure:
+
+    {{
+        "status": "SUPPORTED | CONTRADICTED | NOT_ENOUGH_EVIDENCE",
+        "reason": "short explanation based only on the evidence"
+    }}
+    """
+
+        raw_response = self.llm.generate_response(prompt)
+
+        cleaned_response = (
+            raw_response
+            .strip()
+            .removeprefix("```json")
+            .removeprefix("```")
+            .removesuffix("```")
+            .strip()
+        )
+
+        try:
+            result = json.loads(cleaned_response)
+
+        except json.JSONDecodeError:
+
+            return {
+                "status": "NOT_ENOUGH_EVIDENCE",
+                "reason": (
+                    "The semantic verification model returned "
+                    "an invalid response."
+                )
+            }
+
+        allowed_statuses = {
+            "SUPPORTED",
+            "CONTRADICTED",
+            "NOT_ENOUGH_EVIDENCE"
+        }
+
+        if result.get("status") not in allowed_statuses:
+
+            return {
+                "status": "NOT_ENOUGH_EVIDENCE",
+                "reason": (
+                    "The semantic verification model returned "
+                    "an invalid verification status."
+                )
+            }
+
+        return {
+            "status": result["status"],
+            "reason": result.get(
+                "reason",
+                "No explanation was provided."
+            )
         }
 
     #hallucination detection method
