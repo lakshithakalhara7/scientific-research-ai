@@ -3,3 +3,9 @@ uvicorn
 google-genai
 python-dotenv
 pydantic
+pydantic-settings
+supabase
+nltk
+pymupdf
+python-multipart
+httpx
