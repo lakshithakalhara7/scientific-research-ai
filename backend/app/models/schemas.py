@@ -1,4 +1,4 @@
-from typing import List, Literal
+from typing import Any, Dict, List, Literal
 from uuid import UUID
 
 from pydantic import BaseModel, Field
@@ -44,3 +44,17 @@ class AnalysisResponse(BaseModel):
     key_findings: List[str]
     methods: List[str]
     conclusion: str
+
+# =========================
+# Member 3 - Verification
+# =========================
+
+
+class VerificationRequest(BaseModel):
+    analysis: AnalysisResponse
+    retrieval_output: Dict[str, Any]    
+
+class ResearchWorkflowRequest(BaseModel):
+    question: str
+    document_id: str | None = None
+    top_k: int = 3    
