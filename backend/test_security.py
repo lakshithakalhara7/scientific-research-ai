@@ -60,3 +60,11 @@ for query in privacy_tests:
 
     print("\nSAFE RESULT:")
     pprint(result)
+
+print("\n\n========== ENVIRONMENT SECURITY ==========")
+
+environment_result = (
+    security.check_required_environment_variables()
+)
+
+pprint(environment_result)
