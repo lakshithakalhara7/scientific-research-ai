@@ -188,16 +188,7 @@ def verify_analysis(
         raise HTTPException(
             status_code=500,
             detail=safe_error["message"]
-        ) from None
-    
-@app.get("/protected-test")
-def protected_test(
-    current_user: dict = Depends(get_current_user)
-):
-    return {
-        "message": "Authentication successful.",
-        "user": current_user
-    }    
+        ) from None   
 
 @app.post("/research")
 def research_workflow(
