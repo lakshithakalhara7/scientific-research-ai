@@ -22,7 +22,24 @@ class SecurityService:
         r"bypass\s+(the\s+)?security",
         r"disable\s+(the\s+)?security",
     ]
+    SENSITIVE_PATTERNS = {
+        "email": r"\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}\b",
 
+        "phone": r"\b(?:\+?\d[\d\s\-]{7,}\d)\b",
+
+        "api_key": (
+            r"\b(?:api[_\- ]?key|secret[_\- ]?key|access[_\- ]?token)"
+            r"\s*[:=]\s*[A-Za-z0-9_\-]{8,}\b"
+        ),
+
+        "password": (
+            r"\bpassword\s*[:=]\s*\S+"
+        ),
+
+        "bearer_token": (
+            r"\bBearer\s+[A-Za-z0-9._\-]+\b"
+        )
+    }
     def sanitize_text(self, text):
         """
         Clean basic control characters and unnecessary
@@ -122,4 +139,90 @@ class SecurityService:
             "valid": True,
             "reason": None,
             "cleaned_query": cleaned_query
+        }
+    def detect_sensitive_data(self, text):
+        """
+        Detect potentially sensitive information
+        in user-provided text.
+        """
+
+        cleaned_text = self.sanitize_text(text)
+
+        detected = {}
+
+        for data_type, pattern in self.SENSITIVE_PATTERNS.items():
+
+            matches = re.findall(
+                pattern,
+                cleaned_text,
+                re.IGNORECASE
+            )
+
+            if matches:
+                detected[data_type] = matches
+
+        return {
+            "detected": len(detected) > 0,
+            "types": list(detected.keys()),
+            "matches": detected
+        }
+    def redact_sensitive_data(self, text):
+        """
+        Redact sensitive information before text
+        is sent to external AI services.
+        """
+
+        redacted_text = self.sanitize_text(text)
+
+        replacements = {
+            "email": "[REDACTED_EMAIL]",
+            "phone": "[REDACTED_PHONE]",
+            "api_key": "[REDACTED_API_KEY]",
+            "password": "[REDACTED_PASSWORD]",
+            "bearer_token": "[REDACTED_TOKEN]"
+        }
+
+        for data_type, pattern in self.SENSITIVE_PATTERNS.items():
+
+            redacted_text = re.sub(
+                pattern,
+                replacements[data_type],
+                redacted_text,
+                flags=re.IGNORECASE
+            )
+
+        return redacted_text
+
+    def prepare_safe_query(self, query):
+        """
+        Validate and prepare a user query before
+        sending it to the AI pipeline.
+        """
+
+        validation = self.validate_query(query)
+
+        if not validation["valid"]:
+            return {
+                "safe": False,
+                "reason": validation["reason"],
+                "query": None,
+                "privacy_warning": False
+            }
+
+        cleaned_query = validation["cleaned_query"]
+
+        sensitive_result = self.detect_sensitive_data(
+            cleaned_query
+        )
+
+        safe_query = self.redact_sensitive_data(
+            cleaned_query
+        )
+
+        return {
+            "safe": True,
+            "reason": None,
+            "query": safe_query,
+            "privacy_warning": sensitive_result["detected"],
+            "sensitive_types": sensitive_result["types"]
         }
