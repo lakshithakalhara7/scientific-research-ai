@@ -1,16 +1,48 @@
-from app.core.supabase_client import get_supabase_client
+import os
+
+from dotenv import load_dotenv
+from supabase import create_client
+
+
+load_dotenv()
 
 
 class AuthService:
     """
-    Handles authentication and access-token validation
-    using Supabase Auth.
+    Handles Supabase user authentication.
+
+    This client uses the publishable key only for
+    validating end-user Supabase Auth access tokens.
     """
+
+    def __init__(self):
+
+        self.supabase_url = os.getenv(
+            "SUPABASE_URL"
+        )
+
+        self.publishable_key = os.getenv(
+            "SUPABASE_PUBLISHABLE_KEY"
+        )
+
+        if not self.supabase_url:
+            raise RuntimeError(
+                "SUPABASE_URL is not configured."
+            )
+
+        if not self.publishable_key:
+            raise RuntimeError(
+                "SUPABASE_PUBLISHABLE_KEY is not configured."
+            )
+
+        self.auth_client = create_client(
+            self.supabase_url,
+            self.publishable_key
+        )
 
     def verify_access_token(self, token):
         """
-        Verify a Supabase access token and return
-        basic authenticated-user information.
+        Validate a Supabase Auth user access token.
         """
 
         if not token:
@@ -21,9 +53,10 @@ class AuthService:
             }
 
         try:
-            supabase = get_supabase_client()
 
-            response = supabase.auth.get_user(token)
+            response = self.auth_client.auth.get_user(
+                token
+            )
 
             user = response.user
 
@@ -31,7 +64,9 @@ class AuthService:
                 return {
                     "authenticated": False,
                     "user": None,
-                    "reason": "Invalid authentication token."
+                    "reason": (
+                        "Invalid authentication token."
+                    )
                 }
 
             return {
@@ -48,6 +83,7 @@ class AuthService:
                 "authenticated": False,
                 "user": None,
                 "reason": (
-                    "Authentication failed or the token is invalid."
+                    "Authentication failed or "
+                    "the token is invalid."
                 )
             }

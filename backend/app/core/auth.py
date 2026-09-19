@@ -1,34 +1,39 @@
-from fastapi import Header, HTTPException
+from typing import Annotated
+
+from fastapi import Depends, HTTPException
+from fastapi.security import (
+    HTTPAuthorizationCredentials,
+    HTTPBearer
+)
 
 from app.services.auth_service import AuthService
 
 
 auth_service = AuthService()
 
+bearer_scheme = HTTPBearer(
+    auto_error=False
+)
+
 
 def get_current_user(
-    authorization: str | None = Header(default=None)
+    credentials: Annotated[
+        HTTPAuthorizationCredentials | None,
+        Depends(bearer_scheme)
+    ]
 ):
     """
-    Require a valid Bearer token before allowing
-    access to a protected API endpoint.
+    Require a valid Supabase Bearer access token
+    before allowing access to protected endpoints.
     """
 
-    if not authorization:
+    if credentials is None:
         raise HTTPException(
             status_code=401,
             detail="Authentication is required."
         )
 
-    if not authorization.startswith("Bearer "):
-        raise HTTPException(
-            status_code=401,
-            detail="Invalid authorization header."
-        )
-
-    token = authorization.removeprefix(
-        "Bearer "
-    ).strip()
+    token = credentials.credentials
 
     if not token:
         raise HTTPException(
