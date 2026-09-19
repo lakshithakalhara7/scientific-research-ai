@@ -1,1 +1,60 @@
-# Pydantic request/response schemas will be added here.
+from typing import Any, Dict, List, Literal
+from uuid import UUID
+
+from pydantic import BaseModel, Field
+
+
+# =========================
+# Member 1 - Retrieval
+# =========================
+
+class ResearchQuery(BaseModel):
+    query: str
+    document_id: UUID | None = None
+
+
+class UploadedDocument(BaseModel):
+    """Public ingestion result; storage configuration stays on the server."""
+
+    id: UUID
+    title: str | None = None
+    original_filename: str
+    category: str | None = None
+    status: Literal["indexed"]
+    page_count: int = Field(ge=1)
+    chunk_count: int = Field(ge=1)
+
+
+class DocumentUploadResponse(BaseModel):
+    status: Literal["success"]
+    document: UploadedDocument
+
+
+# =========================
+# Member 2 - Analysis Agent
+# =========================
+
+class AnalysisRequest(BaseModel):
+    question: str
+    chunks: List[str]
+
+
+class AnalysisResponse(BaseModel):
+    summary: str
+    key_findings: List[str]
+    methods: List[str]
+    conclusion: str
+
+# =========================
+# Member 3 - Verification
+# =========================
+
+
+class VerificationRequest(BaseModel):
+    analysis: AnalysisResponse
+    retrieval_output: Dict[str, Any]    
+
+class ResearchWorkflowRequest(BaseModel):
+    question: str
+    document_id: str | None = None
+    top_k: int = 3    

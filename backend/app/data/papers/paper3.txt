@@ -1,0 +1,5 @@
+Title: Cardiovascular Disease Prediction Using Machine Learning
+
+Machine learning models can analyze clinical data to estimate the risk of cardiovascular disease.
+
+Common features include age, cholesterol, blood pressure, heart rate, and lifestyle information. Classification algorithms can be trained using historical patient data.
