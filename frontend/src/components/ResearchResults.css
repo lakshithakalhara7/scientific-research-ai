@@ -1,0 +1,693 @@
+/* =========================================================
+   ANALYSIS RESULT
+========================================================= */
+
+.analysis-result-card {
+  margin-top: 18px;
+
+  padding: 25px;
+
+  border:
+    1px solid
+    rgba(95, 114, 180, 0.15);
+
+  border-radius: 18px;
+
+  background:
+    rgba(255, 255, 255, 0.8);
+}
+
+
+.analysis-result-header {
+  display: flex;
+
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 20px;
+
+  margin-bottom: 20px;
+}
+
+
+.analysis-title {
+  display: flex;
+
+  align-items: center;
+
+  gap: 12px;
+}
+
+
+.analysis-icon {
+  width: 40px;
+  height: 40px;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 12px;
+
+  color: white;
+
+  background:
+    linear-gradient(
+      135deg,
+      #5b58ff,
+      #3187fa
+    );
+
+  box-shadow:
+    0 9px 20px
+    rgba(72, 86, 220, 0.2);
+}
+
+
+.analysis-title span {
+  color: #6169ef;
+
+  font-size: 7px;
+
+  font-weight: 800;
+
+  letter-spacing: 1.2px;
+}
+
+
+.analysis-title h3 {
+  margin: 4px 0 0;
+
+  color: #243650;
+
+  font-size: 15px;
+}
+
+
+.analysis-generated {
+  padding: 6px 9px;
+
+  border-radius: 20px;
+
+  color: #665ef3;
+
+  background: #f0efff;
+
+  font-size: 7px;
+
+  font-weight: 800;
+}
+
+
+.analysis-summary {
+  margin: 0;
+
+  color: #667990;
+
+  font-size: 11px;
+
+  line-height: 1.8;
+}
+
+
+/* =========================================================
+   FINDINGS
+========================================================= */
+
+.key-findings {
+  margin-top: 22px;
+
+  padding-top: 18px;
+
+  border-top:
+    1px solid
+    rgba(100, 120, 170, 0.12);
+}
+
+
+.key-findings h4 {
+  margin:
+    0 0 13px;
+
+  color: #30445f;
+
+  font-size: 11px;
+}
+
+
+.finding-item {
+  display: flex;
+
+  align-items: flex-start;
+
+  gap: 10px;
+
+  margin-top: 9px;
+}
+
+
+.finding-item > span {
+  width: 23px;
+  height: 23px;
+
+  flex: 0 0 auto;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 7px;
+
+  color: #5b66ef;
+
+  background: #eef0ff;
+
+  font-size: 8px;
+
+  font-weight: 800;
+}
+
+
+.finding-item p {
+  margin: 3px 0 0;
+
+  color: #71839a;
+
+  font-size: 10px;
+
+  line-height: 1.6;
+}
+
+
+/* =========================================================
+   PAPERS
+========================================================= */
+
+.papers-section {
+  margin-top: 30px;
+}
+
+
+.papers-heading {
+  display: flex;
+
+  align-items: flex-end;
+  justify-content: space-between;
+
+  gap: 20px;
+
+  margin-bottom: 15px;
+}
+
+
+.papers-heading > div > span {
+  color: #5965ef;
+
+  font-size: 7px;
+
+  font-weight: 800;
+
+  letter-spacing: 1.3px;
+}
+
+
+.papers-heading h3 {
+  margin: 5px 0 0;
+
+  color: #273a54;
+
+  font-size: 17px;
+}
+
+
+.paper-count {
+  padding: 6px 10px;
+
+  border-radius: 20px;
+
+  color: #718198;
+
+  background: #f0f3f8;
+
+  font-size: 8px;
+}
+
+
+/* =========================================================
+   PAPER GRID
+========================================================= */
+
+.papers-grid {
+  display: grid;
+
+  grid-template-columns:
+    repeat(2, 1fr);
+
+  gap: 13px;
+}
+
+
+.paper-card {
+  min-height: 230px;
+
+  display: flex;
+
+  flex-direction: column;
+
+  padding: 19px;
+
+  border:
+    1px solid
+    rgba(103, 128, 177, 0.15);
+
+  border-radius: 16px;
+
+  background:
+    rgba(250, 252, 255, 0.85);
+
+  transition: 0.25s ease;
+}
+
+
+.paper-card:hover {
+  transform:
+    translateY(-4px);
+
+  border-color:
+    rgba(82, 94, 244, 0.25);
+
+  box-shadow:
+    0 15px 35px
+    rgba(45, 72, 130, 0.08);
+}
+
+
+.paper-card-top {
+  display: flex;
+
+  align-items: center;
+  justify-content: space-between;
+
+  margin-bottom: 14px;
+}
+
+
+.paper-number {
+  color: #6973ef;
+
+  font-size: 9px;
+
+  font-weight: 900;
+}
+
+
+.paper-relevance {
+  padding: 5px 8px;
+
+  border-radius: 20px;
+
+  color: #159e87;
+
+  background: #eafaf6;
+
+  font-size: 7px;
+
+  font-weight: 800;
+}
+
+
+.paper-card h4 {
+  margin: 0;
+
+  color: #263a55;
+
+  font-size: 12px;
+
+  line-height: 1.45;
+}
+
+
+.paper-authors {
+  margin:
+    7px 0 0;
+
+  color: #8493a8;
+
+  font-size: 9px;
+}
+
+
+.paper-meta {
+  display: flex;
+
+  align-items: center;
+
+  gap: 7px;
+
+  margin-top: 8px;
+
+  color: #9aa6b7;
+
+  font-size: 8px;
+}
+
+
+.paper-meta i {
+  width: 3px;
+  height: 3px;
+
+  border-radius: 50%;
+
+  background: #b4bfcc;
+}
+
+
+.paper-abstract {
+  display: -webkit-box;
+
+  margin:
+    13px 0 0;
+
+  overflow: hidden;
+
+  color: #7c8ca2;
+
+  font-size: 9px;
+
+  line-height: 1.6;
+
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+}
+
+
+.paper-footer {
+  display: flex;
+
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 10px;
+
+  margin-top: auto;
+
+  padding-top: 16px;
+}
+
+
+.paper-source-status {
+  display: flex;
+
+  align-items: center;
+
+  gap: 5px;
+
+  color: #7c8ba0;
+
+  font-size: 7px;
+}
+
+
+.paper-source-status i {
+  width: 5px;
+  height: 5px;
+
+  border-radius: 50%;
+
+  background: #22c7a7;
+}
+
+
+.paper-footer a,
+.paper-footer button {
+  border: 0;
+
+  color: #5865ef;
+
+  background: transparent;
+
+  font-size: 8px;
+
+  font-weight: 700;
+
+  text-decoration: none;
+}
+
+
+.paper-footer a span {
+  margin-left: 4px;
+}
+
+
+.paper-footer button:disabled {
+  color: #a5afbd;
+
+  cursor: not-allowed;
+}
+
+
+/* =========================================================
+   EMPTY PAPERS
+========================================================= */
+
+.no-papers {
+  padding: 35px;
+
+  border:
+    1px dashed
+    rgba(105, 126, 180, 0.2);
+
+  border-radius: 15px;
+
+  text-align: center;
+}
+
+
+.no-papers > span {
+  color: #6974ef;
+
+  font-size: 25px;
+}
+
+
+.no-papers h4 {
+  margin:
+    8px 0 5px;
+
+  color: #354961;
+}
+
+
+.no-papers p {
+  max-width: 400px;
+
+  margin: auto;
+
+  color: #8b99ab;
+
+  font-size: 9px;
+
+  line-height: 1.6;
+}
+
+
+/* =========================================================
+   VERIFICATION
+========================================================= */
+
+.verification-card {
+  display: flex;
+
+  gap: 18px;
+
+  margin-top: 22px;
+
+  padding: 23px;
+
+  border:
+    1px solid
+    rgba(34, 184, 157, 0.18);
+
+  border-radius: 17px;
+
+  background:
+    linear-gradient(
+      120deg,
+      rgba(238, 252, 249, 0.85),
+      rgba(246, 253, 255, 0.85)
+    );
+}
+
+
+.verification-shield {
+  width: 48px;
+  height: 48px;
+
+  flex: 0 0 auto;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 14px;
+
+  color: #169d85;
+
+  background: #dff8f2;
+
+  font-size: 18px;
+
+  font-weight: 900;
+}
+
+
+.verification-content {
+  flex: 1;
+}
+
+
+.verification-content > span {
+  color: #199e88;
+
+  font-size: 7px;
+
+  font-weight: 800;
+
+  letter-spacing: 1.3px;
+}
+
+
+.verification-content h3 {
+  margin:
+    5px 0;
+
+  color: #31544f;
+
+  font-size: 14px;
+}
+
+
+.verification-content p {
+  margin: 0;
+
+  color: #78958f;
+
+  font-size: 9px;
+
+  line-height: 1.6;
+}
+
+
+.verification-meta {
+  display: flex;
+
+  gap: 25px;
+
+  margin-top: 15px;
+}
+
+
+.verification-meta > div {
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 2px;
+}
+
+
+.verification-meta strong {
+  color: #159d85;
+
+  font-size: 15px;
+}
+
+
+.verification-meta span {
+  color: #829a96;
+
+  font-size: 7px;
+}
+
+
+/* =========================================================
+   DISCLAIMER
+========================================================= */
+
+.result-disclaimer {
+  display: flex;
+
+  align-items: flex-start;
+
+  gap: 9px;
+
+  margin-top: 16px;
+
+  padding: 12px 14px;
+
+  border-radius: 10px;
+
+  background: #f7f9fc;
+}
+
+
+.result-disclaimer > span {
+  width: 18px;
+  height: 18px;
+
+  flex: 0 0 auto;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 50%;
+
+  color: #75869c;
+
+  background: #e8edf4;
+
+  font-size: 8px;
+
+  font-weight: 800;
+}
+
+
+.result-disclaimer p {
+  margin: 2px 0 0;
+
+  color: #8a98aa;
+
+  font-size: 8px;
+
+  line-height: 1.5;
+}
+
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media (max-width: 750px) {
+
+  .papers-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .analysis-result-header {
+    align-items: flex-start;
+  }
+
+  .analysis-generated {
+    display: none;
+  }
+
+  .verification-card {
+    flex-direction: column;
+  }
+
+}

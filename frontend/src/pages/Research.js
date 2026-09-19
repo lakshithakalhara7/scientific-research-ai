@@ -1,62 +1,301 @@
-import { useLocation, useNavigate } from "react-router-dom";
-import { useState } from "react";
+import {
+  useEffect,
+  useRef,
+  useState,
+} from "react";
+
+import {
+  useLocation,
+  useNavigate,
+} from "react-router-dom";
+
 import "./Research.css";
 
+import PdfUpload from "../components/PdfUpload";
+import ResearchResults from "../components/ResearchResults";
+
+import {
+  analyzePdf,
+  searchResearch,
+} from "../services/api";
+
+
 function Research() {
-  const location = useLocation();
-  const navigate = useNavigate();
+  const navigate =
+    useNavigate();
 
-  const [query, setQuery] = useState(location.state?.query || "");
-  const [searched, setSearched] = useState(
-    Boolean(location.state?.query)
-  );
+  const location =
+    useLocation();
 
-  const handleSearch = () => {
-    if (!query.trim()) return;
-    setSearched(true);
-  };
+  const searchRef =
+    useRef(null);
 
-  const handleLogout = () => {
-    localStorage.removeItem("researchAI_logged_in");
-    navigate("/");
-  };
+
+
+  const [query, setQuery] =
+    useState(
+      location.state?.query || ""
+    );
+
+  const [searched, setSearched] =
+    useState(false);
+
+  const [loading, setLoading] =
+    useState(false);
+
+  const [results, setResults] =
+    useState(null);
+
+  const [
+    searchError,
+    setSearchError,
+  ] = useState("");
+
+  const [
+    showPdfUpload,
+    setShowPdfUpload,
+  ] = useState(false);
+
+
+  /* ==========================================
+     SEARCH
+  ========================================== */
+
+  const handleSearch =
+    async () => {
+
+      if (
+        !query.trim() ||
+        loading
+      ) {
+        return;
+      }
+
+
+      setLoading(true);
+
+      setSearched(true);
+
+      setSearchError("");
+
+      setResults(null);
+
+
+      try {
+
+        const data =
+          await searchResearch(
+            query
+          );
+
+
+        setResults(data);
+
+
+        setTimeout(() => {
+
+          document
+            .querySelector(
+              ".research-results"
+            )
+            ?.scrollIntoView({
+              behavior:
+                "smooth",
+
+              block:
+                "start",
+            });
+
+        }, 150);
+
+      } catch (error) {
+
+        console.error(
+          "Research error:",
+          error
+        );
+
+
+        setSearchError(
+          "Unable to complete the research request. Please try again."
+        );
+
+      } finally {
+
+        setLoading(false);
+
+      }
+    };
+
+
+  /* ==========================================
+     PDF ANALYSIS
+  ========================================== */
+
+  const handlePdfAnalysis =
+    async (file) => {
+
+      if (!file) {
+        return;
+      }
+
+
+      console.log(
+        "PDF selected:",
+        file
+      );
+
+
+      setShowPdfUpload(false);
+
+      setLoading(true);
+
+      setSearched(true);
+
+      setSearchError("");
+
+      setResults(null);
+
+
+      try {
+
+        const data =
+          await analyzePdf(
+            file
+          );
+
+
+        setResults(data);
+
+
+        setTimeout(() => {
+
+          document
+            .querySelector(
+              ".research-results"
+            )
+            ?.scrollIntoView({
+              behavior:
+                "smooth",
+
+              block:
+                "start",
+            });
+
+        }, 150);
+
+      } catch (error) {
+
+        console.error(
+          "PDF error:",
+          error
+        );
+
+
+        setSearchError(
+          "The PDF could not be analyzed. Please try again."
+        );
+
+      } finally {
+
+        setLoading(false);
+
+      }
+    };
+
+
+  /* ==========================================
+     SEARCH FOCUS
+  ========================================== */
+
+  const focusResearch =
+    () => {
+
+      searchRef.current
+        ?.scrollIntoView({
+          behavior:
+            "smooth",
+
+          block:
+            "center",
+        });
+
+
+      setTimeout(() => {
+
+        searchRef.current
+          ?.focus();
+
+      }, 400);
+    };
+
+
+  /* ==========================================
+     INITIAL QUERY
+  ========================================== */
+
+  useEffect(() => {
+
+    if (
+      location.state?.query
+    ) {
+
+      setQuery(
+        location.state.query
+      );
+
+    }
+
+  }, [location.state]);
+
 
   return (
     <div className="research-home">
 
       {/* BACKGROUND */}
-      <div className="research-bg" aria-hidden="true">
+
+      <div
+        className="research-bg"
+        aria-hidden="true"
+      >
+
         <div className="research-grid"></div>
+
         <div className="research-glow glow-1"></div>
+
         <div className="research-glow glow-2"></div>
+
         <div className="research-glow glow-3"></div>
 
-        <div className="research-particles">
-          {Array.from({ length: 18 }).map((_, index) => (
-            <span key={index}></span>
-          ))}
-        </div>
       </div>
 
-      {/* =====================================================
-          NAVBAR
-      ====================================================== */}
+
+      {/* NAVBAR */}
 
       <header className="research-navbar">
 
         <button
           className="research-brand"
-          onClick={() => navigate("/research")}
+          onClick={() =>
+            navigate(
+              "/research"
+            )
+          }
         >
-            <div className="home-brand-logo-frame">
-              <img
-                src="/resqmind-logo.jpeg"
-                alt="ResQMind"
-                className="home-brand-logo"
-              />
-            </div>
+
+          <div className="home-brand-logo-frame">
+
+            <img
+              src="/resqmind-logo.jpeg"
+              alt="ResoMind"
+              className="home-brand-logo"
+            />
+
+          </div>
+
 
           <div>
+
             <strong>
               Reso<span>Mind</span>
             </strong>
@@ -64,57 +303,98 @@ function Research() {
             <small>
               Intelligent Research Workspace
             </small>
+
           </div>
+
         </button>
 
+
         <nav className="research-nav">
-          <button className="active">
+
+          <button
+            className="active"
+            onClick={() => {
+
+              window.scrollTo({
+                top: 0,
+                behavior:
+                  "smooth",
+              });
+
+            }}
+          >
             Home
           </button>
 
-          <button>
+
+          <button
+            onClick={
+              focusResearch
+            }
+          >
             Research
           </button>
 
-          <button>
+
+          <button
+            onClick={() => {
+
+              if (results) {
+
+                document
+                  .querySelector(
+                    ".papers-section"
+                  )
+                  ?.scrollIntoView({
+                    behavior:
+                      "smooth",
+                  });
+
+              } else {
+
+                focusResearch();
+
+              }
+
+            }}
+          >
             Papers
           </button>
 
-          <button>
+
+          <button
+            onClick={() => {
+
+              alert(
+                "Research history will be connected in the next stage."
+              );
+
+            }}
+          >
             History
           </button>
+
         </nav>
 
+
         <div className="research-user">
-
-          <button className="notification-button">
-            <svg viewBox="0 0 24 24" fill="none">
-              <path
-                d="M18 8A6 6 0 0 0 6 8C6 15 3 16 3 16H21C21 16 18 15 18 8Z"
-                stroke="currentColor"
-                strokeWidth="1.7"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-
-              <path
-                d="M10 20H14"
-                stroke="currentColor"
-                strokeWidth="1.7"
-                strokeLinecap="round"
-              />
-            </svg>
-
-            <span></span>
-          </button>
 
           <div className="research-avatar">
             R
           </div>
 
+
           <button
             className="logout-button"
-            onClick={handleLogout}
+            onClick={() => {
+
+              localStorage.removeItem(
+                "researchAI_logged_in"
+              );
+
+              navigate("/");
+
+            }}
           >
             Logout
           </button>
@@ -123,42 +403,61 @@ function Research() {
 
       </header>
 
-      {/* =====================================================
-          MAIN
-      ====================================================== */}
+
+      {/* MAIN */}
 
       <main className="research-main">
+
 
         {/* HERO */}
 
         <section className="research-hero">
 
           <div className="research-status">
+
             <span></span>
+
             AI RESEARCH WORKSPACE
+
           </div>
 
+
           <h1>
+
             Discover knowledge.
+
             <br />
 
             <span>
               Research smarter.
             </span>
+
           </h1>
 
+
           <p className="research-description">
-            Search scientific literature, analyze complex
-            papers, verify evidence, and transform research
-            into meaningful insights with intelligent AI.
+
+            Search scientific literature,
+            analyze research papers,
+            investigate evidence and
+            transform complex scientific
+            information into meaningful
+            insights.
+
           </p>
+
 
           {/* SEARCH BOX */}
 
           <div className="research-search-box">
 
             <div className="research-search-icon">
-              <svg viewBox="0 0 24 24" fill="none">
+
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+              >
+
                 <circle
                   cx="11"
                   cy="11"
@@ -173,68 +472,136 @@ function Research() {
                   strokeWidth="1.8"
                   strokeLinecap="round"
                 />
+
               </svg>
+
             </div>
 
+
             <textarea
+              ref={searchRef}
               value={query}
-              onChange={(event) =>
-                setQuery(event.target.value)
-              }
               placeholder="Ask anything about scientific research..."
+              onChange={(event) =>
+                setQuery(
+                  event.target.value
+                )
+              }
               onKeyDown={(event) => {
+
                 if (
-                  event.key === "Enter" &&
+                  event.key ===
+                    "Enter" &&
                   !event.shiftKey
                 ) {
+
                   event.preventDefault();
+
                   handleSearch();
+
                 }
+
               }}
             />
 
+
             <div className="research-search-actions">
 
+              {/* PDF ICON */}
+
               <button
-                className="search-attachment"
                 type="button"
-                title="Upload paper"
+                className="search-attachment"
+                title="Upload PDF"
+                onClick={() =>
+                  setShowPdfUpload(
+                    true
+                  )
+                }
               >
-                <svg viewBox="0 0 24 24" fill="none">
+
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                >
+
                   <path
                     d="M21.4 11.6L12 21A6 6 0 0 1 3.5 12.5L13 3A4 4 0 0 1 18.7 8.7L9.2 18.2A2 2 0 0 1 6.4 15.4L15 6.8"
                     stroke="currentColor"
                     strokeWidth="1.7"
                     strokeLinecap="round"
                   />
+
                 </svg>
+
               </button>
+
+
+              {/* SEARCH BUTTON */}
 
               <button
                 className="research-search-button"
-                onClick={handleSearch}
-                disabled={!query.trim()}
+                type="button"
+                disabled={
+                  !query.trim() ||
+                  loading
+                }
+                onClick={
+                  handleSearch
+                }
               >
-                <span>Research</span>
 
-                <svg viewBox="0 0 24 24" fill="none">
-                  <path
-                    d="M5 12H19M13 6L19 12L13 18"
-                    stroke="currentColor"
-                    strokeWidth="1.8"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                </svg>
+                {loading ? (
+
+                  <>
+                    <span>
+                      Working...
+                    </span>
+
+                    <div className="button-loader"></div>
+                  </>
+
+                ) : (
+
+                  <>
+                    <span>
+                      Research
+                    </span>
+
+                    <svg
+                      viewBox="0 0 24 24"
+                      fill="none"
+                    >
+
+                      <path
+                        d="M5 12H19M13 6L19 12L13 18"
+                        stroke="currentColor"
+                        strokeWidth="1.8"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+
+                    </svg>
+
+                  </>
+
+                )}
+
               </button>
 
             </div>
 
           </div>
 
+
+          {/* SUGGESTIONS */}
+
           <div className="search-suggestions">
 
-            <span>Try asking:</span>
+            <span>
+              Try asking:
+            </span>
+
 
             <button
               onClick={() =>
@@ -246,6 +613,7 @@ function Research() {
               Artificial Intelligence
             </button>
 
+
             <button
               onClick={() =>
                 setQuery(
@@ -256,10 +624,11 @@ function Research() {
               Quantum Computing
             </button>
 
+
             <button
               onClick={() =>
                 setQuery(
-                  "Machine learning in healthcare"
+                  "Machine learning applications in healthcare"
                 )
               }
             >
@@ -271,15 +640,14 @@ function Research() {
         </section>
 
 
-        {/* =====================================================
-            CAPABILITIES
-        ====================================================== */}
+        {/* TOOLS */}
 
         <section className="capabilities-section">
 
           <div className="section-heading">
 
             <div>
+
               <span className="section-label">
                 RESEARCH TOOLS
               </span>
@@ -289,47 +657,28 @@ function Research() {
               </h2>
 
               <p>
-                Powerful AI tools designed for scientific
-                discovery and evidence-based research.
+                Intelligent tools designed
+                for scientific discovery,
+                analysis and evidence
+                verification.
               </p>
-            </div>
 
-            <button className="view-tools">
-              View all tools →
-            </button>
+            </div>
 
           </div>
 
 
           <div className="capabilities-grid">
 
-            {/* CARD 1 */}
+
+            {/* PDF */}
 
             <article className="capability-card">
 
               <div className="capability-top">
 
                 <div className="capability-icon blue">
-                  <svg viewBox="0 0 24 24" fill="none">
-                    <path
-                      d="M14 2H6A2 2 0 0 0 4 4V20A2 2 0 0 0 6 22H18A2 2 0 0 0 20 20V8Z"
-                      stroke="currentColor"
-                      strokeWidth="1.7"
-                    />
-
-                    <path
-                      d="M14 2V8H20"
-                      stroke="currentColor"
-                      strokeWidth="1.7"
-                    />
-
-                    <path
-                      d="M8 13H16M8 17H14"
-                      stroke="currentColor"
-                      strokeWidth="1.7"
-                      strokeLinecap="round"
-                    />
-                  </svg>
+                  📄
                 </div>
 
                 <span className="capability-badge">
@@ -338,45 +687,45 @@ function Research() {
 
               </div>
 
+
               <h3>
                 Analyze a paper
               </h3>
 
+
               <p>
-                Upload scientific PDFs and let AI extract
-                methods, findings, limitations, and key
-                research insights.
+                Upload scientific PDFs and
+                analyze methods, findings,
+                limitations and important
+                research concepts.
               </p>
 
-              <button className="capability-action">
+
+              <button
+                type="button"
+                className="capability-action"
+                onClick={() =>
+                  setShowPdfUpload(
+                    true
+                  )
+                }
+              >
                 Upload PDF
+
                 <span>→</span>
               </button>
 
             </article>
 
 
-            {/* CARD 2 */}
+            {/* RESEARCH */}
 
             <article className="capability-card featured">
 
               <div className="capability-top">
 
                 <div className="capability-icon purple">
-                  <svg viewBox="0 0 24 24" fill="none">
-                    <path
-                      d="M12 3L14 8L19 10L14 12L12 17L10 12L5 10L10 8L12 3Z"
-                      stroke="currentColor"
-                      strokeWidth="1.6"
-                      strokeLinejoin="round"
-                    />
-
-                    <path
-                      d="M18 16L19 18L21 19L19 20L18 22L17 20L15 19L17 18L18 16Z"
-                      stroke="currentColor"
-                      strokeWidth="1.5"
-                    />
-                  </svg>
+                  ✦
                 </div>
 
                 <span className="capability-badge ai">
@@ -385,55 +734,43 @@ function Research() {
 
               </div>
 
+
               <h3>
                 Intelligent research
               </h3>
 
+
               <p>
-                Search across scientific knowledge and
-                discover relevant evidence, concepts,
-                relationships, and research directions.
+                Ask scientific questions
+                and discover relevant
+                research, evidence and
+                structured AI insights.
               </p>
 
+
               <button
+                type="button"
                 className="capability-action"
-                onClick={() =>
-                  document
-                    .querySelector(
-                      ".research-search-box textarea"
-                    )
-                    ?.focus()
+                onClick={
+                  focusResearch
                 }
               >
-                Start researching
+                Start Researching
+
                 <span>→</span>
               </button>
 
             </article>
 
 
-            {/* CARD 3 */}
+            {/* VERIFICATION */}
 
             <article className="capability-card">
 
               <div className="capability-top">
 
                 <div className="capability-icon cyan">
-                  <svg viewBox="0 0 24 24" fill="none">
-                    <path
-                      d="M12 3L20 6V11C20 16 16.6 20.4 12 22C7.4 20.4 4 16 4 11V6L12 3Z"
-                      stroke="currentColor"
-                      strokeWidth="1.7"
-                    />
-
-                    <path
-                      d="M8.5 12L11 14.5L16 9.5"
-                      stroke="currentColor"
-                      strokeWidth="1.7"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                  </svg>
+                  ✓
                 </div>
 
                 <span className="capability-badge">
@@ -442,18 +779,46 @@ function Research() {
 
               </div>
 
+
               <h3>
                 Evidence verification
               </h3>
 
+
               <p>
-                Review supporting sources and compare AI
-                insights against original scientific
-                literature.
+                Compare AI-generated
+                research insights against
+                supporting scientific
+                evidence.
               </p>
 
-              <button className="capability-action">
-                Explore sources
+
+              <button
+                type="button"
+                className="capability-action"
+                onClick={() => {
+
+                  if (results) {
+
+                    document
+                      .querySelector(
+                        ".verification-card"
+                      )
+                      ?.scrollIntoView({
+                        behavior:
+                          "smooth",
+                      });
+
+                  } else {
+
+                    focusResearch();
+
+                  }
+
+                }}
+              >
+                Verify Research
+
                 <span>→</span>
               </button>
 
@@ -464,131 +829,74 @@ function Research() {
         </section>
 
 
-        {/* =====================================================
-            SEARCH RESULTS
-        ====================================================== */}
+        {/* ERROR */}
 
-        {searched && (
+        {searchError && (
 
-          <section className="research-results">
+          <div className="research-error">
 
-            <div className="results-heading">
+            <span>!</span>
 
-              <div>
-                <span>
-                  AI RESEARCH
-                </span>
+            <div>
 
-                <h2>
-                  Research analysis
-                </h2>
-              </div>
+              <strong>
+                Something went wrong
+              </strong>
 
-              <div className="ai-status">
-                <span></span>
-                AI PROCESSING
-              </div>
+              <p>
+                {searchError}
+              </p>
 
             </div>
 
+          </div>
 
-            <div className="agent-grid">
-
-              <div className="agent-card">
-
-                <div className="agent-icon">
-                  ⌕
-                </div>
-
-                <div>
-                  <strong>
-                    Retrieval Agent
-                  </strong>
-
-                  <p>
-                    Searching scientific literature
-                  </p>
-                </div>
-
-                <span className="agent-ready">
-                  READY
-                </span>
-
-              </div>
+        )}
 
 
-              <div className="agent-card">
+        {/* LOADING */}
 
-                <div className="agent-icon">
-                  ✦
-                </div>
+        {loading && (
 
-                <div>
-                  <strong>
-                    Analysis Agent
-                  </strong>
+          <section className="research-processing">
 
-                  <p>
-                    Extracting research insights
-                  </p>
-                </div>
+            <div className="processing-orbit">
 
-                <span className="agent-ready">
-                  READY
-                </span>
-
-              </div>
-
-
-              <div className="agent-card">
-
-                <div className="agent-icon">
-                  ✓
-                </div>
-
-                <div>
-                  <strong>
-                    Verification Agent
-                  </strong>
-
-                  <p>
-                    Checking supporting evidence
-                  </p>
-                </div>
-
-                <span className="agent-ready">
-                  READY
-                </span>
-
-              </div>
-
-            </div>
-
-
-            <div className="query-result-card">
-
-              <div className="query-result-icon">
+              <div className="processing-core">
                 ✦
               </div>
 
-              <div>
+            </div>
 
-                <span className="query-label">
-                  YOUR RESEARCH QUESTION
-                </span>
 
-                <h3>
-                  {query}
-                </h3>
+            <h3>
+              Research agents are working
+            </h3>
 
-                <p>
-                  Retrieved papers, AI analysis and
-                  verified scientific sources will appear
-                  here when your backend agents are
-                  connected.
-                </p>
 
-              </div>
+            <p>
+              Retrieving information,
+              analyzing research and
+              verifying evidence...
+            </p>
+
+
+            <div className="processing-steps">
+
+              <span>
+                <i></i>
+                Retrieval
+              </span>
+
+              <span>
+                <i></i>
+                Analysis
+              </span>
+
+              <span>
+                <i></i>
+                Verification
+              </span>
 
             </div>
 
@@ -597,9 +905,21 @@ function Research() {
         )}
 
 
-        {/* =====================================================
-            RESPONSIBLE AI
-        ====================================================== */}
+        {/* RESULTS */}
+
+        {searched &&
+          !loading &&
+          results && (
+
+            <ResearchResults
+              data={results}
+              query={query}
+            />
+
+          )}
+
+
+        {/* RESPONSIBLE AI */}
 
         <div className="responsible-notice">
 
@@ -607,24 +927,52 @@ function Research() {
             ✓
           </div>
 
+
           <div>
+
             <strong>
-              Responsible AI research
+              Responsible AI Research
             </strong>
 
             <p>
-              AI-generated insights should always be
-              reviewed against the original scientific
-              sources.
+              AI-generated research
+              information should always be
+              reviewed against original
+              scientific sources.
             </p>
+
           </div>
 
         </div>
 
       </main>
 
+
+      {/* PDF MODAL */}
+
+      {showPdfUpload && (
+
+        <PdfUpload
+          onClose={() =>
+            setShowPdfUpload(
+              false
+            )
+          }
+          onAnalyze={
+            handlePdfAnalysis
+          }
+        />
+
+      )}
+
     </div>
   );
 }
 
+
 export default Research;
+
+
+
+
+

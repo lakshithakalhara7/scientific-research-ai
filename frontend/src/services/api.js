@@ -1,163 +1,324 @@
+/* =========================================================
+   RESOMIND API SERVICE
+========================================================= */
+
+
+/* =========================================================
+   CONFIGURATION
+========================================================= */
+
 const API_BASE_URL =
-  import.meta.env.VITE_API_BASE_URL || "http://localhost:8000";
+  import.meta.env.VITE_API_URL ||
+  "http://localhost:8000/api";
 
 
-// Search research
-export async function searchResearch(query) {
+/*
+  Keep this TRUE while developing only the frontend.
 
-  /*
-   * TEMPORARY DEMO DATA
-   *
-   * Replace this section with the real backend API
-   * once your group provides the endpoint.
-   */
+  When the backend is ready:
 
-  console.log("Research query:", query);
+  const USE_MOCK_API = false;
+*/
 
-  await new Promise((resolve) =>
-    setTimeout(resolve, 1500)
-  );
+const USE_MOCK_API = true;
 
 
-  return {
+/* =========================================================
+   HELPER
+========================================================= */
 
-    papers: [
-
-      {
-        id: 1,
-        title: "Applications of Machine Learning in Healthcare",
-        authors: "Example Research Authors",
-        abstract:
-          "This is demonstration data. The actual research paper information will come from the Information Retrieval agent.",
-        score: 0.92,
-        year: 2025,
-        source: "#"
-      },
-
-      {
-        id: 2,
-        title: "Artificial Intelligence for Modern Healthcare",
-        authors: "Example Research Authors",
-        abstract:
-          "This is demonstration data used to test the frontend before backend API integration.",
-        score: 0.87,
-        year: 2024,
-        source: "#"
-      },
-
-      {
-        id: 3,
-        title: "Deep Learning Applications in Medical Research",
-        authors: "Example Research Authors",
-        abstract:
-          "The real system will display papers retrieved by the research retrieval agent.",
-        score: 0.81,
-        year: 2024,
-        source: "#"
-      }
-
-    ],
+const delay = (milliseconds) => {
+  return new Promise((resolve) => {
+    setTimeout(resolve, milliseconds);
+  });
+};
 
 
-    analysis: {
+/* =========================================================
+   RESEARCH QUESTION
+========================================================= */
 
-      summary:
-        "Machine learning and artificial intelligence are increasingly being applied to healthcare research and clinical applications. These technologies can support diagnosis, prediction, medical imaging, and decision-making.",
+export const searchResearch = async (question) => {
 
-      findings:
-        "The retrieved research indicates that machine learning can be applied to several healthcare tasks. However, research quality, data quality, model reliability, and appropriate validation remain important considerations.",
-
-      comparison:
-        "Different studies focus on different healthcare applications and datasets. Their results should therefore be interpreted according to the specific research context."
-
-    },
-
-
-    verification: [
-
-      {
-        claim:
-          "Machine learning is being applied in healthcare research.",
-        status: "verified",
-        explanation:
-          "The claim is supported by the retrieved research papers.",
-        source: "#"
-      },
-
-      {
-        claim:
-          "AI can support healthcare decision-making.",
-        status: "warning",
-        explanation:
-          "This claim requires checking against the specific evidence and context of the retrieved studies.",
-        source: "#"
-      }
-
-    ]
-
-  };
-}
-
-
-
-// Upload PDF
-export async function uploadPdf(file) {
-
-  console.log("Uploading:", file.name);
-
-
-  /*
-   * TEMPORARY DEMO
-   *
-   * Replace this with the real backend upload API.
-   */
-
-  await new Promise((resolve) =>
-    setTimeout(resolve, 1200)
-  );
-
-
-  return {
-    success: true,
-    message: `${file.name} is ready for research analysis.`
-  };
-
-
-  /*
-   * REAL API VERSION WILL LOOK LIKE:
-
-   const formData = new FormData();
-   formData.append("file", file);
-
-   const response = await fetch(
-     `${API_BASE_URL}/upload`,
-     {
-       method: "POST",
-       body: formData
-     }
-   );
-
-   if (!response.ok) {
-     throw new Error("PDF upload failed");
-   }
-
-   return await response.json();
-
-   */
-}
-
-
-
-// Optional health check
-export async function checkBackend() {
-
-  const response = await fetch(
-    `${API_BASE_URL}/health`
-  );
-
-  if (!response.ok) {
-    throw new Error("Backend is unavailable");
+  if (!question || !question.trim()) {
+    throw new Error(
+      "Research question is required."
+    );
   }
 
+  /* =======================================================
+     MOCK MODE
+  ======================================================= */
+
+  if (USE_MOCK_API) {
+
+    await delay(1800);
+
+    return {
+      question,
+
+      summary:
+        `ResoMind analyzed the research question "${question}". This is currently demonstration data generated by the frontend while the retrieval, analysis and verification backend agents are being integrated. In the completed system, this section will contain an evidence-based synthesis produced from retrieved scientific literature.`,
+
+      keyFindings: [
+        "Scientific conclusions should be supported by multiple relevant sources rather than a single publication.",
+
+        "Information retrieval can identify research papers related to the user's scientific question.",
+
+        "The analysis agent can transform retrieved research into structured summaries and key findings.",
+
+        "The verification agent can compare generated claims against supporting scientific evidence.",
+      ],
+
+      papers: [
+        {
+          id: 1,
+
+          title:
+            "Artificial Intelligence in Scientific Research: Methods and Applications",
+
+          authors:
+            "J. Silva, M. Chen, A. Perera",
+
+          year: "2024",
+
+          journal:
+            "Journal of Intelligent Systems",
+
+          relevance:
+            "96% match",
+
+          abstract:
+            "A demonstration research-paper entry showing how retrieved scientific literature will be presented in the ResoMind frontend.",
+
+          url: "",
+        },
+
+        {
+          id: 2,
+
+          title:
+            "Machine Learning for Evidence-Based Scientific Discovery",
+
+          authors:
+            "L. Morgan, R. Kumar",
+
+          year: "2023",
+
+          journal:
+            "Computational Science Review",
+
+          relevance:
+            "92% match",
+
+          abstract:
+            "This demonstration entry represents scientific literature returned by the information retrieval component.",
+
+          url: "",
+        },
+
+        {
+          id: 3,
+
+          title:
+            "Responsible Artificial Intelligence for Research Systems",
+
+          authors:
+            "S. Fernando, H. Wilson",
+
+          year: "2024",
+
+          journal:
+            "AI & Society",
+
+          relevance:
+            "89% match",
+
+          abstract:
+            "This mock result demonstrates how responsible AI and verification-related scientific sources can be displayed.",
+
+          url: "",
+        },
+
+        {
+          id: 4,
+
+          title:
+            "Semantic Information Retrieval for Scientific Literature",
+
+          authors:
+            "D. Lee, K. Patel",
+
+          year: "2022",
+
+          journal:
+            "Information Retrieval Journal",
+
+          relevance:
+            "86% match",
+
+          abstract:
+            "A demonstration paper representing semantic retrieval techniques for scientific document discovery.",
+
+          url: "",
+        },
+      ],
+
+      verification: {
+        status:
+          "Demonstration verification complete",
+
+        message:
+          "These results are currently mock frontend data. Real evidence verification will be displayed after the verification agent is connected.",
+
+        sourcesChecked: 4,
+
+        supportedClaims: 3,
+      },
+    };
+  }
+
+
+  /* =======================================================
+     REAL BACKEND
+  ======================================================= */
+
+  const response = await fetch(
+    `${API_BASE_URL}/research`,
+    {
+      method: "POST",
+
+      headers: {
+        "Content-Type":
+          "application/json",
+      },
+
+      body: JSON.stringify({
+        query: question,
+      }),
+    }
+  );
+
+
+  if (!response.ok) {
+    throw new Error(
+      `Research request failed: ${response.status}`
+    );
+  }
+
+
   return await response.json();
-}
+};
+
+
+/* =========================================================
+   PDF ANALYSIS
+========================================================= */
+
+export const analyzePdf = async (file) => {
+
+  if (!file) {
+    throw new Error(
+      "PDF file is required."
+    );
+  }
+
+
+  /* =======================================================
+     MOCK MODE
+  ======================================================= */
+
+  if (USE_MOCK_API) {
+
+    console.log(
+      "PDF received by frontend:",
+      file
+    );
+
+    console.log(
+      "PDF name:",
+      file.name
+    );
+
+    console.log(
+      "PDF size:",
+      file.size
+    );
+
+    console.log(
+      "PDF type:",
+      file.type
+    );
+
+
+    await delay(2000);
+
+
+    return {
+
+      question:
+        `Analysis of ${file.name}`,
+
+      summary:
+        `The PDF "${file.name}" was successfully selected and processed by the ResoMind frontend. The system is currently operating in mock mode. When the document ingestion backend is connected, the PDF will be uploaded to the server, its text will be extracted, and the analysis agent will return structured scientific insights.`,
+
+      keyFindings: [
+        "The PDF file was successfully received by the frontend.",
+
+        "The document passed the PDF type and file-size validation checks.",
+
+        "The final system will send this document to the document ingestion service.",
+
+        "Extracted document content will then be passed to the analysis and verification agents.",
+      ],
+
+      papers: [],
+
+      verification: {
+        status:
+          "PDF accepted by frontend",
+
+        message:
+          "The document has not yet been scientifically verified because the backend verification agent is not connected in mock mode.",
+
+        sourcesChecked: 0,
+
+        supportedClaims: "—",
+      },
+    };
+  }
+
+
+  /* =======================================================
+     REAL PDF BACKEND
+  ======================================================= */
+
+  const formData =
+    new FormData();
+
+
+  formData.append(
+    "file",
+    file
+  );
+
+
+  const response = await fetch(
+    `${API_BASE_URL}/upload`,
+    {
+      method: "POST",
+
+      body: formData,
+    }
+  );
+
+
+  if (!response.ok) {
+    throw new Error(
+      `PDF upload failed: ${response.status}`
+    );
+  }
+
+
+  return await response.json();
+};
