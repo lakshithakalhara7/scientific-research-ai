@@ -1,3 +1,4 @@
+from functools import lru_cache
 from typing import Annotated
 
 from fastapi import Depends, HTTPException
@@ -9,7 +10,17 @@ from fastapi.security import (
 from app.services.auth_service import AuthService
 
 
-auth_service = AuthService()
+@lru_cache(maxsize=1)
+def get_auth_service() -> AuthService:
+    """Initialize auth only when a request supplies a token to validate."""
+    try:
+        return AuthService()
+    except Exception:
+        # Configuration and SDK errors may contain credentials or request details.
+        raise HTTPException(
+            status_code=503,
+            detail="Authentication service is unavailable."
+        ) from None
 
 bearer_scheme = HTTPBearer(
     auto_error=False
@@ -41,7 +52,7 @@ def get_current_user(
             detail="Authentication token is missing."
         )
 
-    result = auth_service.verify_access_token(
+    result = get_auth_service().verify_access_token(
         token
     )
 

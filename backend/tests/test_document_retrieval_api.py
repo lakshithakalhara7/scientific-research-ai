@@ -14,6 +14,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from app import main
 from app.agents import retrieval_agent
+from app.core.auth import get_current_user
 from app.core.config import SupabaseConfigurationError
 from app.services import retrieval_index_service as index
 from app.services.database_service import DocumentChunkRecord, DocumentRecord
@@ -23,6 +24,7 @@ FIRST_ID = UUID(int=101)
 SECOND_ID = UUID(int=102)
 MISSING_ID = UUID(int=103)
 DUMMY_PRIVATE_VALUE = "offline-private-error-detail-must-not-leak"
+FAKE_USER = {"id": str(UUID(int=104)), "email": "retrieval-test@example.invalid"}
 
 
 def document(identifier: UUID) -> DocumentRecord:
@@ -44,6 +46,12 @@ def chunk(parent: DocumentRecord, identifier: int, text: str) -> DocumentChunkRe
 
 class DocumentRetrievalApiTests(unittest.TestCase):
     def setUp(self) -> None:
+        auth_override = patch.dict(
+            main.app.dependency_overrides,
+            {get_current_user: lambda: FAKE_USER.copy()},
+        )
+        auth_override.start()
+        self.addCleanup(auth_override.stop)
         index.clear_retrieval_cache()
         self.addCleanup(index.clear_retrieval_cache)
         first, second = document(FIRST_ID), document(SECOND_ID)
@@ -206,22 +214,30 @@ class DocumentRetrievalApiTests(unittest.TestCase):
         self.assertEqual(response.json()["results"][0]["chunk_id"], "local.pdf_p1_c1")
         self.assertNotIn("document_id", response.json()["results"][0])
 
-    def test_unexpected_retrieval_failure_returns_safe_500_and_safe_log(self) -> None:
+    def test_unexpected_retrieval_failure_returns_safe_500_without_logging_private_details(self) -> None:
         with patch.object(retrieval_agent, "search_documents", side_effect=RuntimeError(DUMMY_PRIVATE_VALUE)):
-            with self.assertLogs(main.logger, level="ERROR") as captured:
+            with self.assertNoLogs(main.logger, level="DEBUG"):
                 response = self.retrieve()
         self.assert_safe_error(response, 500)
-        self.assertEqual(response.json(), {"detail": "Research retrieval failed."})
-        self.assertNotIn(DUMMY_PRIVATE_VALUE, " ".join(captured.output))
-
-    def test_empty_query_keeps_existing_agent_validation_response(self) -> None:
-        response = self.retrieve(query="   ")
-        self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json(), {
+            "detail": "An unexpected error occurred while processing the request.",
+        })
+
+    def test_empty_http_query_is_rejected_by_security_before_cloud_access(self) -> None:
+        response = self.retrieve(query="   ")
+        self.assert_safe_error(response, 400)
+        self.assertEqual(response.json(), {"detail": "Query cannot be empty."})
+        self.factory.assert_not_called()
+        self.local.assert_not_called()
+
+    def test_direct_agent_empty_query_keeps_existing_validation_response(self) -> None:
+        result = retrieval_agent.RetrievalAgent().run("   ", document_id=FIRST_ID)
+        self.assertEqual(result, {
             "agent": "Retrieval Agent", "status": "error",
             "message": "Research query cannot be empty.", "results": [],
         })
         self.factory.assert_not_called()
+        self.local.assert_not_called()
 
     def test_stopword_query_keeps_existing_agent_validation_response(self) -> None:
         response = self.retrieve(query="  the and or  ")

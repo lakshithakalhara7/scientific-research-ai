@@ -17,6 +17,7 @@ from starlette.datastructures import Headers
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from app.api import documents
+from app.core.auth import get_current_user
 from app.main import app
 from app.services.database_service import DocumentRecord
 from app.services.ingestion_service import IngestionError, IngestionService
@@ -26,6 +27,7 @@ from app.services.storage_service import MAX_PDF_SIZE_BYTES
 DOCUMENT_ID = str(UUID(int=41))
 PDF = b"%PDF-1.7\nOffline API fixture"
 DUMMY_PRIVATE_VALUE = "offline-private-value-must-not-leak"
+FAKE_USER = {"id": str(UUID(int=42)), "email": "upload-test@example.invalid"}
 
 
 def success_result() -> dict:
@@ -47,8 +49,12 @@ class DocumentUploadApiTests(unittest.TestCase):
     def setUp(self) -> None:
         self.service = Mock(spec=IngestionService)
         self.service.ingest_pdf.return_value = success_result()
-        app.dependency_overrides[documents.get_ingestion_service] = lambda: self.service
-        self.addCleanup(app.dependency_overrides.clear)
+        overrides = patch.dict(app.dependency_overrides, {
+            get_current_user: lambda: FAKE_USER.copy(),
+            documents.get_ingestion_service: lambda: self.service,
+        })
+        overrides.start()
+        self.addCleanup(overrides.stop)
         self.client = TestClient(app)
         self.addCleanup(self.client.close)
 
@@ -131,7 +137,7 @@ class DocumentUploadApiTests(unittest.TestCase):
         stream = BytesIO(PDF)
         file = UploadFile(file=stream, headers=Headers({"content-type": "application/pdf"}))
         with self.assertRaises(HTTPException) as caught:
-            documents.upload_document(service, file=file)
+            documents.upload_document(service, current_user=FAKE_USER.copy(), file=file)
         self.assertEqual(caught.exception.status_code, 400)
         self.assertIn("filename", caught.exception.detail)
         self.assertTrue(stream.closed)
@@ -226,7 +232,7 @@ class DocumentUploadApiTests(unittest.TestCase):
             headers=Headers({"content-type": "application/pdf"}),
         )
         with self.assertRaises(HTTPException) as caught:
-            documents.upload_document(self.service, file=file)
+            documents.upload_document(self.service, current_user=FAKE_USER.copy(), file=file)
         self.assertEqual(caught.exception.status_code, 413)
         stream.read.assert_not_called()
         stream.close.assert_called_once()
@@ -242,7 +248,7 @@ class DocumentUploadApiTests(unittest.TestCase):
         )
         with patch.object(documents, "MAX_PDF_SIZE_BYTES", 32):
             with self.assertRaises(HTTPException) as caught:
-                documents.upload_document(self.service, file=file)
+                documents.upload_document(self.service, current_user=FAKE_USER.copy(), file=file)
         self.assertEqual(caught.exception.status_code, 413)
         stream.read.assert_called_once_with(33)
         stream.close.assert_called_once()
@@ -266,7 +272,7 @@ class DocumentUploadApiTests(unittest.TestCase):
         )
         with self.assertLogs(documents.logger, level="ERROR"):
             with self.assertRaises(HTTPException):
-                documents.upload_document(self.service, file=file)
+                documents.upload_document(self.service, current_user=FAKE_USER.copy(), file=file)
         self.assertTrue(stream.closed)
 
     def test_existing_health_route_still_works(self) -> None:

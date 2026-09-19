@@ -4,9 +4,6 @@ from dotenv import load_dotenv
 from supabase import create_client
 
 
-load_dotenv()
-
-
 class AuthService:
     """
     Handles Supabase user authentication.
@@ -16,6 +13,8 @@ class AuthService:
     """
 
     def __init__(self):
+        # Configuration loading must not prevent unrelated modules from importing.
+        load_dotenv()
 
         self.supabase_url = os.getenv(
             "SUPABASE_URL"
