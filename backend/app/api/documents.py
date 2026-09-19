@@ -8,7 +8,7 @@ from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile, s
 from app.models.schemas import DocumentUploadResponse
 from app.services.ingestion_service import IngestionError, IngestionService
 from app.services.storage_service import MAX_PDF_SIZE_BYTES
-
+from app.core.auth import get_current_user
 
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/documents", tags=["documents"])
@@ -25,12 +25,34 @@ def get_ingestion_service() -> IngestionService:
     response_model=DocumentUploadResponse,
 )
 def upload_document(
-    service: Annotated[IngestionService, Depends(get_ingestion_service)],
-    file: Annotated[UploadFile | None, File()] = None,
-    category: Annotated[str | None, Form()] = None,
-    title: Annotated[str | None, Form()] = None,
-    doi: Annotated[str | None, Form()] = None,
-    source_url: Annotated[str | None, Form()] = None,
+    service: Annotated[
+        IngestionService,
+        Depends(get_ingestion_service)
+    ],
+    current_user: Annotated[
+        dict,
+        Depends(get_current_user)
+    ],
+    file: Annotated[
+        UploadFile | None,
+        File()
+    ] = None,
+    category: Annotated[
+        str | None,
+        Form()
+    ] = None,
+    title: Annotated[
+        str | None,
+        Form()
+    ] = None,
+    doi: Annotated[
+        str | None,
+        Form()
+    ] = None,
+    source_url: Annotated[
+        str | None,
+        Form()
+    ] = None,
 ) -> dict:
     """Ingest one PDF synchronously in FastAPI's worker thread pool."""
     if file is None:
