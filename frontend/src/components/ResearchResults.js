@@ -1,45 +1,59 @@
 import "./ResearchResults.css";
 
-function ResearchResults({
-  data,
-  query,
-}) {
+function ResearchResults({ data, query }) {
   if (!data) {
     return null;
   }
 
-  const papers =
-    data.papers || [];
+  // =========================================================
+  // REAL BACKEND RESPONSE
+  // =========================================================
 
-  const findings =
-    data.keyFindings || [];
+  const analysis = data.analysis || {};
+  const verification = data.verification || {};
+  const sources = data.sources || [];
+
+  const findings = analysis.key_findings || [];
+  const methods = analysis.methods || [];
+  const warnings = verification.warnings || [];
+
+  const verificationStatus =
+    verification.overall_status || "NOT VERIFIED";
+
+  const formatStatus = (status) => {
+    return String(status || "")
+      .replaceAll("_", " ")
+      .toLowerCase()
+      .replace(/\b\w/g, (letter) =>
+        letter.toUpperCase()
+      );
+  };
 
   return (
     <section className="research-results">
 
-      {/* HEADER */}
+      {/* =====================================================
+          HEADER
+      ===================================================== */}
 
       <div className="results-heading">
 
         <div>
-          <span>
-            AI RESEARCH
-          </span>
+          <span>AI RESEARCH</span>
 
-          <h2>
-            Research Analysis
-          </h2>
+          <h2>Research Analysis</h2>
         </div>
 
         <div className="ai-status">
           <span></span>
-
           ANALYSIS COMPLETE
         </div>
 
       </div>
 
-      {/* AGENTS */}
+      {/* =====================================================
+          AGENTS
+      ===================================================== */}
 
       <div className="agent-grid">
 
@@ -104,14 +118,16 @@ function ResearchResults({
           </div>
 
           <span className="agent-ready">
-            VERIFIED
+            {formatStatus(verificationStatus)}
           </span>
 
         </div>
 
       </div>
 
-      {/* QUESTION */}
+      {/* =====================================================
+          QUESTION
+      ===================================================== */}
 
       <div className="query-result-card">
 
@@ -135,7 +151,9 @@ function ResearchResults({
 
       </div>
 
-      {/* ANALYSIS */}
+      {/* =====================================================
+          ANALYSIS
+      ===================================================== */}
 
       <div className="analysis-result-card">
 
@@ -166,8 +184,11 @@ function ResearchResults({
         </div>
 
         <p className="analysis-summary">
-          {data.summary}
+          {analysis.summary ||
+            "No summary was returned."}
         </p>
+
+        {/* KEY FINDINGS */}
 
         {findings.length > 0 && (
 
@@ -202,9 +223,64 @@ function ResearchResults({
 
         )}
 
+        {/* METHODS */}
+
+        {methods.length > 0 && (
+
+          <div className="key-findings">
+
+            <h4>
+              Methods / Models
+            </h4>
+
+            {methods.map(
+              (method, index) => (
+
+                <div
+                  className="finding-item"
+                  key={index}
+                >
+
+                  <span>
+                    {index + 1}
+                  </span>
+
+                  <p>
+                    {method}
+                  </p>
+
+                </div>
+
+              )
+            )}
+
+          </div>
+
+        )}
+
+        {/* CONCLUSION */}
+
+        {analysis.conclusion && (
+
+          <div className="key-findings">
+
+            <h4>
+              Conclusion
+            </h4>
+
+            <p className="analysis-summary">
+              {analysis.conclusion}
+            </p>
+
+          </div>
+
+        )}
+
       </div>
 
-      {/* PAPERS */}
+      {/* =====================================================
+          RETRIEVED SOURCES
+      ===================================================== */}
 
       <div className="papers-section">
 
@@ -216,30 +292,32 @@ function ResearchResults({
             </span>
 
             <h3>
-              Research Papers
+              Research Sources
             </h3>
           </div>
 
           <div className="paper-count">
-            {papers.length} sources
+            {sources.length}{" "}
+            {sources.length === 1
+              ? "source"
+              : "sources"}
           </div>
 
         </div>
 
-        {papers.length === 0 ? (
+        {sources.length === 0 ? (
 
           <div className="no-papers">
 
             <span>📄</span>
 
             <h4>
-              No external papers returned
+              No research sources returned
             </h4>
 
             <p>
-              Scientific papers returned by
-              the retrieval agent will appear
-              in this section.
+              Sources returned by the retrieval
+              agent will appear in this section.
             </p>
 
           </div>
@@ -248,15 +326,12 @@ function ResearchResults({
 
           <div className="papers-grid">
 
-            {papers.map(
-              (paper, index) => (
+            {sources.map(
+              (source, index) => (
 
                 <article
                   className="paper-card"
-                  key={
-                    paper.id ||
-                    index
-                  }
+                  key={`${source.filename}-${source.page_number}-${source.chunk_number}-${index}`}
                 >
 
                   <div className="paper-card-top">
@@ -271,38 +346,46 @@ function ResearchResults({
                     </div>
 
                     <div className="paper-relevance">
-                      {paper.relevance ||
-                        "Relevant"}
+                      Retrieved
                     </div>
 
                   </div>
 
                   <h4>
-                    {paper.title}
+                    {source.filename ||
+                      "Research document"}
                   </h4>
 
                   <p className="paper-authors">
-                    {paper.authors}
+                    Retrieved evidence source
                   </p>
 
                   <div className="paper-meta">
 
                     <span>
-                      {paper.year}
+                      Page{" "}
+                      {source.page_number ??
+                        "—"}
                     </span>
 
                     <i></i>
 
                     <span>
-                      {paper.journal}
+                      Chunk{" "}
+                      {source.chunk_number ??
+                        "—"}
                     </span>
 
                   </div>
 
-                  {paper.abstract && (
+                  {source.retrieval_score !=
+                    null && (
 
                     <p className="paper-abstract">
-                      {paper.abstract}
+                      Retrieval score:{" "}
+                      {Number(
+                        source.retrieval_score
+                      ).toFixed(4)}
                     </p>
 
                   )}
@@ -311,30 +394,8 @@ function ResearchResults({
 
                     <span className="paper-source-status">
                       <i></i>
-
                       Source retrieved
                     </span>
-
-                    {paper.url ? (
-
-                      <a
-                        href={paper.url}
-                        target="_blank"
-                        rel="noreferrer"
-                      >
-                        View Source ↗
-                      </a>
-
-                    ) : (
-
-                      <button
-                        type="button"
-                        disabled
-                      >
-                        Demo Source
-                      </button>
-
-                    )}
 
                   </div>
 
@@ -349,7 +410,9 @@ function ResearchResults({
 
       </div>
 
-      {/* VERIFICATION */}
+      {/* =====================================================
+          VERIFICATION
+      ===================================================== */}
 
       <div className="verification-card">
 
@@ -364,48 +427,114 @@ function ResearchResults({
           </span>
 
           <h3>
-            {data.verification?.status ||
-              "Evidence reviewed"}
+            {formatStatus(
+              verificationStatus
+            )}
           </h3>
 
           <p>
-            {data.verification?.message ||
-              "Verification results will appear here."}
+            {verification.total_claims > 0
+              ? `${verification.verified_claims ?? 0} of ${verification.total_claims} claims were fully verified against the retrieved evidence.`
+              : "No claims were available for verification."}
           </p>
 
           <div className="verification-meta">
 
             <div>
+
               <strong>
-                {data.verification
-                  ?.sourcesChecked ??
-                  papers.length}
+                {sources.length}
               </strong>
 
               <span>
                 Sources Checked
               </span>
+
             </div>
 
             <div>
+
               <strong>
-                {data.verification
-                  ?.supportedClaims ??
-                  "—"}
+                {verification.verified_claims ??
+                  0}
               </strong>
 
               <span>
-                Supported Claims
+                Verified Claims
               </span>
+
+            </div>
+
+            <div>
+
+              <strong>
+                {verification.partially_supported_claims ??
+                  0}
+              </strong>
+
+              <span>
+                Partially Supported
+              </span>
+
+            </div>
+
+            <div>
+
+              <strong>
+                {verification.insufficient_evidence_claims ??
+                  0}
+              </strong>
+
+              <span>
+                Insufficient Evidence
+              </span>
+
             </div>
 
           </div>
+
+          {/* WARNINGS */}
+
+          {warnings.length > 0 && (
+
+            <div className="key-findings">
+
+              <h4>
+                Verification Warnings
+              </h4>
+
+              {warnings.map(
+                (warning, index) => (
+
+                  <div
+                    className="finding-item"
+                    key={index}
+                  >
+
+                    <span>!</span>
+
+                    <p>
+                      {warning.message ||
+                        warning.claim ||
+                        "Verification warning"}
+                    </p>
+
+                  </div>
+
+                )
+              )}
+
+            </div>
+
+          )}
 
         </div>
 
       </div>
 
-      {/* RESPONSIBLE AI */}
+      {/* =====================================================
+          RESPONSIBLE AI
+      ===================================================== */}
 
       <div className="result-disclaimer">
 

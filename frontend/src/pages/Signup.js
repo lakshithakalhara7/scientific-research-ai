@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { supabase } from "../services/supabase";
 import "./Signup.css";
 
 function Signup() {
@@ -12,25 +13,53 @@ function Signup() {
   const [loading, setLoading] = useState(false);
 
   const handleGoogleSignup = () => {
-  alert("Google Sign Up will be connected to Firebase later.");
+  alert("Google sign up is not enabled yet.");
 };
 
-  const handleSignup = (event) => {
+  const handleSignup = async (event) => {
     event.preventDefault();
 
     setLoading(true);
 
-    console.log({
-      name,
-      email,
-      password,
-    });
+    try {
+      const { data, error } =
+        await supabase.auth.signUp({
+          email: email.trim(),
+          password,
 
-    setTimeout(() => {
-      setLoading(false);
-      alert("Account created successfully!");
+          options: {
+            data: {
+              full_name: name.trim(),
+            },
+          },
+        });
+
+      if (error) {
+        throw error;
+      }
+
+      if (data.session) {
+        alert("Account created successfully!");
+
+        navigate("/research");
+        return;
+      }
+
+      alert(
+        "Account created. Please check your email to confirm your account, then sign in."
+      );
+
       navigate("/login");
-    }, 900);
+    } catch (error) {
+      console.error("Signup failed:", error);
+
+      alert(
+        error.message ||
+          "Unable to create your account."
+      );
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (

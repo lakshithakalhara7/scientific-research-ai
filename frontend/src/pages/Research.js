@@ -15,9 +15,11 @@ import PdfUpload from "../components/PdfUpload";
 import ResearchResults from "../components/ResearchResults";
 
 import {
-  analyzePdf,
+  uploadDocument,
   searchResearch,
 } from "../services/api";
+
+import { supabase } from "../services/supabase";
 
 
 function Research() {
@@ -56,152 +58,223 @@ function Research() {
     setShowPdfUpload,
   ] = useState(false);
 
+  const [
+    uploadedDocument,
+    setUploadedDocument,
+  ] = useState(null);
+
+  // NEW:
+  // Success message shown after PDF
+  // upload/indexing is completed.
+  const [
+    uploadMessage,
+    setUploadMessage,
+  ] = useState("");
+
 
   /* ==========================================
      SEARCH
   ========================================== */
 
-  const handleSearch =
-    async () => {
+  const handleSearch = async () => {
+    if (!query.trim() || loading) {
+      return;
+    }
 
-      if (
-        !query.trim() ||
-        loading
-      ) {
+    setLoading(true);
+    setSearched(true);
+    setSearchError("");
+
+    // Hide the PDF success message once
+    // the actual research request starts.
+    setUploadMessage("");
+
+    setResults(null);
+
+    try {
+      /* Get logged-in Supabase session */
+      const {
+        data: { session },
+        error: sessionError,
+      } = await supabase.auth.getSession();
+
+      if (sessionError) {
+        throw sessionError;
+      }
+
+      if (!session?.access_token) {
+        navigate("/login");
         return;
       }
 
+      /*
+        If a PDF was uploaded, restrict research
+        to that indexed document.
 
-      setLoading(true);
+        Otherwise document_id is null and the
+        backend searches its available research.
+      */
+      const documentId =
+        uploadedDocument?.id || null;
 
-      setSearched(true);
+      const data = await searchResearch(
+        query,
+        session.access_token,
+        documentId,
+        3
+      );
 
-      setSearchError("");
+      setResults(data);
 
-      setResults(null);
+      setTimeout(() => {
+        document
+          .querySelector(".research-results")
+          ?.scrollIntoView({
+            behavior: "smooth",
+            block: "start",
+          });
+      }, 150);
+    } catch (error) {
+      console.error(
+        "Research error:",
+        error
+      );
 
-
-      try {
-
-        const data =
-          await searchResearch(
-            query
-          );
-
-
-        setResults(data);
-
-
-        setTimeout(() => {
-
-          document
-            .querySelector(
-              ".research-results"
-            )
-            ?.scrollIntoView({
-              behavior:
-                "smooth",
-
-              block:
-                "start",
-            });
-
-        }, 150);
-
-      } catch (error) {
-
-        console.error(
-          "Research error:",
-          error
-        );
-
-
-        setSearchError(
+      setSearchError(
+        error.message ||
           "Unable to complete the research request. Please try again."
-        );
-
-      } finally {
-
-        setLoading(false);
-
-      }
-    };
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
 
 
   /* ==========================================
      PDF ANALYSIS
   ========================================== */
 
-  const handlePdfAnalysis =
-    async (file) => {
+  const handlePdfAnalysis = async (file) => {
+    if (!file || loading) {
+      return;
+    }
 
-      if (!file) {
+    console.log(
+      "PDF selected:",
+      file.name
+    );
+
+    setShowPdfUpload(false);
+    setLoading(true);
+    setSearchError("");
+    setUploadMessage("");
+
+    try {
+      /* Get logged-in Supabase session */
+      const {
+        data: { session },
+        error: sessionError,
+      } = await supabase.auth.getSession();
+
+      if (sessionError) {
+        throw sessionError;
+      }
+
+      if (!session?.access_token) {
+        navigate("/login");
         return;
       }
 
+      /* Upload + ingest + index PDF */
+      const uploadResponse =
+        await uploadDocument(
+          file,
+          session.access_token
+        );
 
       console.log(
-        "PDF selected:",
-        file
+        "Document uploaded:",
+        uploadResponse
       );
 
-
-      setShowPdfUpload(false);
-
-      setLoading(true);
-
-      setSearched(true);
-
-      setSearchError("");
-
-      setResults(null);
-
-
-      try {
-
-        const data =
-          await analyzePdf(
-            file
-          );
-
-
-        setResults(data);
-
-
-        setTimeout(() => {
-
-          document
-            .querySelector(
-              ".research-results"
-            )
-            ?.scrollIntoView({
-              behavior:
-                "smooth",
-
-              block:
-                "start",
-            });
-
-        }, 150);
-
-      } catch (error) {
-
-        console.error(
-          "PDF error:",
-          error
+      if (!uploadResponse?.document?.id) {
+        throw new Error(
+          "The backend uploaded the PDF but did not return a document ID."
         );
-
-
-        setSearchError(
-          "The PDF could not be analyzed. Please try again."
-        );
-
-      } finally {
-
-        setLoading(false);
-
       }
-    };
+
+      /*
+        Remember the indexed document.
+
+        This document ID will be passed to
+        /research when the user asks a question.
+      */
+      setUploadedDocument(
+        uploadResponse.document
+      );
+
+      /*
+        Do NOT put uploadResponse into
+        ResearchResults.
+
+        Uploading/indexing and asking the
+        research question are two different
+        operations.
+      */
+      setResults(null);
+      setSearched(false);
+
+      /*
+        IMPORTANT CHANGE:
+
+        Previously we automatically generated:
+        "Summarize the key findings... filename.pdf"
+
+        That filename-heavy question can reduce
+        retrieval quality.
+
+        Instead, keep the search box empty and
+        let the user ask a natural question.
+      */
+      setQuery("");
+
+      /*
+        Show a success message informing the user
+        that the PDF is indexed and ready.
+      */
+      setUploadMessage(
+        "PDF uploaded successfully! Your document has been indexed. Ask a research question about this document below."
+      );
+
+      /*
+        Move back to the research box and
+        automatically focus it.
+      */
+      setTimeout(() => {
+        searchRef.current
+          ?.scrollIntoView({
+            behavior: "smooth",
+            block: "center",
+          });
+
+        searchRef.current?.focus();
+      }, 150);
+    } catch (error) {
+      console.error(
+        "PDF upload error:",
+        error
+      );
+
+      setUploadMessage("");
+
+      setSearchError(
+        error.message ||
+          "The PDF could not be uploaded. Please try again."
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
 
 
   /* ==========================================
@@ -386,14 +459,17 @@ function Research() {
 
           <button
             className="logout-button"
-            onClick={() => {
-
-              localStorage.removeItem(
-                "researchAI_logged_in"
-              );
-
-              navigate("/");
-
+            onClick={async () => {
+              try {
+                await supabase.auth.signOut();
+              } catch (error) {
+                console.error(
+                  "Logout error:",
+                  error
+                );
+              } finally {
+                navigate("/");
+              }
             }}
           >
             Logout
@@ -481,12 +557,20 @@ function Research() {
             <textarea
               ref={searchRef}
               value={query}
-              placeholder="Ask anything about scientific research..."
-              onChange={(event) =>
+              placeholder={
+                uploadedDocument
+                  ? "Ask a question about your uploaded PDF..."
+                  : "Ask anything about scientific research..."
+              }
+              onChange={(event) => {
                 setQuery(
                   event.target.value
-                )
-              }
+                );
+
+                if (searchError) {
+                  setSearchError("");
+                }
+              }}
               onKeyDown={(event) => {
 
                 if (
@@ -513,11 +597,12 @@ function Research() {
                 type="button"
                 className="search-attachment"
                 title="Upload PDF"
-                onClick={() =>
+                onClick={() => {
+                  setSearchError("");
                   setShowPdfUpload(
                     true
-                  )
-                }
+                  );
+                }}
               >
 
                 <svg
@@ -592,6 +677,45 @@ function Research() {
             </div>
 
           </div>
+
+
+          {/* PDF UPLOAD SUCCESS MESSAGE */}
+
+          {uploadMessage && (
+
+            <div className="pdf-upload-success">
+
+              <div className="pdf-upload-success-icon">
+                ✓
+              </div>
+
+              <div className="pdf-upload-success-content">
+
+                <strong>
+                  Document ready for research
+                </strong>
+
+                <p>
+                  {uploadMessage}
+                </p>
+
+                {uploadedDocument
+                  ?.original_filename && (
+
+                  <span className="uploaded-file-name">
+                    📄{" "}
+                    {
+                      uploadedDocument.original_filename
+                    }
+                  </span>
+
+                )}
+
+              </div>
+
+            </div>
+
+          )}
 
 
           {/* SUGGESTIONS */}
@@ -704,11 +828,12 @@ function Research() {
               <button
                 type="button"
                 className="capability-action"
-                onClick={() =>
+                onClick={() => {
+                  setSearchError("");
                   setShowPdfUpload(
                     true
-                  )
-                }
+                  );
+                }}
               >
                 Upload PDF
 
@@ -971,8 +1096,3 @@ function Research() {
 
 
 export default Research;
-
-
-
-
-

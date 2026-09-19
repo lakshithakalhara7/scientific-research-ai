@@ -2038,5 +2038,124 @@ button {
     min-height: 240px;
   }
 }
+/* =========================================================
+   PDF UPLOAD SUCCESS MESSAGE
+========================================================= */
 
+.pdf-upload-success {
+  width: 100%;
+  box-sizing: border-box;
+
+  margin-top: 18px;
+  padding: 16px 18px;
+
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+
+  text-align: left;
+
+  background: rgba(236, 253, 250, 0.9);
+  border: 1px solid #b9eee4;
+  border-radius: 14px;
+
+  box-shadow:
+    0 8px 24px
+    rgba(15, 118, 110, 0.05);
+
+  animation:
+    pdfSuccessIn 0.25s ease;
+}
+
+.pdf-upload-success-icon {
+  width: 36px;
+  height: 36px;
+  min-width: 36px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 10px;
+
+  background: #d9f8f1;
+  color: #0ca789;
+
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.pdf-upload-success-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.pdf-upload-success-content strong {
+  display: block;
+
+  margin-bottom: 4px;
+
+  color: #17345c;
+
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.pdf-upload-success-content p {
+  margin: 0;
+
+  color: #64748b;
+
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+.uploaded-file-name {
+  display: block;
+
+  margin-top: 8px;
+
+  color: #4f6cff;
+
+  font-size: 12px;
+  font-weight: 600;
+
+  overflow-wrap: anywhere;
+}
+
+@keyframes pdfSuccessIn {
+  from {
+    opacity: 0;
+    transform: translateY(-5px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 768px) {
+  .pdf-upload-success {
+    padding: 14px;
+    margin-top: 14px;
+  }
+
+  .pdf-upload-success-icon {
+    width: 32px;
+    height: 32px;
+    min-width: 32px;
+
+    font-size: 16px;
+  }
+
+  .pdf-upload-success-content strong {
+    font-size: 13px;
+  }
+
+  .pdf-upload-success-content p,
+  .uploaded-file-name {
+    font-size: 11px;
+  }
+}
 
