@@ -22,6 +22,151 @@ import {
 import { supabase } from "../services/supabase";
 
 
+/* =========================================================
+   ICON COMPONENT
+========================================================= */
+
+function Icon({
+  name,
+  size = 20,
+}) {
+  const common = {
+    width: size,
+    height: size,
+    viewBox: "0 0 24 24",
+    fill: "none",
+    stroke: "currentColor",
+    strokeWidth: 1.8,
+    strokeLinecap: "round",
+    strokeLinejoin: "round",
+    "aria-hidden": "true",
+  };
+
+  const paths = {
+    plus: (
+      <>
+        <path d="M12 5v14" />
+        <path d="M5 12h14" />
+      </>
+    ),
+
+    search: (
+      <>
+        <circle
+          cx="11"
+          cy="11"
+          r="7"
+        />
+        <path d="m20 20-3.7-3.7" />
+      </>
+    ),
+
+    book: (
+      <>
+        <path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H11v17H6.5A2.5 2.5 0 0 0 4 22z" />
+        <path d="M20 5.5A2.5 2.5 0 0 0 17.5 3H13v17h4.5A2.5 2.5 0 0 1 20 22z" />
+      </>
+    ),
+
+    history: (
+      <>
+        <path d="M3 12a9 9 0 1 0 3-6.7L3 8" />
+        <path d="M3 3v5h5" />
+        <path d="M12 7v5l3 2" />
+      </>
+    ),
+
+    bookmark: (
+      <path d="M6 4.5A1.5 1.5 0 0 1 7.5 3h9A1.5 1.5 0 0 1 18 4.5V21l-6-4-6 4z" />
+    ),
+
+    file: (
+      <>
+        <path d="M6 2h8l4 4v16H6z" />
+        <path d="M14 2v5h5" />
+        <path d="M9 12h6M9 16h6" />
+      </>
+    ),
+
+    shield: (
+      <>
+        <path d="M12 3 5 6v5c0 4.8 2.9 8.2 7 10 4.1-1.8 7-5.2 7-10V6z" />
+        <path d="m9.5 12 1.7 1.7 3.5-3.8" />
+      </>
+    ),
+
+    chart: (
+      <>
+        <path d="M5 20V10" />
+        <path d="M10 20V4" />
+        <path d="M15 20v-7" />
+        <path d="M20 20V7" />
+      </>
+    ),
+
+    sparkle: (
+      <>
+        <path d="m12 3 1.2 3.8L17 8l-3.8 1.2L12 13l-1.2-3.8L7 8l3.8-1.2z" />
+        <path d="m18.5 14 .7 2.3 2.3.7-2.3.7-.7 2.3-.7-2.3-2.3-.7 2.3-.7z" />
+      </>
+    ),
+
+    settings: (
+      <>
+        <circle
+          cx="12"
+          cy="12"
+          r="3"
+        />
+
+        <path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1-2.8 2.8-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.5V21h-4v-.1a1.7 1.7 0 0 0-1-1.5 1.7 1.7 0 0 0-1.9.3l-.1.1L4.2 17l.1-.1a1.7 1.7 0 0 0 .3-1.9A1.7 1.7 0 0 0 3.1 14H3v-4h.1A1.7 1.7 0 0 0 4.6 9a1.7 1.7 0 0 0-.3-1.9L4.2 7 7 4.2l.1.1a1.7 1.7 0 0 0 1.9.3A1.7 1.7 0 0 0 10 3.1V3h4v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.9-.3l.1-.1L19.8 7l-.1.1a1.7 1.7 0 0 0-.3 1.9 1.7 1.7 0 0 0 1.5 1H21v4h-.1a1.7 1.7 0 0 0-1.5 1z" />
+      </>
+    ),
+
+    paperclip: (
+      <path d="m20.5 11.5-8.9 8.9a5 5 0 0 1-7.1-7.1l9.5-9.5a3.5 3.5 0 1 1 5 5l-9.5 9.5a2 2 0 0 1-2.8-2.8l8.8-8.8" />
+    ),
+
+    arrow: (
+      <>
+        <path d="M5 12h14" />
+        <path d="m14 7 5 5-5 5" />
+      </>
+    ),
+
+    check: (
+      <path d="m7 12 3 3 7-7" />
+    ),
+
+    bulb: (
+      <>
+        <path d="M9 18h6" />
+        <path d="M10 22h4" />
+        <path d="M8.5 14.5A6 6 0 1 1 15.5 14.5c-.9.7-1.5 1.5-1.5 2.5h-4c0-1-.6-1.8-1.5-2.5z" />
+      </>
+    ),
+
+    logout: (
+      <>
+        <path d="M10 17l5-5-5-5" />
+        <path d="M15 12H3" />
+        <path d="M21 19V5a2 2 0 0 0-2-2h-6" />
+      </>
+    ),
+  };
+
+  return (
+    <svg {...common}>
+      {paths[name]}
+    </svg>
+  );
+}
+
+
+/* =========================================================
+   RESEARCH PAGE
+========================================================= */
+
 function Research() {
   const navigate =
     useNavigate();
@@ -32,21 +177,35 @@ function Research() {
   const searchRef =
     useRef(null);
 
+  const profileRef =
+    useRef(null);
 
 
-  const [query, setQuery] =
-    useState(
-      location.state?.query || ""
-    );
+  /* =========================================================
+     STATE
+  ========================================================= */
 
-  const [searched, setSearched] =
-    useState(false);
+  const [
+    query,
+    setQuery,
+  ] = useState(
+    location.state?.query || ""
+  );
 
-  const [loading, setLoading] =
-    useState(false);
+  const [
+    searched,
+    setSearched,
+  ] = useState(false);
 
-  const [results, setResults] =
-    useState(null);
+  const [
+    loading,
+    setLoading,
+  ] = useState(false);
+
+  const [
+    results,
+    setResults,
+  ] = useState(null);
 
   const [
     searchError,
@@ -63,653 +222,1422 @@ function Research() {
     setUploadedDocument,
   ] = useState(null);
 
-  // NEW:
-  // Success message shown after PDF
-  // upload/indexing is completed.
   const [
     uploadMessage,
     setUploadMessage,
   ] = useState("");
 
+  const [
+    currentUser,
+    setCurrentUser,
+  ] = useState(null);
 
-  /* ==========================================
-     SEARCH
-  ========================================== */
+  const [
+    userName,
+    setUserName,
+  ] = useState("");
 
-  const handleSearch = async () => {
-    if (!query.trim() || loading) {
-      return;
-    }
+  const [
+    userInitial,
+    setUserInitial,
+  ] = useState("U");
 
-    setLoading(true);
-    setSearched(true);
-    setSearchError("");
+  const [
+    sidebarCollapsed,
+    setSidebarCollapsed,
+  ] = useState(false);
 
-    // Hide the PDF success message once
-    // the actual research request starts.
-    setUploadMessage("");
-
-    setResults(null);
-
-    try {
-      /* Get logged-in Supabase session */
-      const {
-        data: { session },
-        error: sessionError,
-      } = await supabase.auth.getSession();
-
-      if (sessionError) {
-        throw sessionError;
-      }
-
-      if (!session?.access_token) {
-        navigate("/login");
-        return;
-      }
-
-      /*
-        If a PDF was uploaded, restrict research
-        to that indexed document.
-
-        Otherwise document_id is null and the
-        backend searches its available research.
-      */
-      const documentId =
-        uploadedDocument?.id || null;
-
-      const data = await searchResearch(
-        query,
-        session.access_token,
-        documentId,
-        3
-      );
-
-      setResults(data);
-
-      setTimeout(() => {
-        document
-          .querySelector(".research-results")
-          ?.scrollIntoView({
-            behavior: "smooth",
-            block: "start",
-          });
-      }, 150);
-    } catch (error) {
-      console.error(
-        "Research error:",
-        error
-      );
-
-      setSearchError(
-        error.message ||
-          "Unable to complete the research request. Please try again."
-      );
-    } finally {
-      setLoading(false);
-    }
-  };
+  const [
+    profileOpen,
+    setProfileOpen,
+  ] = useState(false);
 
 
-  /* ==========================================
-     PDF ANALYSIS
-  ========================================== */
-
-  const handlePdfAnalysis = async (file) => {
-    if (!file || loading) {
-      return;
-    }
-
-    console.log(
-      "PDF selected:",
-      file.name
-    );
-
-    setShowPdfUpload(false);
-    setLoading(true);
-    setSearchError("");
-    setUploadMessage("");
-
-    try {
-      /* Get logged-in Supabase session */
-      const {
-        data: { session },
-        error: sessionError,
-      } = await supabase.auth.getSession();
-
-      if (sessionError) {
-        throw sessionError;
-      }
-
-      if (!session?.access_token) {
-        navigate("/login");
-        return;
-      }
-
-      /* Upload + ingest + index PDF */
-      const uploadResponse =
-        await uploadDocument(
-          file,
-          session.access_token
-        );
-
-      console.log(
-        "Document uploaded:",
-        uploadResponse
-      );
-
-      if (!uploadResponse?.document?.id) {
-        throw new Error(
-          "The backend uploaded the PDF but did not return a document ID."
-        );
-      }
-
-      /*
-        Remember the indexed document.
-
-        This document ID will be passed to
-        /research when the user asks a question.
-      */
-      setUploadedDocument(
-        uploadResponse.document
-      );
-
-      /*
-        Do NOT put uploadResponse into
-        ResearchResults.
-
-        Uploading/indexing and asking the
-        research question are two different
-        operations.
-      */
-      setResults(null);
-      setSearched(false);
-
-      /*
-        IMPORTANT CHANGE:
-
-        Previously we automatically generated:
-        "Summarize the key findings... filename.pdf"
-
-        That filename-heavy question can reduce
-        retrieval quality.
-
-        Instead, keep the search box empty and
-        let the user ask a natural question.
-      */
-      setQuery("");
-
-      /*
-        Show a success message informing the user
-        that the PDF is indexed and ready.
-      */
-      setUploadMessage(
-        "PDF uploaded successfully! Your document has been indexed. Ask a research question about this document below."
-      );
-
-      /*
-        Move back to the research box and
-        automatically focus it.
-      */
-      setTimeout(() => {
-        searchRef.current
-          ?.scrollIntoView({
-            behavior: "smooth",
-            block: "center",
-          });
-
-        searchRef.current?.focus();
-      }, 150);
-    } catch (error) {
-      console.error(
-        "PDF upload error:",
-        error
-      );
-
-      setUploadMessage("");
-
-      setSearchError(
-        error.message ||
-          "The PDF could not be uploaded. Please try again."
-      );
-    } finally {
-      setLoading(false);
-    }
-  };
-
-
-  /* ==========================================
-     SEARCH FOCUS
-  ========================================== */
-
-  const focusResearch =
-    () => {
-
-      searchRef.current
-        ?.scrollIntoView({
-          behavior:
-            "smooth",
-
-          block:
-            "center",
-        });
-
-
-      setTimeout(() => {
-
-        searchRef.current
-          ?.focus();
-
-      }, 400);
-    };
-
-
-  /* ==========================================
-     INITIAL QUERY
-  ========================================== */
+  /* =========================================================
+     LOAD LOGGED-IN USER
+  ========================================================= */
 
   useEffect(() => {
+    const loadCurrentUser =
+      async () => {
+        try {
+          const {
+            data: { user },
+            error,
+          } =
+            await supabase.auth.getUser();
 
-    if (
-      location.state?.query
-    ) {
+          if (error) {
+            throw error;
+          }
 
+          if (!user) {
+            navigate("/login");
+            return;
+          }
+
+          setCurrentUser(user);
+
+          const fullName =
+            user.user_metadata?.full_name ||
+            user.user_metadata?.name ||
+            user.user_metadata?.first_name ||
+            "";
+
+          const email =
+            user.email || "";
+
+          const firstName =
+            fullName.trim()
+              ? fullName
+                  .trim()
+                  .split(" ")[0]
+              : email.split("@")[0];
+
+          setUserName(firstName);
+
+          const initial =
+            firstName?.charAt(0) ||
+            email?.charAt(0) ||
+            "U";
+
+          setUserInitial(
+            initial.toUpperCase()
+          );
+        } catch (error) {
+          console.error(
+            "Unable to load user:",
+            error
+          );
+        }
+      };
+
+    loadCurrentUser();
+  }, [navigate]);
+
+
+  /* =========================================================
+     INITIAL QUERY
+  ========================================================= */
+
+  useEffect(() => {
+    if (location.state?.query) {
       setQuery(
         location.state.query
       );
-
     }
-
   }, [location.state]);
 
 
+  /* =========================================================
+     CLOSE PROFILE WHEN CLICKING OUTSIDE
+  ========================================================= */
+
+  useEffect(() => {
+    const handleOutsideClick =
+      (event) => {
+        if (
+          profileRef.current &&
+          !profileRef.current.contains(
+            event.target
+          )
+        ) {
+          setProfileOpen(false);
+        }
+      };
+
+    document.addEventListener(
+      "mousedown",
+      handleOutsideClick
+    );
+
+    return () => {
+      document.removeEventListener(
+        "mousedown",
+        handleOutsideClick
+      );
+    };
+  }, []);
+
+
+  /* =========================================================
+     RESEARCH FOCUS
+  ========================================================= */
+
+  const focusResearch = () => {
+    searchRef.current
+      ?.scrollIntoView({
+        behavior: "smooth",
+        block: "center",
+      });
+
+    setTimeout(() => {
+      searchRef.current?.focus();
+    }, 350);
+  };
+
+
+  /* =========================================================
+     SEARCH
+  ========================================================= */
+
+  const handleSearch =
+    async () => {
+      if (
+        !query.trim() ||
+        loading
+      ) {
+        return;
+      }
+
+      setLoading(true);
+      setSearched(true);
+      setSearchError("");
+      setUploadMessage("");
+      setResults(null);
+
+      try {
+        const {
+          data: { session },
+          error: sessionError,
+        } =
+          await supabase.auth.getSession();
+
+        if (sessionError) {
+          throw sessionError;
+        }
+
+        if (
+          !session?.access_token
+        ) {
+          navigate("/login");
+          return;
+        }
+
+        const documentId =
+          uploadedDocument?.id ||
+          null;
+
+        const data =
+          await searchResearch(
+            query,
+            session.access_token,
+            documentId,
+            3
+          );
+
+        setResults(data);
+
+        setTimeout(() => {
+          document
+            .querySelector(
+              ".research-results"
+            )
+            ?.scrollIntoView({
+              behavior: "smooth",
+              block: "start",
+            });
+        }, 150);
+      } catch (error) {
+        console.error(
+          "Research error:",
+          error
+        );
+
+        setSearchError(
+          error.message ||
+            "Unable to complete the research request. Please try again."
+        );
+      } finally {
+        setLoading(false);
+      }
+    };
+
+
+  /* =========================================================
+     PDF UPLOAD
+  ========================================================= */
+
+  const handlePdfAnalysis =
+    async (file) => {
+      if (
+        !file ||
+        loading
+      ) {
+        return;
+      }
+
+      setShowPdfUpload(false);
+      setLoading(true);
+      setSearchError("");
+      setUploadMessage("");
+
+      try {
+        const {
+          data: { session },
+          error: sessionError,
+        } =
+          await supabase.auth.getSession();
+
+        if (sessionError) {
+          throw sessionError;
+        }
+
+        if (
+          !session?.access_token
+        ) {
+          navigate("/login");
+          return;
+        }
+
+        const uploadResponse =
+          await uploadDocument(
+            file,
+            session.access_token
+          );
+
+        if (
+          !uploadResponse
+            ?.document?.id
+        ) {
+          throw new Error(
+            "The backend uploaded the PDF but did not return a document ID."
+          );
+        }
+
+        setUploadedDocument(
+          uploadResponse.document
+        );
+
+        setResults(null);
+        setSearched(false);
+        setQuery("");
+
+        setUploadMessage(
+          "PDF uploaded successfully! Your document has been indexed. Ask a research question about this document below."
+        );
+
+        setTimeout(() => {
+          searchRef.current
+            ?.scrollIntoView({
+              behavior: "smooth",
+              block: "center",
+            });
+
+          searchRef.current
+            ?.focus();
+        }, 150);
+      } catch (error) {
+        console.error(
+          "PDF upload error:",
+          error
+        );
+
+        setUploadMessage("");
+
+        setSearchError(
+          error.message ||
+            "The PDF could not be uploaded. Please try again."
+        );
+      } finally {
+        setLoading(false);
+      }
+    };
+
+
+  /* =========================================================
+     LOGOUT
+  ========================================================= */
+
+  const handleLogout =
+    async () => {
+      try {
+        await supabase.auth.signOut();
+      } catch (error) {
+        console.error(
+          "Logout error:",
+          error
+        );
+      } finally {
+        setProfileOpen(false);
+        navigate("/");
+      }
+    };
+
+
+  /* =========================================================
+     SUGGESTIONS
+  ========================================================= */
+
+  const suggestions = [
+    [
+      "Artificial Intelligence",
+      "Latest advances in artificial intelligence",
+    ],
+    [
+      "Quantum Computing",
+      "Recent research in quantum computing",
+    ],
+    [
+      "Climate Change",
+      "Latest scientific research about climate change",
+    ],
+    [
+      "Machine Learning",
+      "Machine learning applications in healthcare",
+    ],
+  ];
+
+
+  /* =========================================================
+     UI
+  ========================================================= */
+
   return (
-    <div className="research-home">
+    <div
+      className={`research-app-shell ${
+        sidebarCollapsed
+          ? "sidebar-collapsed"
+          : ""
+      }`}
+    >
 
-      {/* BACKGROUND */}
+      {/* =====================================================
+          SIDEBAR
+      ===================================================== */}
 
-      <div
-        className="research-bg"
-        aria-hidden="true"
-      >
+      <aside className="research-sidebar">
 
-        <div className="research-grid"></div>
-
-        <div className="research-glow glow-1"></div>
-
-        <div className="research-glow glow-2"></div>
-
-        <div className="research-glow glow-3"></div>
-
-      </div>
-
-
-      {/* NAVBAR */}
-
-      <header className="research-navbar">
+        {/* COLLAPSE / EXPAND */}
 
         <button
-          className="research-brand"
+          type="button"
+          className="sidebar-collapse-btn"
           onClick={() =>
-            navigate(
-              "/research"
+            setSidebarCollapsed(
+              (previous) =>
+                !previous
             )
           }
+          title={
+            sidebarCollapsed
+              ? "Expand sidebar"
+              : "Collapse sidebar"
+          }
+          aria-label={
+            sidebarCollapsed
+              ? "Expand sidebar"
+              : "Collapse sidebar"
+          }
         >
-
-          <div className="home-brand-logo-frame">
-
-            <img
-              src="/resqmind-logo.jpeg"
-              alt="ResoMind"
-              className="home-brand-logo"
-            />
-
-          </div>
-
-
-          <div>
-
-            <strong>
-              Reso<span>Mind</span>
-            </strong>
-
-            <small>
-              Intelligent Research Workspace
-            </small>
-
-          </div>
-
+          {sidebarCollapsed
+            ? "›"
+            : "‹"}
         </button>
 
 
-        <nav className="research-nav">
+        {/* BRAND */}
+
+        <button
+          type="button"
+          className="sidebar-brand"
+          onClick={() =>
+            navigate("/research")
+          }
+          title="ResoMind"
+        >
+          <div className="brand-mark-wrap">
+            <img
+              src="/resqmind-logo.jpeg"
+              alt="ResoMind"
+              className="brand-mark"
+            />
+          </div>
+
+          <div>
+            <strong>
+              Reso
+              <span>Mind</span>
+            </strong>
+
+            <small>
+              AI Research Workspace
+            </small>
+          </div>
+        </button>
+
+
+        {/* NEW RESEARCH */}
+
+        <button
+          type="button"
+          className="new-research-btn"
+          onClick={focusResearch}
+          title="New Research"
+        >
+          <Icon
+            name="plus"
+            size={22}
+          />
+
+          <span>
+            New Research
+          </span>
+        </button>
+
+
+        {/* MAIN NAVIGATION */}
+
+        <nav
+          className="sidebar-nav"
+          aria-label="Main navigation"
+        >
 
           <button
+            type="button"
             className="active"
-            onClick={() => {
-
-              window.scrollTo({
-                top: 0,
-                behavior:
-                  "smooth",
-              });
-
-            }}
+            onClick={focusResearch}
+            title="Discover"
           >
-            Home
+            <Icon name="search" />
+
+            <span>
+              Discover
+            </span>
           </button>
 
 
           <button
-            onClick={
-              focusResearch
+            type="button"
+            onClick={() =>
+              alert(
+                "Library will be connected in the next stage."
+              )
             }
+            title="Library"
           >
-            Research
+            <Icon name="book" />
+
+            <span>
+              Library
+            </span>
           </button>
 
 
           <button
-            onClick={() => {
-
-              if (results) {
-
-                document
-                  .querySelector(
-                    ".papers-section"
-                  )
-                  ?.scrollIntoView({
-                    behavior:
-                      "smooth",
-                  });
-
-              } else {
-
-                focusResearch();
-
-              }
-
-            }}
-          >
-            Papers
-          </button>
-
-
-          <button
-            onClick={() => {
-
+            type="button"
+            onClick={() =>
               alert(
                 "Research history will be connected in the next stage."
-              );
-
-            }}
+              )
+            }
+            title="Research History"
           >
-            History
+            <Icon name="history" />
+
+            <span>
+              Research History
+            </span>
+          </button>
+
+
+          <button
+            type="button"
+            onClick={() =>
+              alert(
+                "Saved papers will be connected in the next stage."
+              )
+            }
+            title="Saved Papers"
+          >
+            <Icon name="bookmark" />
+
+            <span>
+              Saved Papers
+            </span>
           </button>
 
         </nav>
 
 
-        <div className="research-user">
+        {/* RESEARCH TOOLS LABEL */}
 
-          <div className="research-avatar">
-            R
-          </div>
+        <div className="sidebar-section-label">
+          RESEARCH TOOLS
+        </div>
+
+
+        {/* RESEARCH TOOLS */}
+
+        <nav
+          className="sidebar-nav sidebar-tools"
+          aria-label="Research tools"
+        >
+
+          <button
+            type="button"
+            onClick={() => {
+              setSearchError("");
+              setShowPdfUpload(true);
+            }}
+            title="Paper Analyzer"
+          >
+            <Icon name="file" />
+
+            <span>
+              Paper Analyzer
+            </span>
+          </button>
 
 
           <button
-            className="logout-button"
-            onClick={async () => {
-              try {
-                await supabase.auth.signOut();
-              } catch (error) {
-                console.error(
-                  "Logout error:",
-                  error
-                );
-              } finally {
-                navigate("/");
+            type="button"
+            onClick={() => {
+              if (results) {
+                document
+                  .querySelector(
+                    ".verification-card"
+                  )
+                  ?.scrollIntoView({
+                    behavior:
+                      "smooth",
+                  });
+              } else {
+                focusResearch();
               }
             }}
+            title="Source Verification"
           >
-            Logout
+            <Icon name="shield" />
+
+            <span>
+              Source Verification
+            </span>
           </button>
+
+
+          <button
+            type="button"
+            onClick={() => {
+              if (results) {
+                document
+                  .querySelector(
+                    ".research-results"
+                  )
+                  ?.scrollIntoView({
+                    behavior:
+                      "smooth",
+                  });
+              } else {
+                focusResearch();
+              }
+            }}
+            title="Research Insights"
+          >
+            <Icon name="chart" />
+
+            <span>
+              Research Insights
+            </span>
+          </button>
+
+
+          <button
+            type="button"
+            onClick={focusResearch}
+            title="AI Assistant"
+          >
+            <Icon name="sparkle" />
+
+            <span>
+              AI Assistant
+            </span>
+          </button>
+
+        </nav>
+
+
+        {/* SIDEBAR BOTTOM */}
+
+        <div className="sidebar-bottom">
+
+          <button
+            type="button"
+            className="settings-btn"
+            title="Settings"
+            onClick={() =>
+              alert(
+                "Settings will be connected in the next stage."
+              )
+            }
+          >
+            <Icon name="settings" />
+
+            <span>
+              Settings
+            </span>
+          </button>
+
+
+          <div className="sidebar-ai-card">
+
+            <div className="sidebar-ai-icon">
+              <Icon
+                name="sparkle"
+                size={18}
+              />
+            </div>
+
+            <div>
+              <strong>
+                ResoMind AI
+              </strong>
+
+              <span>
+                Research smarter with
+                intelligent AI agents.
+              </span>
+            </div>
+
+          </div>
 
         </div>
 
-      </header>
+      </aside>
 
 
-      {/* MAIN */}
+      {/* =====================================================
+          WORKSPACE
+      ===================================================== */}
 
-      <main className="research-main">
+      <div className="research-workspace">
 
+        {/* TOP BAR */}
 
-        {/* HERO */}
+        <header className="workspace-topbar">
 
-        <section className="research-hero">
+          <div></div>
 
-          <div className="research-status">
+          <div className="topbar-actions">
 
-            <span></span>
+            {/* ONLINE STATUS */}
 
-            AI RESEARCH WORKSPACE
-
-          </div>
-
-
-          <h1>
-
-            Discover knowledge.
-
-            <br />
-
-            <span>
-              Research smarter.
-            </span>
-
-          </h1>
-
-
-          <p className="research-description">
-
-            Search scientific literature,
-            analyze research papers,
-            investigate evidence and
-            transform complex scientific
-            information into meaningful
-            insights.
-
-          </p>
-
-
-          {/* SEARCH BOX */}
-
-          <div className="research-search-box">
-
-            <div className="research-search-icon">
-
-              <svg
-                viewBox="0 0 24 24"
-                fill="none"
-              >
-
-                <circle
-                  cx="11"
-                  cy="11"
-                  r="7"
-                  stroke="currentColor"
-                  strokeWidth="1.8"
-                />
-
-                <path
-                  d="M16.5 16.5L21 21"
-                  stroke="currentColor"
-                  strokeWidth="1.8"
-                  strokeLinecap="round"
-                />
-
-              </svg>
-
+            <div className="online-status">
+              <span></span>
+              AI systems online
             </div>
 
 
-            <textarea
-              ref={searchRef}
-              value={query}
-              placeholder={
-                uploadedDocument
-                  ? "Ask a question about your uploaded PDF..."
-                  : "Ask anything about scientific research..."
-              }
-              onChange={(event) => {
-                setQuery(
-                  event.target.value
-                );
+            {/* USER PROFILE */}
 
-                if (searchError) {
-                  setSearchError("");
-                }
-              }}
-              onKeyDown={(event) => {
-
-                if (
-                  event.key ===
-                    "Enter" &&
-                  !event.shiftKey
-                ) {
-
-                  event.preventDefault();
-
-                  handleSearch();
-
-                }
-
-              }}
-            />
-
-
-            <div className="research-search-actions">
-
-              {/* PDF ICON */}
+            <div
+              className="profile-menu-wrap"
+              ref={profileRef}
+            >
 
               <button
                 type="button"
-                className="search-attachment"
-                title="Upload PDF"
-                onClick={() => {
-                  setSearchError("");
-                  setShowPdfUpload(
-                    true
-                  );
-                }}
+                className="user-chip"
+                onClick={() =>
+                  setProfileOpen(
+                    (previous) =>
+                      !previous
+                  )
+                }
+                aria-expanded={
+                  profileOpen
+                }
               >
 
-                <svg
-                  viewBox="0 0 24 24"
-                  fill="none"
+                <div
+                  className="user-avatar"
+                  title={
+                    currentUser?.email ||
+                    "User"
+                  }
                 >
-
-                  <path
-                    d="M21.4 11.6L12 21A6 6 0 0 1 3.5 12.5L13 3A4 4 0 0 1 18.7 8.7L9.2 18.2A2 2 0 0 1 6.4 15.4L15 6.8"
-                    stroke="currentColor"
-                    strokeWidth="1.7"
-                    strokeLinecap="round"
-                  />
-
-                </svg>
-
-              </button>
+                  {userInitial}
+                </div>
 
 
-              {/* SEARCH BUTTON */}
+                <div className="user-meta">
 
-              <button
-                className="research-search-button"
-                type="button"
-                disabled={
-                  !query.trim() ||
-                  loading
-                }
-                onClick={
-                  handleSearch
-                }
-              >
+                  <strong>
+                    {userName ||
+                      "User"}
+                  </strong>
 
-                {loading ? (
+                  <span>
+                    Researcher
+                  </span>
 
-                  <>
-                    <span>
-                      Working...
-                    </span>
+                </div>
 
-                    <div className="button-loader"></div>
-                  </>
 
-                ) : (
-
-                  <>
-                    <span>
-                      Research
-                    </span>
-
-                    <svg
-                      viewBox="0 0 24 24"
-                      fill="none"
-                    >
-
-                      <path
-                        d="M5 12H19M13 6L19 12L13 18"
-                        stroke="currentColor"
-                        strokeWidth="1.8"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      />
-
-                    </svg>
-
-                  </>
-
-                )}
+                <span
+                  className={`user-chevron ${
+                    profileOpen
+                      ? "open"
+                      : ""
+                  }`}
+                >
+                  ⌄
+                </span>
 
               </button>
+
+
+              {/* PROFILE DROPDOWN */}
+
+              {profileOpen && (
+
+                <div className="profile-dropdown">
+
+                  <div className="profile-dropdown-header">
+
+                    <div className="profile-dropdown-avatar">
+                      {userInitial}
+                    </div>
+
+
+                    <div>
+
+                      <strong>
+                        {userName ||
+                          "User"}
+                      </strong>
+
+                      <span>
+                        {currentUser
+                          ?.email ||
+                          ""}
+                      </span>
+
+                    </div>
+
+                  </div>
+
+
+                  <div className="profile-dropdown-divider" />
+
+
+                  <button
+                    type="button"
+                    className="profile-logout-btn"
+                    onClick={
+                      handleLogout
+                    }
+                  >
+
+                    <Icon
+                      name="logout"
+                      size={17}
+                    />
+
+                    <span>
+                      Sign out
+                    </span>
+
+                  </button>
+
+                </div>
+
+              )}
 
             </div>
 
           </div>
 
+        </header>
 
-          {/* PDF UPLOAD SUCCESS MESSAGE */}
 
-          {uploadMessage && (
+        {/* ===================================================
+            MAIN CONTENT
+        =================================================== */}
 
-            <div className="pdf-upload-success">
+        <main className="workspace-content">
 
-              <div className="pdf-upload-success-icon">
-                ✓
+          {/* HERO */}
+
+          <section className="discover-hero">
+
+            {/* DECORATIVE BACKGROUND */}
+
+            <div className="hero-orbit orbit-a"></div>
+
+            <div className="hero-orbit orbit-b"></div>
+
+            <span className="orbit-dot dot-a"></span>
+
+            <span className="orbit-dot dot-b"></span>
+
+            <span className="orbit-dot dot-c"></span>
+
+
+            {/* HERO CONTENT */}
+
+            <div className="hero-content-wrap">
+
+              <div className="research-status">
+
+                <span></span>
+
+                AI RESEARCH PLATFORM
+
               </div>
 
-              <div className="pdf-upload-success-content">
+
+              <h1>
+                Research smarter.
+
+                <br />
+
+                <span>
+                  Discover deeper.
+                </span>
+              </h1>
+
+
+              <p className="hero-subtitle">
+
+                Ask scientific questions,
+                explore trusted research and
+                let intelligent AI agents
+
+                <br className="desktop-break" />
+
+                retrieve evidence, analyze
+                findings and verify
+                information for you.
+
+              </p>
+
+
+              {/* =============================================
+                  SEARCH BOX
+              ============================================= */}
+
+              <div className="research-search-box">
+
+                <div className="research-search-icon">
+                  <Icon
+                    name="search"
+                    size={27}
+                  />
+                </div>
+
+
+                <textarea
+                  ref={searchRef}
+                  rows={1}
+                  value={query}
+                  placeholder={
+                    uploadedDocument
+                      ? "Ask a question about your uploaded PDF..."
+                      : "Ask ResoMind a scientific research question..."
+                  }
+                  onChange={(event) => {
+                    setQuery(
+                      event.target.value
+                    );
+
+                    if (
+                      searchError
+                    ) {
+                      setSearchError(
+                        ""
+                      );
+                    }
+                  }}
+                  onKeyDown={(event) => {
+                    if (
+                      event.key ===
+                        "Enter" &&
+                      !event.shiftKey
+                    ) {
+                      event.preventDefault();
+
+                      handleSearch();
+                    }
+                  }}
+                />
+
+
+                <div className="research-search-actions">
+
+                  {/* PDF */}
+
+                  <button
+                    type="button"
+                    className="search-attachment"
+                    title="Upload PDF"
+                    onClick={() => {
+                      setSearchError(
+                        ""
+                      );
+
+                      setShowPdfUpload(
+                        true
+                      );
+                    }}
+                  >
+                    <Icon
+                      name="paperclip"
+                      size={23}
+                    />
+                  </button>
+
+
+                  {/* SEARCH */}
+
+                  <button
+                    type="button"
+                    className="research-search-button"
+                    disabled={
+                      !query.trim() ||
+                      loading
+                    }
+                    onClick={
+                      handleSearch
+                    }
+                    aria-label="Start research"
+                  >
+
+                    {loading ? (
+
+                      <div className="button-loader"></div>
+
+                    ) : (
+
+                      <Icon
+                        name="arrow"
+                        size={25}
+                      />
+
+                    )}
+
+                  </button>
+
+                </div>
+
+              </div>
+
+
+              {/* =============================================
+                  PDF SUCCESS
+              ============================================= */}
+
+              {uploadMessage && (
+
+                <div className="pdf-upload-success">
+
+                  <div className="pdf-upload-success-icon">
+                    <Icon
+                      name="check"
+                      size={20}
+                    />
+                  </div>
+
+
+                  <div className="pdf-upload-success-content">
+
+                    <strong>
+                      Document ready
+                      for research
+                    </strong>
+
+                    <p>
+                      {uploadMessage}
+                    </p>
+
+                    {uploadedDocument
+                      ?.original_filename && (
+
+                      <span className="uploaded-file-name">
+                        📄{" "}
+                        {
+                          uploadedDocument.original_filename
+                        }
+                      </span>
+
+                    )}
+
+                  </div>
+
+                </div>
+
+              )}
+
+
+              {/* =============================================
+                  SUGGESTIONS
+              ============================================= */}
+
+              <div className="search-suggestions">
+
+                <span>
+                  Try asking:
+                </span>
+
+
+                {suggestions.map(
+                  ([
+                    label,
+                    value,
+                  ]) => (
+
+                    <button
+                      type="button"
+                      key={label}
+                      onClick={() => {
+                        setQuery(
+                          value
+                        );
+
+                        setTimeout(
+                          () =>
+                            searchRef.current
+                              ?.focus(),
+                          0
+                        );
+                      }}
+                    >
+                      {label}
+                    </button>
+
+                  )
+                )}
+
+              </div>
+
+
+              {/* =============================================
+                  QUICK TOOLS
+              ============================================= */}
+
+              <div className="quick-tools-grid">
+
+                {/* ANALYZE PAPERS */}
+
+                <button
+                  type="button"
+                  className="quick-tool-card"
+                  onClick={() => {
+                    setSearchError(
+                      ""
+                    );
+
+                    setShowPdfUpload(
+                      true
+                    );
+                  }}
+                >
+
+                  <div className="quick-tool-icon purple">
+                    <Icon
+                      name="file"
+                      size={24}
+                    />
+                  </div>
+
+
+                  <div>
+
+                    <strong>
+                      Analyze Papers
+                    </strong>
+
+                    <span>
+                      Extract key insights
+                      from
+                      <br />
+                      research papers
+                    </span>
+
+                  </div>
+
+
+                  <div className="quick-arrow">
+                    <Icon
+                      name="arrow"
+                      size={17}
+                    />
+                  </div>
+
+                </button>
+
+
+                {/* VERIFY SOURCES */}
+
+                <button
+                  type="button"
+                  className="quick-tool-card"
+                  onClick={() => {
+                    if (results) {
+                      document
+                        .querySelector(
+                          ".verification-card"
+                        )
+                        ?.scrollIntoView({
+                          behavior:
+                            "smooth",
+                        });
+                    } else {
+                      focusResearch();
+                    }
+                  }}
+                >
+
+                  <div className="quick-tool-icon green">
+                    <Icon
+                      name="shield"
+                      size={24}
+                    />
+                  </div>
+
+
+                  <div>
+
+                    <strong>
+                      Verify Sources
+                    </strong>
+
+                    <span>
+                      Check source
+                      credibility
+                      <br />
+                      and detect claims
+                    </span>
+
+                  </div>
+
+
+                  <div className="quick-arrow">
+                    <Icon
+                      name="arrow"
+                      size={17}
+                    />
+                  </div>
+
+                </button>
+
+
+                {/* RESEARCH INSIGHTS */}
+
+                <button
+                  type="button"
+                  className="quick-tool-card"
+                  onClick={() => {
+                    if (results) {
+                      document
+                        .querySelector(
+                          ".research-results"
+                        )
+                        ?.scrollIntoView({
+                          behavior:
+                            "smooth",
+                        });
+                    } else {
+                      focusResearch();
+                    }
+                  }}
+                >
+
+                  <div className="quick-tool-icon blue">
+                    <Icon
+                      name="chart"
+                      size={24}
+                    />
+                  </div>
+
+
+                  <div>
+
+                    <strong>
+                      Research Insights
+                    </strong>
+
+                    <span>
+                      Get AI-powered
+                      <br />
+                      research summaries
+                    </span>
+
+                  </div>
+
+
+                  <div className="quick-arrow">
+                    <Icon
+                      name="arrow"
+                      size={17}
+                    />
+                  </div>
+
+                </button>
+
+
+                {/* AI ASSISTANT */}
+
+                <button
+                  type="button"
+                  className="quick-tool-card"
+                  onClick={
+                    focusResearch
+                  }
+                >
+
+                  <div className="quick-tool-icon orange">
+                    <Icon
+                      name="bulb"
+                      size={24}
+                    />
+                  </div>
+
+
+                  <div>
+
+                    <strong>
+                      AI Assistant
+                    </strong>
+
+                    <span>
+                      Explore complex
+                      topics
+                      <br />
+                      with AI agents
+                    </span>
+
+                  </div>
+
+
+                  <div className="quick-arrow">
+                    <Icon
+                      name="arrow"
+                      size={17}
+                    />
+                  </div>
+
+                </button>
+
+              </div>
+
+
+              {/* =============================================
+                  TRUSTED SOURCES
+              ============================================= */}
+
+              <div className="trusted-row">
+
+                <div className="trust-line"></div>
+
+                <span className="trust-label">
+                  Trusted by researchers
+                  worldwide
+                </span>
+
+                <div className="trust-line"></div>
+
+              </div>
+
+
+              <div
+                className="source-logos"
+                aria-label="Research sources"
+              >
+
+                <span>
+                  arXiv
+                </span>
+
+                <span>
+                  PubMed
+                </span>
+
+                <span>
+                  ◆ IEEE
+                </span>
+
+                <span>
+                  ♞ Springer
+                </span>
+
+                <span>
+                  ScienceDirect
+                </span>
+
+                <span>
+                  Google Scholar
+                </span>
+
+              </div>
+
+            </div>
+
+
+            {/* =============================================
+                DECORATIVE ROBOT
+            ============================================= */}
+
+            <div
+              className="hero-bot"
+              aria-hidden="true"
+            >
+
+              <div className="bot-antenna">
+                <i></i>
+              </div>
+
+
+              <div className="bot-head">
+
+                <span className="bot-eye"></span>
+
+                <span className="bot-eye"></span>
+
+              </div>
+
+
+              <div className="bot-body">
+                <Icon
+                  name="sparkle"
+                  size={22}
+                />
+              </div>
+
+
+              <div className="bot-arm left"></div>
+
+              <div className="bot-arm right"></div>
+
+              <div className="bot-shadow"></div>
+
+            </div>
+
+          </section>
+
+
+          {/* =================================================
+              ERROR
+          ================================================= */}
+
+          {searchError && (
+
+            <div className="research-error">
+
+              <span>
+                !
+              </span>
+
+
+              <div>
 
                 <strong>
-                  Document ready for research
+                  Something went wrong
                 </strong>
 
                 <p>
-                  {uploadMessage}
+                  {searchError}
                 </p>
-
-                {uploadedDocument
-                  ?.original_filename && (
-
-                  <span className="uploaded-file-name">
-                    📄{" "}
-                    {
-                      uploadedDocument.original_filename
-                    }
-                  </span>
-
-                )}
 
               </div>
 
@@ -718,323 +1646,67 @@ function Research() {
           )}
 
 
-          {/* SUGGESTIONS */}
+          {/* =================================================
+              LOADING
+          ================================================= */}
 
-          <div className="search-suggestions">
+          {loading && (
 
-            <span>
-              Try asking:
-            </span>
+            <section className="research-processing">
 
+              <div className="processing-orbit">
 
-            <button
-              onClick={() =>
-                setQuery(
-                  "Latest advances in artificial intelligence"
-                )
-              }
-            >
-              Artificial Intelligence
-            </button>
-
-
-            <button
-              onClick={() =>
-                setQuery(
-                  "Recent research in quantum computing"
-                )
-              }
-            >
-              Quantum Computing
-            </button>
-
-
-            <button
-              onClick={() =>
-                setQuery(
-                  "Machine learning applications in healthcare"
-                )
-              }
-            >
-              Machine Learning
-            </button>
-
-          </div>
-
-        </section>
-
-
-        {/* TOOLS */}
-
-        <section className="capabilities-section">
-
-          <div className="section-heading">
-
-            <div>
-
-              <span className="section-label">
-                RESEARCH TOOLS
-              </span>
-
-              <h2>
-                Everything you need to research
-              </h2>
-
-              <p>
-                Intelligent tools designed
-                for scientific discovery,
-                analysis and evidence
-                verification.
-              </p>
-
-            </div>
-
-          </div>
-
-
-          <div className="capabilities-grid">
-
-
-            {/* PDF */}
-
-            <article className="capability-card">
-
-              <div className="capability-top">
-
-                <div className="capability-icon blue">
-                  📄
-                </div>
-
-                <span className="capability-badge">
-                  PDF
-                </span>
-
-              </div>
-
-
-              <h3>
-                Analyze a paper
-              </h3>
-
-
-              <p>
-                Upload scientific PDFs and
-                analyze methods, findings,
-                limitations and important
-                research concepts.
-              </p>
-
-
-              <button
-                type="button"
-                className="capability-action"
-                onClick={() => {
-                  setSearchError("");
-                  setShowPdfUpload(
-                    true
-                  );
-                }}
-              >
-                Upload PDF
-
-                <span>→</span>
-              </button>
-
-            </article>
-
-
-            {/* RESEARCH */}
-
-            <article className="capability-card featured">
-
-              <div className="capability-top">
-
-                <div className="capability-icon purple">
+                <div className="processing-core">
                   ✦
                 </div>
 
-                <span className="capability-badge ai">
-                  AI POWERED
-                </span>
-
               </div>
 
 
               <h3>
-                Intelligent research
+                Research agents are
+                working
               </h3>
 
 
               <p>
-                Ask scientific questions
-                and discover relevant
-                research, evidence and
-                structured AI insights.
+                Retrieving information,
+                analyzing research and
+                verifying evidence...
               </p>
 
 
-              <button
-                type="button"
-                className="capability-action"
-                onClick={
-                  focusResearch
-                }
-              >
-                Start Researching
+              <div className="processing-steps">
 
-                <span>→</span>
-              </button>
+                <span>
+                  <i></i>
+                  Retrieval
+                </span>
 
-            </article>
+                <span>
+                  <i></i>
+                  Analysis
+                </span>
 
-
-            {/* VERIFICATION */}
-
-            <article className="capability-card">
-
-              <div className="capability-top">
-
-                <div className="capability-icon cyan">
-                  ✓
-                </div>
-
-                <span className="capability-badge">
-                  VERIFIED
+                <span>
+                  <i></i>
+                  Verification
                 </span>
 
               </div>
 
+            </section>
 
-              <h3>
-                Evidence verification
-              </h3>
-
-
-              <p>
-                Compare AI-generated
-                research insights against
-                supporting scientific
-                evidence.
-              </p>
+          )}
 
 
-              <button
-                type="button"
-                className="capability-action"
-                onClick={() => {
+          {/* =================================================
+              RESULTS
+          ================================================= */}
 
-                  if (results) {
-
-                    document
-                      .querySelector(
-                        ".verification-card"
-                      )
-                      ?.scrollIntoView({
-                        behavior:
-                          "smooth",
-                      });
-
-                  } else {
-
-                    focusResearch();
-
-                  }
-
-                }}
-              >
-                Verify Research
-
-                <span>→</span>
-              </button>
-
-            </article>
-
-          </div>
-
-        </section>
-
-
-        {/* ERROR */}
-
-        {searchError && (
-
-          <div className="research-error">
-
-            <span>!</span>
-
-            <div>
-
-              <strong>
-                Something went wrong
-              </strong>
-
-              <p>
-                {searchError}
-              </p>
-
-            </div>
-
-          </div>
-
-        )}
-
-
-        {/* LOADING */}
-
-        {loading && (
-
-          <section className="research-processing">
-
-            <div className="processing-orbit">
-
-              <div className="processing-core">
-                ✦
-              </div>
-
-            </div>
-
-
-            <h3>
-              Research agents are working
-            </h3>
-
-
-            <p>
-              Retrieving information,
-              analyzing research and
-              verifying evidence...
-            </p>
-
-
-            <div className="processing-steps">
-
-              <span>
-                <i></i>
-                Retrieval
-              </span>
-
-              <span>
-                <i></i>
-                Analysis
-              </span>
-
-              <span>
-                <i></i>
-                Verification
-              </span>
-
-            </div>
-
-          </section>
-
-        )}
-
-
-        {/* RESULTS */}
-
-        {searched &&
-          !loading &&
-          results && (
+          {searched &&
+            !loading &&
+            results && (
 
             <ResearchResults
               data={results}
@@ -1044,36 +1716,51 @@ function Research() {
           )}
 
 
-        {/* RESPONSIBLE AI */}
+          {/* =================================================
+              RESPONSIBLE AI
+          ================================================= */}
 
-        <div className="responsible-notice">
+          {(searched ||
+            results) && (
 
-          <div className="notice-icon">
-            ✓
-          </div>
+            <div className="responsible-notice">
 
-
-          <div>
-
-            <strong>
-              Responsible AI Research
-            </strong>
-
-            <p>
-              AI-generated research
-              information should always be
-              reviewed against original
-              scientific sources.
-            </p>
-
-          </div>
-
-        </div>
-
-      </main>
+              <div className="notice-icon">
+                <Icon
+                  name="check"
+                  size={18}
+                />
+              </div>
 
 
-      {/* PDF MODAL */}
+              <div>
+
+                <strong>
+                  Responsible AI Research
+                </strong>
+
+                <p>
+                  AI-generated research
+                  information should always
+                  be reviewed against
+                  original scientific
+                  sources.
+                </p>
+
+              </div>
+
+            </div>
+
+          )}
+
+        </main>
+
+      </div>
+
+
+      {/* =====================================================
+          PDF MODAL
+      ===================================================== */}
 
       {showPdfUpload && (
 
