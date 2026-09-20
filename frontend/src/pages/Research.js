@@ -195,7 +195,9 @@ function Research() {
   const [
     searched,
     setSearched,
-  ] = useState(false);
+  ] = useState(
+    location.state?.searched || false
+  );
 
   const [
     loading,
@@ -205,7 +207,9 @@ function Research() {
   const [
     results,
     setResults,
-  ] = useState(null);
+  ] = useState(
+    location.state?.results || null
+  );
 
   const [
     searchError,
@@ -709,31 +713,31 @@ function Research() {
 
           <button
             type="button"
-            onClick={() =>
-              alert(
-                "Library will be connected in the next stage."
-              )
-            }
-            title="Library"
+            onClick={() => navigate("/premium")}
+            title="Research Library - Premium"
+            className="premium-library-nav"
           >
-            <Icon name="book" />
+             <Icon name="book" />
 
-            <span>
-              Library
-            </span>
+            <span className="premium-library-label">
+            Research Library
+
+            <small className="pro-badge">
+              PRO
+            </small>
+             </span>
           </button>
 
 
           <button
             type="button"
-            onClick={() =>
-              alert(
-                "Research history will be connected in the next stage."
-              )
-            }
+            onClick={() => navigate("/research-history")}
             title="Research History"
           >
-            <Icon name="history" />
+            <Icon
+              name="history"
+              size={18}
+            />
 
             <span>
               Research History
@@ -743,14 +747,13 @@ function Research() {
 
           <button
             type="button"
-            onClick={() =>
-              alert(
-                "Saved papers will be connected in the next stage."
-              )
-            }
+            onClick={() => navigate("/saved-papers")}
             title="Saved Papers"
           >
-            <Icon name="bookmark" />
+            <Icon
+              name="bookmark"
+              size={18}
+            />
 
             <span>
               Saved Papers
@@ -866,9 +869,7 @@ function Research() {
             className="settings-btn"
             title="Settings"
             onClick={() =>
-              alert(
-                "Settings will be connected in the next stage."
-              )
+              navigate("/settings")
             }
           >
             <Icon name="settings" />
@@ -877,7 +878,6 @@ function Research() {
               Settings
             </span>
           </button>
-
 
           <div className="sidebar-ai-card">
 
@@ -1646,6 +1646,11 @@ function Research() {
           )}
 
 
+          
+{/* =================================================
+    LOADING
+================================================= */}
+
           {/* =================================================
               LOADING
           ================================================= */}
@@ -1654,44 +1659,66 @@ function Research() {
 
             <section className="research-processing">
 
-              <div className="processing-orbit">
+              {/* ROBOT + ANIMATED CIRCLE */}
 
-                <div className="processing-core">
-                  ✦
+              <div className="processing-loader">
+
+                <div className="processing-ring">
+                  <span className="orbit-dot dot-one"></span>
+                  <span className="orbit-dot dot-two"></span>
+                  <span className="orbit-dot dot-three"></span>
+                </div>
+
+                <div className="processing-robot-wrap">
+                  <img
+                    src="/loading.png"
+                    alt="ResoMind AI research agents working"
+                    className="processing-robot-image"
+                  />
                 </div>
 
               </div>
 
 
+              {/* TEXT */}
+
               <h3>
-                Research agents are
-                working
+                Research agents are working
               </h3>
 
-
               <p>
-                Retrieving information,
-                analyzing research and
-                verifying evidence...
+                Retrieving information, analyzing research
+                and verifying evidence...
               </p>
 
 
-              <div className="processing-steps">
+              {/* PROGRESS */}
 
-                <span>
-                  <i></i>
-                  Retrieval
-                </span>
+              <div className="agent-progress">
 
-                <span>
-                  <i></i>
-                  Analysis
-                </span>
+                <div className="agent-progress-track">
+                  <div className="agent-progress-fill"></div>
+                </div>
 
-                <span>
-                  <i></i>
-                  Verification
-                </span>
+
+                <div className="agent-progress-steps">
+
+                  <div className="agent-step retrieval-step">
+                    <span className="agent-step-dot"></span>
+                    <strong>Retrieval</strong>
+                  </div>
+
+                  <div className="agent-step analysis-step">
+                    <span className="agent-step-dot"></span>
+                    <strong>Analysis</strong>
+                  </div>
+
+                  <div className="agent-step verification-step">
+                    <span className="agent-step-dot"></span>
+                    <strong>Verification</strong>
+                  </div>
+
+                </div>
 
               </div>
 
@@ -1699,22 +1726,20 @@ function Research() {
 
           )}
 
-
           {/* =================================================
-              RESULTS
-          ================================================= */}
+          RESULTS
+      ================================================= */}
 
-          {searched &&
-            !loading &&
-            results && (
+        {searched &&
+           !loading &&
+        results && (
 
-            <ResearchResults
-              data={results}
-              query={query}
-            />
+        <ResearchResults
+          data={results}
+          query={query}
+        />
 
-          )}
-
+        )}
 
           {/* =================================================
               RESPONSIBLE AI

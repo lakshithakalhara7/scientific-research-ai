@@ -1,0 +1,164 @@
+.payment-success-page {
+  min-height: 100vh;
+
+  display: grid;
+  place-items: center;
+
+  padding: 30px;
+
+  background:
+    radial-gradient(
+      circle at 50% 25%,
+      rgba(91, 99, 235, 0.14),
+      transparent 35%
+    ),
+    #f8faff;
+}
+
+.payment-success-card {
+  width: min(480px, 100%);
+
+  padding: 45px 38px;
+
+  border: 1px solid #e1e6f0;
+  border-radius: 25px;
+
+  text-align: center;
+
+  background: white;
+
+  box-shadow:
+    0 25px 70px
+    rgba(43, 60, 101, 0.1);
+}
+
+.success-check {
+  width: 65px;
+  height: 65px;
+
+  display: grid;
+  place-items: center;
+
+  margin: 0 auto 18px;
+
+  border-radius: 50%;
+
+  color: white;
+
+  background:
+    linear-gradient(
+      135deg,
+      #55c493,
+      #329b73
+    );
+
+  font-size: 28px;
+  font-weight: 800;
+}
+
+.success-badge {
+  width: fit-content;
+
+  margin: 0 auto 15px;
+
+  padding: 6px 12px;
+
+  border-radius: 50px;
+
+  color: #5a63e9;
+  background: #f0f2ff;
+
+  font-size: 9px;
+  font-weight: 800;
+
+  letter-spacing: 1px;
+}
+
+.payment-success-card h1 {
+  margin: 0;
+
+  color: #2c3e57;
+
+  font-size: 31px;
+}
+
+.payment-success-card > p {
+  margin: 13px auto 25px;
+
+  max-width: 350px;
+
+  color: #7f8b9e;
+
+  font-size: 12px;
+  line-height: 1.7;
+}
+
+.success-plan {
+  margin-bottom: 25px;
+
+  padding: 18px;
+
+  border: 1px solid #e2e5ff;
+  border-radius: 14px;
+
+  background: #f5f6ff;
+}
+
+.success-plan span,
+.success-plan strong,
+.success-plan small {
+  display: block;
+}
+
+.success-plan span {
+  color: #929cad;
+
+  font-size: 9px;
+}
+
+.success-plan strong {
+  margin: 5px 0;
+
+  color: #4c5b73;
+
+  font-size: 15px;
+}
+
+.success-plan small {
+  color: #2e966f;
+
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.payment-success-card button {
+  width: 100%;
+
+  padding: 14px;
+
+  border: 0;
+  border-radius: 11px;
+
+  color: white;
+
+  background:
+    linear-gradient(
+      135deg,
+      #5964ed,
+      #7657e8
+    );
+
+  font-size: 12px;
+  font-weight: 700;
+
+  cursor: pointer;
+}
+
+.payment-success-card
+.success-note {
+  margin-bottom: 0;
+
+  color: #a0a9b7;
+
+  font-size: 9px;
+}

@@ -1,0 +1,1475 @@
+/* =========================================================
+   RESOMIND SETTINGS
+========================================================= */
+
+.settings-page {
+  --settings-sidebar: 305px;
+
+  min-height: 100vh;
+
+  color: #293b55;
+  background: #f8faff;
+
+  transition:
+    background 0.25s ease,
+    color 0.25s ease;
+}
+
+
+/* =========================================================
+   SIDEBAR
+========================================================= */
+
+.settings-sidebar {
+  position: fixed;
+
+  inset: 0 auto 0 0;
+
+  z-index: 20;
+
+  width: var(--settings-sidebar);
+
+  padding: 22px;
+
+  display: flex;
+  flex-direction: column;
+
+  overflow-y: auto;
+
+  border-right: 1px solid #e4e9f1;
+
+  background: #ffffff;
+}
+
+
+.settings-brand {
+  display: flex;
+  align-items: center;
+
+  gap: 12px;
+
+  margin-bottom: 26px;
+
+  cursor: pointer;
+}
+
+
+.settings-logo {
+  width: 52px;
+  height: 52px;
+
+  overflow: hidden;
+
+  border: 1px solid #e3e8f1;
+  border-radius: 15px;
+
+  background: white;
+}
+
+
+.settings-logo img {
+  width: 100%;
+  height: 100%;
+
+  object-fit: cover;
+}
+
+
+.settings-brand strong {
+  display: block;
+
+  font-size: 20px;
+  font-weight: 800;
+}
+
+
+.settings-brand strong span {
+  color: #5964ed;
+}
+
+
+.settings-brand small {
+  display: block;
+
+  margin-top: 3px;
+
+  color: #9ba6b6;
+
+  font-size: 9px;
+}
+
+
+.settings-new-research {
+  width: 100%;
+
+  padding: 11px;
+
+  border: 0;
+  border-radius: 12px;
+
+  color: white;
+
+  background:
+    linear-gradient(
+      135deg,
+      #4d9cff,
+      #6756ef
+    );
+
+  font-family: inherit;
+  font-weight: 700;
+
+  cursor: pointer;
+}
+
+
+.settings-navigation {
+  display: grid;
+
+  gap: 7px;
+
+  margin-top: 17px;
+}
+
+
+.settings-navigation button {
+  width: 100%;
+
+  display: flex;
+  align-items: center;
+
+  gap: 13px;
+
+  padding: 12px 13px;
+
+  border: 0;
+  border-radius: 11px;
+
+  color: #61718a;
+  background: transparent;
+
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 600;
+
+  text-align: left;
+
+  cursor: pointer;
+}
+
+
+.settings-navigation button:hover,
+.settings-navigation button.active {
+  color: #4264e8;
+
+  background:
+    linear-gradient(
+      90deg,
+      #f0f6ff,
+      #f6f7ff
+    );
+}
+
+
+.settings-navigation button.active {
+  box-shadow:
+    inset 3px 0 0 #4196ff;
+}
+
+
+.settings-navigation button > span {
+  width: 24px;
+
+  font-size: 17px;
+}
+
+
+.settings-nav-label {
+  width: 100%;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+
+.settings-nav-label small {
+  padding: 3px 7px;
+
+  border: 1px solid #dadbff;
+  border-radius: 20px;
+
+  color: #5c5dea;
+  background: #eff0ff;
+
+  font-size: 7px;
+}
+
+
+.settings-sidebar-title {
+  margin: 26px 12px 3px;
+
+  color: #9aa6b7;
+
+  font-size: 8px;
+  font-weight: 800;
+
+  letter-spacing: 1.4px;
+}
+
+
+.settings-bottom-navigation {
+  margin-top: 24px;
+}
+
+
+.settings-user-card {
+  display: flex;
+  align-items: center;
+
+  gap: 11px;
+
+  margin-top: auto;
+
+  padding: 13px;
+
+  border: 1px solid #e1e6f0;
+  border-radius: 14px;
+
+  background: #f7f9ff;
+}
+
+
+.settings-user-avatar {
+  width: 38px;
+  height: 38px;
+
+  display: grid;
+  place-items: center;
+
+  border-radius: 11px;
+
+  color: white;
+  background: #17243a;
+
+  font-weight: 700;
+}
+
+
+.settings-user-card strong,
+.settings-user-card span {
+  display: block;
+}
+
+
+.settings-user-card strong {
+  font-size: 10px;
+}
+
+
+.settings-user-card span {
+  margin-top: 3px;
+
+  color: #929eae;
+
+  font-size: 8px;
+}
+
+
+/* =========================================================
+   WORKSPACE
+========================================================= */
+
+.settings-workspace {
+  min-height: 100vh;
+
+  margin-left: var(--settings-sidebar);
+}
+
+
+/* =========================================================
+   TOPBAR
+========================================================= */
+
+.settings-topbar {
+  position: sticky;
+
+  top: 0;
+
+  z-index: 15;
+
+  height: 70px;
+
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+
+  gap: 25px;
+
+  padding: 0 4%;
+
+  border-bottom: 1px solid #e7ebf3;
+
+  background:
+    rgba(255, 255, 255, 0.94);
+
+  backdrop-filter: blur(16px);
+}
+
+
+.settings-online {
+  display: flex;
+  align-items: center;
+
+  gap: 8px;
+
+  color: #8794a6;
+
+  font-size: 10px;
+}
+
+
+.settings-online > span {
+  width: 8px;
+  height: 8px;
+
+  border-radius: 50%;
+
+  background: #31c795;
+
+  box-shadow:
+    0 0 0 6px
+    rgba(49, 199, 149, 0.1);
+}
+
+
+.settings-back {
+  padding: 9px 13px;
+
+  border: 1px solid #e0e6ee;
+  border-radius: 9px;
+
+  color: #66768b;
+  background: white;
+
+  font-family: inherit;
+  font-size: 9px;
+
+  cursor: pointer;
+}
+
+
+/* =========================================================
+   CONTENT
+========================================================= */
+
+.settings-content {
+  width: min(980px, 90%);
+
+  margin: 0 auto;
+
+  padding: 55px 0 80px;
+}
+
+
+/* =========================================================
+   HEADER
+========================================================= */
+
+.settings-header {
+  display: flex;
+  align-items: center;
+
+  gap: 18px;
+
+  margin-bottom: 30px;
+}
+
+
+.settings-header-icon {
+  width: 62px;
+  height: 62px;
+
+  display: grid;
+  place-items: center;
+
+  border-radius: 17px;
+
+  color: #5c62e8;
+  background: #ebefff;
+
+  font-size: 25px;
+}
+
+
+.settings-eyebrow {
+  color: #6668e9;
+
+  font-size: 8px;
+  font-weight: 800;
+
+  letter-spacing: 1.4px;
+}
+
+
+.settings-header h1 {
+  margin: 4px 0 4px;
+
+  font-size: 32px;
+}
+
+
+.settings-header p {
+  margin: 0;
+
+  color: #8d99aa;
+
+  font-size: 10px;
+}
+
+
+/* =========================================================
+   PANELS
+========================================================= */
+
+.settings-panel {
+  margin-bottom: 17px;
+
+  padding: 25px;
+
+  border: 1px solid #e1e6ef;
+  border-radius: 17px;
+
+  background: white;
+
+  box-shadow:
+    0 8px 28px
+    rgba(43, 61, 103, 0.035);
+}
+
+
+.settings-panel-heading {
+  margin-bottom: 22px;
+}
+
+
+.settings-panel-heading > div {
+  display: flex;
+  align-items: center;
+
+  gap: 12px;
+}
+
+
+.settings-section-icon {
+  width: 36px;
+  height: 36px;
+
+  display: grid;
+  place-items: center;
+
+  border-radius: 10px;
+
+  color: #6267e9;
+  background: #eef0ff;
+}
+
+
+.settings-panel h2 {
+  margin: 0;
+
+  font-size: 14px;
+}
+
+
+.settings-panel-heading p {
+  margin: 4px 0 0;
+
+  color: #929eae;
+
+  font-size: 8px;
+}
+
+
+/* =========================================================
+   PROFILE
+========================================================= */
+
+.settings-profile {
+  display: flex;
+  align-items: center;
+
+  gap: 14px;
+
+  margin-bottom: 22px;
+
+  padding: 17px;
+
+  border-radius: 13px;
+
+  background:
+    linear-gradient(
+      135deg,
+      #f5f7ff,
+      #fafaff
+    );
+}
+
+
+.settings-large-avatar {
+  width: 54px;
+  height: 54px;
+
+  display: grid;
+  place-items: center;
+
+  border-radius: 15px;
+
+  color: white;
+  background:
+    linear-gradient(
+      135deg,
+      #5365ed,
+      #6f58e9
+    );
+
+  font-size: 19px;
+  font-weight: 800;
+}
+
+
+.settings-profile-details strong,
+.settings-profile-details span,
+.settings-profile-details small {
+  display: block;
+}
+
+
+.settings-profile-details strong {
+  font-size: 13px;
+}
+
+
+.settings-profile-details span {
+  margin-top: 3px;
+
+  color: #646ae6;
+
+  font-size: 8px;
+}
+
+
+.settings-profile-details small {
+  margin-top: 4px;
+
+  color: #9aa5b4;
+
+  font-size: 8px;
+}
+
+
+.settings-form-grid {
+  display: grid;
+
+  grid-template-columns:
+    repeat(2, 1fr);
+
+  gap: 15px;
+}
+
+
+.settings-field label {
+  display: block;
+
+  margin-bottom: 7px;
+
+  color: #64738a;
+
+  font-size: 8px;
+  font-weight: 700;
+}
+
+
+.settings-field input {
+  width: 100%;
+
+  box-sizing: border-box;
+
+  padding: 11px 12px;
+
+  border: 1px solid #e0e5ed;
+  border-radius: 9px;
+
+  outline: none;
+
+  color: #44556d;
+  background: white;
+
+  font-family: inherit;
+  font-size: 10px;
+}
+
+
+.settings-field input:focus {
+  border-color: #9ba3ff;
+
+  box-shadow:
+    0 0 0 3px
+    rgba(95, 101, 235, 0.08);
+}
+
+
+.settings-field input:disabled {
+  color: #8f9aaa;
+  background: #f6f7fa;
+}
+
+
+.settings-field small {
+  display: block;
+
+  margin-top: 5px;
+
+  color: #a0a9b7;
+
+  font-size: 7px;
+}
+
+
+/* =========================================================
+   THEMES
+========================================================= */
+
+.theme-options {
+  display: grid;
+
+  grid-template-columns:
+    repeat(3, 1fr);
+
+  gap: 12px;
+}
+
+
+.theme-option {
+  padding: 12px;
+
+  border: 1px solid #e1e6ef;
+  border-radius: 13px;
+
+  color: #526176;
+  background: white;
+
+  text-align: left;
+
+  cursor: pointer;
+}
+
+
+.theme-option.active {
+  border-color: #7b80ed;
+
+  background: #f7f7ff;
+
+  box-shadow:
+    0 0 0 3px
+    rgba(94, 99, 234, 0.07);
+}
+
+
+.theme-preview {
+  height: 75px;
+
+  margin-bottom: 11px;
+  padding: 9px;
+
+  border-radius: 9px;
+}
+
+
+.theme-preview span,
+.theme-preview i {
+  display: block;
+
+  border-radius: 10px;
+}
+
+
+.theme-preview span {
+  width: 45%;
+  height: 9px;
+
+  margin-bottom: 10px;
+}
+
+
+.theme-preview i {
+  height: 7px;
+
+  margin: 6px 0;
+}
+
+
+.light-preview {
+  border: 1px solid #e5e9f1;
+
+  background: white;
+}
+
+
+.light-preview span {
+  background: #6970ec;
+}
+
+
+.light-preview i {
+  background: #e8ebf2;
+}
+
+
+.dark-preview {
+  background: #182235;
+}
+
+
+.dark-preview span {
+  background: #7479ff;
+}
+
+
+.dark-preview i {
+  background: #344057;
+}
+
+
+.system-preview {
+  background:
+    linear-gradient(
+      90deg,
+      #ffffff 50%,
+      #182235 50%
+    );
+
+  border: 1px solid #e3e7ef;
+}
+
+
+.system-preview span {
+  background: #6a70ee;
+}
+
+
+.system-preview i {
+  background: #9ca6b7;
+}
+
+
+.theme-option strong,
+.theme-option > div:last-child span {
+  display: block;
+}
+
+
+.theme-option strong {
+  font-size: 10px;
+}
+
+
+.theme-option > div:last-child span {
+  margin-top: 3px;
+
+  color: #929eae;
+
+  font-size: 7px;
+}
+
+
+/* =========================================================
+   PREFERENCES
+========================================================= */
+
+.settings-preference-row,
+.settings-account-row {
+  min-height: 65px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 20px;
+
+  padding: 13px 0;
+
+  border-top: 1px solid #edf0f5;
+}
+
+
+.settings-preference-row:first-of-type {
+  border-top: 0;
+}
+
+
+.settings-preference-row strong,
+.settings-preference-row span,
+.settings-account-row strong,
+.settings-account-row span {
+  display: block;
+}
+
+
+.settings-preference-row strong,
+.settings-account-row strong {
+  font-size: 10px;
+}
+
+
+.settings-preference-row > div > span,
+.settings-account-row > div > span {
+  max-width: 550px;
+
+  margin-top: 4px;
+
+  color: #929eae;
+
+  font-size: 8px;
+  line-height: 1.5;
+}
+
+
+/* SWITCH */
+
+.settings-switch {
+  position: relative;
+
+  width: 42px;
+  height: 23px;
+
+  flex: 0 0 auto;
+
+  padding: 0;
+
+  border: 0;
+  border-radius: 20px;
+
+  background: #dce1e9;
+
+  cursor: pointer;
+
+  transition: 0.2s ease;
+}
+
+
+.settings-switch span {
+  position: absolute;
+
+  top: 3px;
+  left: 3px;
+
+  width: 17px;
+  height: 17px;
+
+  border-radius: 50%;
+
+  background: white;
+
+  box-shadow:
+    0 2px 6px
+    rgba(0, 0, 0, 0.14);
+
+  transition: 0.2s ease;
+}
+
+
+.settings-switch.active {
+  background:
+    linear-gradient(
+      135deg,
+      #4e91f3,
+      #6860e9
+    );
+}
+
+
+.settings-switch.active span {
+  transform:
+    translateX(19px);
+}
+
+
+.settings-select {
+  padding: 9px 11px;
+
+  border: 1px solid #dfe4ec;
+  border-radius: 8px;
+
+  outline: none;
+
+  color: #5d6d82;
+  background: white;
+
+  font-family: inherit;
+  font-size: 9px;
+}
+
+
+/* =========================================================
+   SECURITY
+========================================================= */
+
+.settings-security-card {
+  display: flex;
+  align-items: center;
+
+  gap: 12px;
+
+  padding: 14px;
+
+  border: 1px solid #d9eee8;
+  border-radius: 11px;
+
+  background: #f4fcf9;
+}
+
+
+.security-icon {
+  width: 34px;
+  height: 34px;
+
+  display: grid;
+  place-items: center;
+
+  border-radius: 50%;
+
+  color: #2c9c70;
+  background: #e0f7ef;
+}
+
+
+.settings-security-card strong,
+.settings-security-card span {
+  display: block;
+}
+
+
+.settings-security-card strong {
+  font-size: 9px;
+}
+
+
+.settings-security-card span {
+  margin-top: 3px;
+
+  color: #84968f;
+
+  font-size: 8px;
+}
+
+
+/* =========================================================
+   ACCOUNT
+========================================================= */
+
+.settings-logout-btn {
+  padding: 9px 15px;
+
+  border: 1px solid #f0cdd2;
+  border-radius: 8px;
+
+  color: #c95060;
+  background: #fff7f8;
+
+  font-family: inherit;
+  font-size: 9px;
+  font-weight: 700;
+
+  cursor: pointer;
+}
+
+
+/* =========================================================
+   SAVE
+========================================================= */
+
+.settings-save-area {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+
+  gap: 17px;
+
+  margin-top: 25px;
+}
+
+
+.settings-message {
+  color: #2d9b70;
+
+  font-size: 9px;
+  font-weight: 600;
+}
+
+
+.settings-save-btn {
+  padding: 12px 24px;
+
+  border: 0;
+  border-radius: 10px;
+
+  color: white;
+
+  background:
+    linear-gradient(
+      135deg,
+      #4f91f3,
+      #665ae9
+    );
+
+  box-shadow:
+    0 8px 20px
+    rgba(92, 94, 230, 0.18);
+
+  font-family: inherit;
+  font-size: 10px;
+  font-weight: 700;
+
+  cursor: pointer;
+}
+
+
+/* =========================================================
+   DARK THEME - SETTINGS PAGE
+========================================================= */
+
+[data-resomind-theme="dark"]
+.settings-page {
+  color: #e7ecf5;
+  background: #101725;
+}
+
+
+[data-resomind-theme="dark"]
+.settings-sidebar,
+[data-resomind-theme="dark"]
+.settings-panel,
+[data-resomind-theme="dark"]
+.settings-topbar {
+  border-color: #283449;
+
+  background: #151e2e;
+}
+
+
+[data-resomind-theme="dark"]
+.settings-topbar {
+  background:
+    rgba(21, 30, 46, 0.95);
+}
+
+
+[data-resomind-theme="dark"]
+.settings-brand strong,
+[data-resomind-theme="dark"]
+.settings-header h1,
+[data-resomind-theme="dark"]
+.settings-panel h2,
+[data-resomind-theme="dark"]
+.settings-preference-row strong,
+[data-resomind-theme="dark"]
+.settings-account-row strong,
+[data-resomind-theme="dark"]
+.settings-profile-details strong {
+  color: #eef2f9;
+}
+
+
+[data-resomind-theme="dark"]
+.settings-navigation button {
+  color: #aab5c7;
+}
+
+
+[data-resomind-theme="dark"]
+.settings-navigation button:hover,
+[data-resomind-theme="dark"]
+.settings-navigation button.active {
+  color: #9fa5ff;
+  background: #202b40;
+}
+
+
+[data-resomind-theme="dark"]
+.settings-profile,
+[data-resomind-theme="dark"]
+.settings-user-card {
+  border-color: #2b3850;
+  background: #1c273a;
+}
+
+
+[data-resomind-theme="dark"]
+.settings-field input,
+[data-resomind-theme="dark"]
+.settings-select,
+[data-resomind-theme="dark"]
+.theme-option,
+[data-resomind-theme="dark"]
+.settings-back {
+  color: #dce4ef;
+
+  border-color: #334057;
+
+  background: #192436;
+}
+
+
+[data-resomind-theme="dark"]
+.theme-option.active {
+  border-color: #7379ef;
+
+  background: #232d48;
+}
+
+
+[data-resomind-theme="dark"]
+.settings-preference-row,
+[data-resomind-theme="dark"]
+.settings-account-row {
+  border-color: #28354a;
+}
+
+
+[data-resomind-theme="dark"]
+.settings-security-card {
+  border-color: #265443;
+
+  background: #172b29;
+}
+
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media (max-width: 900px) {
+
+  .settings-page {
+    --settings-sidebar: 84px;
+  }
+
+  .settings-sidebar {
+    padding: 18px 12px;
+  }
+
+  .settings-brand > div:last-child,
+  .settings-navigation button > :not(:first-child),
+  .settings-sidebar-title,
+  .settings-user-card > div:last-child {
+    display: none;
+  }
+
+  .settings-navigation button {
+    justify-content: center;
+  }
+
+}
+
+
+@media (max-width: 650px) {
+
+  .settings-page {
+    --settings-sidebar: 0px;
+  }
+
+  .settings-sidebar {
+    display: none;
+  }
+
+  .settings-content {
+    width: 92%;
+
+    padding-top: 35px;
+  }
+
+  .settings-form-grid,
+  .theme-options {
+    grid-template-columns: 1fr;
+  }
+
+}
+
+
+@media (max-width: 480px) {
+
+  .settings-header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .settings-preference-row,
+  .settings-account-row {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .settings-save-area {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .settings-save-btn {
+    width: 100%;
+  }
+
+}
+
+/* =========================================================
+   RESOMIND SETTINGS - READABLE TYPOGRAPHY OVERRIDES
+   ChatGPT-like sizing + black text in LIGHT mode.
+   Intentional accent, success, danger and button colors remain.
+========================================================= */
+
+.settings-page {
+  color: #171717;
+  font-family:
+    Inter,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    Roboto,
+    Arial,
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Black text instead of ash/gray in light mode */
+.settings-brand small,
+.settings-navigation button,
+.settings-sidebar-title,
+.settings-user-card strong,
+.settings-user-card span,
+.settings-online,
+.settings-back,
+.settings-header h1,
+.settings-header p,
+.settings-panel h2,
+.settings-panel-heading p,
+.settings-profile-details strong,
+.settings-profile-details small,
+.settings-field label,
+.settings-field input,
+.settings-field input:disabled,
+.theme-option,
+.theme-option strong,
+.theme-option > div:last-child span,
+.settings-preference-row strong,
+.settings-preference-row > div > span,
+.settings-account-row strong,
+.settings-account-row > div > span,
+.settings-select,
+.settings-security-card strong,
+.settings-security-card span {
+  color: #171717;
+}
+
+/* Sidebar */
+.settings-brand small {
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.settings-navigation button {
+  font-size: 15px;
+}
+
+.settings-sidebar-title {
+  font-size: 11px;
+}
+
+.settings-nav-label small {
+  font-size: 10px;
+}
+
+.settings-user-card strong {
+  font-size: 14px;
+}
+
+.settings-user-card span {
+  font-size: 13px;
+}
+
+/* Topbar */
+.settings-online {
+  font-size: 13px;
+}
+
+.settings-back {
+  font-size: 14px;
+}
+
+/* Page heading */
+.settings-eyebrow {
+  font-size: 11px;
+}
+
+.settings-header h1 {
+  font-size: 34px;
+  line-height: 1.25;
+}
+
+.settings-header p {
+  font-size: 16px;
+  line-height: 1.7;
+}
+
+/* Panels */
+.settings-panel h2 {
+  font-size: 20px;
+  line-height: 1.4;
+}
+
+.settings-panel-heading p {
+  font-size: 15px;
+  line-height: 1.6;
+}
+
+/* Profile */
+.settings-profile-details strong {
+  font-size: 16px;
+}
+
+.settings-profile-details span {
+  font-size: 13px;
+}
+
+.settings-profile-details small {
+  font-size: 13px;
+}
+
+/* Form */
+.settings-field label {
+  font-size: 14px;
+}
+
+.settings-field input {
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+.settings-field small {
+  color: #171717;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+/* Appearance */
+.theme-option strong {
+  font-size: 15px;
+}
+
+.theme-option > div:last-child span {
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+/* Preferences + account */
+.settings-preference-row strong,
+.settings-account-row strong {
+  font-size: 16px;
+  line-height: 1.45;
+}
+
+.settings-preference-row > div > span,
+.settings-account-row > div > span {
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.settings-select {
+  font-size: 14px;
+}
+
+/* Security */
+.settings-security-card strong {
+  font-size: 15px;
+}
+
+.settings-security-card span {
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+/* Buttons/messages */
+.settings-logout-btn {
+  font-size: 14px;
+}
+
+.settings-message {
+  font-size: 14px;
+}
+
+.settings-save-btn {
+  font-size: 15px;
+}
+
+/* Preserve intentional accent/status colors */
+.settings-brand strong span,
+.settings-navigation button:hover,
+.settings-navigation button.active,
+.settings-eyebrow,
+.settings-profile-details span {
+  color: #5964ed;
+}
+
+.settings-nav-label small {
+  color: #5c5dea;
+}
+
+.settings-logout-btn {
+  color: #c95060;
+}
+
+.settings-message,
+.security-icon {
+  color: #2d9b70;
+}
+
+.settings-new-research,
+.settings-save-btn,
+.settings-user-avatar,
+.settings-large-avatar {
+  color: #ffffff;
+}
+
+/* Keep dark mode readable instead of forcing black text there */
+[data-resomind-theme="dark"] .settings-page {
+  color: #e7ecf5;
+}
+
+[data-resomind-theme="dark"] .settings-brand small,
+[data-resomind-theme="dark"] .settings-navigation button,
+[data-resomind-theme="dark"] .settings-sidebar-title,
+[data-resomind-theme="dark"] .settings-user-card strong,
+[data-resomind-theme="dark"] .settings-user-card span,
+[data-resomind-theme="dark"] .settings-online,
+[data-resomind-theme="dark"] .settings-back,
+[data-resomind-theme="dark"] .settings-header h1,
+[data-resomind-theme="dark"] .settings-header p,
+[data-resomind-theme="dark"] .settings-panel h2,
+[data-resomind-theme="dark"] .settings-panel-heading p,
+[data-resomind-theme="dark"] .settings-profile-details strong,
+[data-resomind-theme="dark"] .settings-profile-details small,
+[data-resomind-theme="dark"] .settings-field label,
+[data-resomind-theme="dark"] .settings-field input,
+[data-resomind-theme="dark"] .settings-field input:disabled,
+[data-resomind-theme="dark"] .theme-option,
+[data-resomind-theme="dark"] .theme-option strong,
+[data-resomind-theme="dark"] .theme-option > div:last-child span,
+[data-resomind-theme="dark"] .settings-preference-row strong,
+[data-resomind-theme="dark"] .settings-preference-row > div > span,
+[data-resomind-theme="dark"] .settings-account-row strong,
+[data-resomind-theme="dark"] .settings-account-row > div > span,
+[data-resomind-theme="dark"] .settings-select,
+[data-resomind-theme="dark"] .settings-security-card strong,
+[data-resomind-theme="dark"] .settings-security-card span,
+[data-resomind-theme="dark"] .settings-field small {
+  color: #e7ecf5;
+}

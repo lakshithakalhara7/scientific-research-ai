@@ -317,4 +317,458 @@
   .home-page *, .home-page *::before, .home-page *::after{
     animation-duration:.01ms !important;animation-iteration-count:1 !important;scroll-behavior:auto !important;
   }
+  
+}
+
+/* =========================================================
+   HOME RESEARCH PROCESSING
+========================================================= */
+
+.home-search-shell-loading {
+  border-color: #8797f7;
+
+  box-shadow:
+    0 12px 40px
+    rgba(75, 104, 220, 0.13),
+    0 0 0 4px
+    rgba(91, 100, 239, 0.05);
+}
+
+
+/* Disable textarea while agents are working */
+
+.home-search-main textarea:disabled {
+  cursor: not-allowed;
+
+  opacity: 0.75;
+}
+
+
+/* =========================================================
+   LOADING CARD
+========================================================= */
+
+.home-research-loading {
+  width: min(600px, 88%);
+
+  box-sizing: border-box;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: 20px;
+
+  margin: 22px auto 0;
+
+  padding: 17px 24px;
+
+  border: 1px solid
+    rgba(101, 117, 239, 0.18);
+
+  border-radius: 18px;
+
+  background:
+    rgba(255, 255, 255, 0.8);
+
+  box-shadow:
+    0 15px 45px
+    rgba(61, 87, 160, 0.08);
+
+  backdrop-filter:
+    blur(12px);
+
+  animation:
+    homeLoadingAppear
+    0.35s ease;
+}
+
+
+@keyframes homeLoadingAppear {
+
+  from {
+    opacity: 0;
+
+    transform:
+      translateY(8px);
+  }
+
+  to {
+    opacity: 1;
+
+    transform:
+      translateY(0);
+  }
+
+}
+
+
+/* =========================================================
+   ROBOT + LOADING CIRCLE
+========================================================= */
+
+.home-loading-visual {
+  width: 75px;
+  height: 75px;
+
+  flex: 0 0 75px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+
+.home-loading-ring {
+  position: relative;
+
+  width: 67px;
+  height: 67px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 50%;
+}
+
+
+/*
+   Rotating outer ring
+*/
+
+.home-loading-ring::before {
+  content: "";
+
+  position: absolute;
+
+  inset: 0;
+
+  border: 3px solid
+    rgba(93, 106, 239, 0.12);
+
+  border-top-color: #5f67ef;
+  border-right-color: #54a9ef;
+
+  border-radius: 50%;
+
+  animation:
+    homeLoadingSpin
+    1.1s linear infinite;
+}
+
+
+/*
+   Soft glow
+*/
+
+.home-loading-ring::after {
+  content: "";
+
+  position: absolute;
+
+  inset: 8px;
+
+  border-radius: 50%;
+
+  background:
+    rgba(101, 111, 239, 0.06);
+
+  filter: blur(4px);
+}
+
+
+.home-loading-image {
+  position: relative;
+
+  z-index: 2;
+
+  width: 50px;
+  height: 42px;
+
+  display: block;
+
+  object-fit: contain;
+
+  border-radius: 12px;
+
+  animation:
+    homeRobotFloat
+    2s ease-in-out infinite;
+}
+
+
+@keyframes homeLoadingSpin {
+
+  to {
+    transform:
+      rotate(360deg);
+  }
+
+}
+
+
+@keyframes homeRobotFloat {
+
+  0%,
+  100% {
+    transform:
+      translateY(0);
+  }
+
+  50% {
+    transform:
+      translateY(-3px);
+  }
+
+}
+
+
+/* =========================================================
+   LOADING TEXT
+========================================================= */
+
+.home-loading-content {
+  text-align: left;
+}
+
+
+.home-loading-content strong {
+  display: block;
+
+  color: #253957;
+
+  font-size: 12px;
+  font-weight: 750;
+}
+
+
+.home-loading-content p {
+  max-width: 380px;
+
+  margin:
+    5px 0 9px;
+
+  color: #8594aa;
+
+  font-size: 8px;
+
+  line-height: 1.55;
+}
+
+
+/* =========================================================
+   LOADING STEPS
+========================================================= */
+
+.home-loading-steps {
+  display: flex;
+  align-items: center;
+
+  gap: 17px;
+}
+
+
+.home-loading-steps span {
+  display: flex;
+  align-items: center;
+
+  gap: 5px;
+
+  color: #8391a6;
+
+  font-size: 7px;
+}
+
+
+.home-loading-steps i {
+  width: 5px;
+  height: 5px;
+
+  border-radius: 50%;
+
+  background: #5f68ef;
+
+  animation:
+    homeLoadingPulse
+    1.4s ease-in-out infinite;
+}
+
+
+.home-loading-steps span:nth-child(2) i {
+  background: #44c3a0;
+
+  animation-delay:
+    0.25s;
+}
+
+
+.home-loading-steps span:nth-child(3) i {
+  background: #42bcd0;
+
+  animation-delay:
+    0.5s;
+}
+
+
+@keyframes homeLoadingPulse {
+
+  0%,
+  100% {
+    opacity: 0.35;
+
+    transform:
+      scale(0.8);
+  }
+
+  50% {
+    opacity: 1;
+
+    transform:
+      scale(1.35);
+  }
+
+}
+
+
+/* =========================================================
+   SEARCH BUTTON SPINNER
+========================================================= */
+
+.home-button-spinner {
+  width: 16px;
+  height: 16px;
+
+  display: block;
+
+  box-sizing: border-box;
+
+  border: 2px solid
+    rgba(255, 255, 255, 0.4);
+
+  border-top-color: #ffffff;
+
+  border-radius: 50%;
+
+  animation:
+    homeLoadingSpin
+    0.75s linear infinite;
+}
+
+
+/* =========================================================
+   ERROR
+========================================================= */
+
+.home-search-error {
+  width: min(600px, 88%);
+
+  box-sizing: border-box;
+
+  display: flex;
+  align-items: center;
+
+  gap: 11px;
+
+  margin: 17px auto 0;
+
+  padding: 12px 16px;
+
+  border: 1px solid #f3d4da;
+  border-radius: 13px;
+
+  color: #a94d5d;
+  background:
+    rgba(255, 247, 249, 0.92);
+
+  text-align: left;
+}
+
+
+.home-search-error > span {
+  width: 26px;
+  height: 26px;
+
+  flex: 0 0 26px;
+
+  display: grid;
+  place-items: center;
+
+  border-radius: 50%;
+
+  color: #c45465;
+  background: #ffe9ed;
+
+  font-size: 11px;
+  font-weight: 800;
+}
+
+
+.home-search-error strong {
+  display: block;
+
+  font-size: 9px;
+}
+
+
+.home-search-error p {
+  margin: 3px 0 0;
+
+  color: #a96a75;
+
+  font-size: 8px;
+}
+
+
+/* =========================================================
+   DISABLED BUTTONS
+========================================================= */
+
+.home-research-button:disabled,
+.home-attach-button:disabled {
+  cursor: not-allowed;
+}
+
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media (max-width: 600px) {
+
+  .home-research-loading {
+    width: 94%;
+
+    flex-direction: column;
+
+    gap: 11px;
+
+    padding: 16px;
+
+    text-align: center;
+  }
+
+
+  .home-loading-content {
+    text-align: center;
+  }
+
+
+  .home-loading-content p {
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+
+  .home-loading-steps {
+    justify-content: center;
+
+    gap: 11px;
+  }
+
+
+  .home-search-error {
+    width: 94%;
+  }
+
 }

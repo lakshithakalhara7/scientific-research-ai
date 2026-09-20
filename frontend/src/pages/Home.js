@@ -1,7 +1,9 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import "./Home.css";
+import { supabase } from "../services/supabase";
+import { searchResearch } from "../services/api";
 
+import "./Home.css";
 /* =========================================================
    ICONS
 ========================================================= */
@@ -253,32 +255,162 @@ const suggestions = [
 function Home() {
   const navigate = useNavigate();
 
-  const [query, setQuery] = useState("");
-  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [query, setQuery] =
+    useState("");
+
+  const [sidebarOpen, setSidebarOpen] =
+    useState(true);
+
+  const [loading, setLoading] =
+    useState(false);
+
+  const [searchError, setSearchError] =
+    useState("");
+
 
   /* =========================================================
      RESEARCH
   ========================================================= */
 
-  const handleResearch = () => {
-    if (!query.trim()) return;
+  const handleResearch = async () => {
 
-    navigate("/research", {
-      state: {
-        query: query.trim(),
-      },
-    });
+    const cleanQuery =
+      query.trim();
+
+    if (!cleanQuery || loading) {
+      return;
+    }
+
+    setSearchError("");
+
+
+    try {
+
+      /* -----------------------------------------------------
+         CHECK AUTHENTICATION
+      ----------------------------------------------------- */
+
+      const {
+        data: {
+          session,
+        },
+        error: sessionError,
+      } =
+        await supabase.auth.getSession();
+
+
+      if (sessionError) {
+        throw sessionError;
+      }
+
+
+      /*
+        User must be logged in because /research
+        is a protected backend endpoint.
+      */
+
+      if (!session?.access_token) {
+
+        navigate("/login", {
+          state: {
+            query: cleanQuery,
+            returnTo: "/",
+          },
+        });
+
+        return;
+      }
+
+
+      /* -----------------------------------------------------
+         START LOADING
+      ----------------------------------------------------- */
+
+      setLoading(true);
+
+
+      /* -----------------------------------------------------
+         RUN COMPLETE RESEARCH WORKFLOW
+      ----------------------------------------------------- */
+
+      const results =
+        await searchResearch(
+          cleanQuery,
+          session.access_token,
+          null,
+          3
+        );
+
+
+      /* -----------------------------------------------------
+         ONLY NAVIGATE AFTER RESEARCH FINISHES
+      ----------------------------------------------------- */
+
+      navigate("/research", {
+        state: {
+          query: cleanQuery,
+          results: results,
+          searched: true,
+        },
+      });
+
+
+    } catch (error) {
+
+      console.error(
+        "Home research error:",
+        error
+      );
+
+
+      setSearchError(
+        error?.message ||
+          "Unable to complete the research. Please try again."
+      );
+
+
+    } finally {
+
+      setLoading(false);
+
+    }
+
   };
+
+
+  /* =========================================================
+     KEYBOARD
+  ========================================================= */
 
   const handleKeyDown = (event) => {
-    if (event.key === "Enter" && !event.shiftKey) {
+
+    if (
+      event.key === "Enter" &&
+      !event.shiftKey
+    ) {
+
       event.preventDefault();
+
       handleResearch();
+
     }
+
   };
 
+
+  /* =========================================================
+     SUGGESTIONS
+  ========================================================= */
+
   const useSuggestion = (question) => {
+
+    if (loading) {
+      return;
+    }
+
     setQuery(question);
+    setSearchError("");
+
   };
 
   /* =========================================================
@@ -604,61 +736,203 @@ function Home() {
                 SEARCH
             ============================================== */}
 
-            <div className="home-search-shell">
-              <div className="home-search-main">
-                <span className="home-search-icon">
-                  <SearchIcon />
-                </span>
+<div
+  className={`home-search-shell ${
+    loading
+      ? "home-search-shell-loading"
+      : ""
+  }`}
+>
 
-                <textarea
-                  rows="1"
-                  value={query}
-                  onChange={(event) =>
-                    setQuery(event.target.value)
-                  }
-                  onKeyDown={handleKeyDown}
-                  placeholder="Ask ResQMind a scientific research question..."
-                  aria-label="Research question"
-                />
+  <div className="home-search-main">
 
-                <div className="home-search-actions">
-                  <button
-                    type="button"
-                    className="home-attach-button"
-                    aria-label="Attach file"
-                  >
-                    <PlusIcon />
-                  </button>
+    <span className="home-search-icon">
+      <SearchIcon />
+    </span>
 
-                  <button
-                    type="button"
-                    className="home-research-button"
-                    onClick={handleResearch}
-                    disabled={!query.trim()}
-                    aria-label="Start research"
-                  >
-                    <ArrowUpIcon />
-                  </button>
-                </div>
-              </div>
 
-              <div className="home-search-footer">
-                <span>
-                  Ask about papers, scientific concepts,
-                  evidence or findings
-                </span>
+    <textarea
+      rows="1"
+      value={query}
+      onChange={(event) => {
+        setQuery(
+          event.target.value
+        );
 
-                <span className="home-enter-hint">
-                  <kbd>Enter</kbd>
-                  to research
-                </span>
-              </div>
-            </div>
+        if (searchError) {
+          setSearchError("");
+        }
+      }}
+      onKeyDown={handleKeyDown}
+      placeholder="Ask ResQMind a scientific research question..."
+      aria-label="Research question"
+      disabled={loading}
+    />
 
-            {/* =============================================
-                TRUST INDICATORS
-            ============================================== */}
 
+    <div className="home-search-actions">
+
+      <button
+        type="button"
+        className="home-attach-button"
+        aria-label="Attach file"
+        disabled={loading}
+      >
+        <PlusIcon />
+      </button>
+
+
+      <button
+        type="button"
+        className="home-research-button"
+        onClick={handleResearch}
+        disabled={
+          !query.trim() ||
+          loading
+        }
+        aria-label={
+          loading
+            ? "Research in progress"
+            : "Start research"
+        }
+      >
+
+        {loading ? (
+
+          <span className="home-button-spinner" />
+
+        ) : (
+
+          <ArrowUpIcon />
+
+        )}
+
+      </button>
+
+    </div>
+
+  </div>
+
+
+  <div className="home-search-footer">
+
+    <span>
+
+      {loading
+        ? "ResoMind agents are researching your question..."
+        : "Ask about papers, scientific concepts, evidence or findings"}
+
+    </span>
+
+
+    {!loading && (
+
+      <span className="home-enter-hint">
+
+        <kbd>
+          Enter
+        </kbd>
+
+        to research
+
+      </span>
+
+    )}
+
+  </div>
+
+</div>
+
+
+{/* =================================================
+    RESEARCH LOADING
+================================================= */}
+
+{loading && (
+
+  <div className="home-research-loading">
+
+    <div className="home-loading-visual">
+
+      <div className="home-loading-ring">
+
+        <img
+          src="/loading.jpeg"
+          alt="ResoMind research agents working"
+          className="home-loading-image"
+        />
+
+      </div>
+
+    </div>
+
+
+    <div className="home-loading-content">
+
+      <strong>
+        Research agents are working
+      </strong>
+
+      <p>
+        Retrieving scientific information,
+        analyzing research and verifying
+        evidence...
+      </p>
+
+
+      <div className="home-loading-steps">
+
+        <span>
+          <i></i>
+          Retrieval
+        </span>
+
+        <span>
+          <i></i>
+          Analysis
+        </span>
+
+        <span>
+          <i></i>
+          Verification
+        </span>
+
+      </div>
+
+    </div>
+
+  </div>
+
+)}
+
+
+{/* =================================================
+    SEARCH ERROR
+================================================= */}
+
+{searchError && !loading && (
+
+                    <div className="home-search-error">
+
+                      <span>
+                        !
+                      </span>
+
+                      <div>
+
+                        <strong>
+                          Research could not be completed
+                        </strong>
+
+                        <p>
+                          {searchError}
+                        </p>
+
+                      </div>
+
+                    </div>
+
+                  )}
             
           </section>
 
