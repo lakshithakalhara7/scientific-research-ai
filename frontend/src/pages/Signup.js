@@ -12,13 +12,26 @@ function Signup() {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
 
+  const [signupNotice, setSignupNotice] = useState(null);
+
+  const clearNotice = () => {
+    if (signupNotice) {
+      setSignupNotice(null);
+    }
+  };
+
   const handleGoogleSignup = () => {
-  alert("Google sign up is not enabled yet.");
-};
+    setSignupNotice({
+      type: "info",
+      title: "Google sign up",
+      message: "Google sign up is not enabled yet.",
+    });
+  };
 
   const handleSignup = async (event) => {
     event.preventDefault();
 
+    setSignupNotice(null);
     setLoading(true);
 
     try {
@@ -38,25 +51,77 @@ function Signup() {
         throw error;
       }
 
+      /*
+        If Supabase creates a session immediately,
+        the account is ready and we can go directly
+        to the Research workspace.
+      */
       if (data.session) {
-        alert("Account created successfully!");
-
         navigate("/research");
         return;
       }
 
-      alert(
-        "Account created. Please check your email to confirm your account, then sign in."
-      );
-
-      navigate("/login");
+      /*
+        When email confirmation is enabled Supabase
+        may create the user without creating a session.
+        Show the message inside our own UI instead of
+        using a browser/localhost alert.
+      */
+      setSignupNotice({
+        type: "success",
+        title: "Account created",
+        message:
+          "Please check your email to confirm your account. After confirming, you can sign in.",
+      });
     } catch (error) {
       console.error("Signup failed:", error);
 
-      alert(
-        error.message ||
-          "Unable to create your account."
-      );
+      const rawMessage =
+        String(error?.message || "").toLowerCase();
+
+      if (
+        rawMessage.includes("already registered") ||
+        rawMessage.includes("already been registered") ||
+        rawMessage.includes("user already registered")
+      ) {
+        setSignupNotice({
+          type: "error",
+          title: "Account already exists",
+          message:
+            "An account already exists with this email address. Try signing in instead.",
+        });
+      } else if (
+        rawMessage.includes("password") &&
+        (
+          rawMessage.includes("weak") ||
+          rawMessage.includes("characters") ||
+          rawMessage.includes("length")
+        )
+      ) {
+        setSignupNotice({
+          type: "error",
+          title: "Password not accepted",
+          message:
+            "Please choose a stronger password and try again.",
+        });
+      } else if (
+        rawMessage.includes("invalid email") ||
+        rawMessage.includes("email address is invalid")
+      ) {
+        setSignupNotice({
+          type: "error",
+          title: "Invalid email address",
+          message:
+            "Please enter a valid email address and try again.",
+        });
+      } else {
+        setSignupNotice({
+          type: "error",
+          title: "Account could not be created",
+          message:
+            "We couldn't create your account right now. Please check your details and try again.",
+        });
+      }
     } finally {
       setLoading(false);
     }
@@ -95,7 +160,7 @@ function Signup() {
             <div className="home-brand-logo-frame">
               <img
                 src="/resqmind-logo.jpeg"
-                alt="ResQMind"
+                alt="ResoMind"
                 className="home-brand-logo"
               />
             </div>
@@ -122,6 +187,31 @@ function Signup() {
               Start exploring scientific knowledge with intelligent AI.
             </p>
           </div>
+
+          {/* Themed Status / Error Message */}
+          {signupNotice && (
+            <div
+              className={`signup-notice signup-notice-${signupNotice.type}`}
+              role={signupNotice.type === "error" ? "alert" : "status"}
+              aria-live="polite"
+            >
+              <span
+                className="signup-notice-icon"
+                aria-hidden="true"
+              >
+                {signupNotice.type === "success"
+                  ? "✓"
+                  : signupNotice.type === "info"
+                    ? "i"
+                    : "!"}
+              </span>
+
+              <div className="signup-notice-copy">
+                <strong>{signupNotice.title}</strong>
+                <p>{signupNotice.message}</p>
+              </div>
+            </div>
+          )}
 
           {/* Form */}
           <form className="signup-form" onSubmit={handleSignup}>
@@ -152,7 +242,10 @@ function Signup() {
                   type="text"
                   placeholder="Enter your full name"
                   value={name}
-                  onChange={(event) => setName(event.target.value)}
+                  onChange={(event) => {
+                    setName(event.target.value);
+                    clearNotice();
+                  }}
                   required
                 />
               </div>
@@ -189,7 +282,10 @@ function Signup() {
                   type="email"
                   placeholder="you@example.com"
                   value={email}
-                  onChange={(event) => setEmail(event.target.value)}
+                  onChange={(event) => {
+                    setEmail(event.target.value);
+                    clearNotice();
+                  }}
                   required
                 />
               </div>
@@ -225,7 +321,10 @@ function Signup() {
                   type={showPassword ? "text" : "password"}
                   placeholder="Create a password"
                   value={password}
-                  onChange={(event) => setPassword(event.target.value)}
+                  onChange={(event) => {
+                    setPassword(event.target.value);
+                    clearNotice();
+                  }}
                   required
                   minLength={6}
                 />
@@ -235,6 +334,11 @@ function Signup() {
                   className="password-toggle"
                   onClick={() =>
                     setShowPassword((current) => !current)
+                  }
+                  aria-label={
+                    showPassword
+                      ? "Hide password"
+                      : "Show password"
                   }
                 >
                   {showPassword ? "Hide" : "Show"}
@@ -261,49 +365,50 @@ function Signup() {
             </button>
           </form>
 
-{/* Divider */}
-<div className="signup-divider">
-  <span></span>
-  <p>OR</p>
-  <span></span>
-</div>
+          {/* Divider */}
+          <div className="signup-divider">
+            <span></span>
+            <p>OR</p>
+            <span></span>
+          </div>
 
-{/* Google Signup */}
-<button
-  type="button"
-  className="signup-google"
-  onClick={handleGoogleSignup}
->
-  <svg
-    className="google-icon"
-    viewBox="0 0 48 48"
-    aria-hidden="true"
-  >
-    <path
-      fill="#FFC107"
-      d="M43.6 20H42V20H24V28H35.3C33.7 32.7 29.2 36 24 36C17.4 36 12 30.6 12 24C12 17.4 17.4 12 24 12C27.1 12 29.9 13.2 32 15.1L37.7 9.4C34.1 6 29.4 4 24 4C12.9 4 4 12.9 4 24C4 35.1 12.9 44 24 44C35.1 44 44 35.1 44 24C44 22.7 43.9 21.3 43.6 20Z"
-    />
+          {/* Google Signup */}
+          <button
+            type="button"
+            className="signup-google"
+            onClick={handleGoogleSignup}
+          >
+            <svg
+              className="google-icon"
+              viewBox="0 0 48 48"
+              aria-hidden="true"
+            >
+              <path
+                fill="#FFC107"
+                d="M43.6 20H42V20H24V28H35.3C33.7 32.7 29.2 36 24 36C17.4 36 12 30.6 12 24C12 17.4 17.4 12 24 12C27.1 12 29.9 13.2 32 15.1L37.7 9.4C34.1 6 29.4 4 24 4C12.9 4 4 12.9 4 24C4 35.1 12.9 44 24 44C35.1 44 44 35.1 44 24C44 22.7 43.9 21.3 43.6 20Z"
+              />
 
-    <path
-      fill="#FF3D00"
-      d="M6.3 14.7L12.9 19.5C14.7 15.1 19 12 24 12C27.1 12 29.9 13.2 32 15.1L37.7 9.4C34.1 6 29.4 4 24 4C16.3 4 9.6 8.3 6.3 14.7Z"
-    />
+              <path
+                fill="#FF3D00"
+                d="M6.3 14.7L12.9 19.5C14.7 15.1 19 12 24 12C27.1 12 29.9 13.2 32 15.1L37.7 9.4C34.1 6 29.4 4 24 4C16.3 4 9.6 8.3 6.3 14.7Z"
+              />
 
-    <path
-      fill="#4CAF50"
-      d="M24 44C29.2 44 33.8 42 37.3 38.8L31.2 33.6C29.2 35.1 26.7 36 24 36C18.8 36 14.4 32.7 12.7 28.2L6.2 33.2C9.5 39.5 16.2 44 24 44Z"
-    />
+              <path
+                fill="#4CAF50"
+                d="M24 44C29.2 44 33.8 42 37.3 38.8L31.2 33.6C29.2 35.1 26.7 36 24 36C18.8 36 14.4 32.7 12.7 28.2L6.2 33.2C9.5 39.5 16.2 44 24 44Z"
+              />
 
-    <path
-      fill="#1976D2"
-      d="M43.6 20H42V20H24V28H35.3C34.5 30.3 33.1 32.2 31.2 33.6L37.3 38.8C36.9 39.2 44 34 44 24C44 22.7 43.9 21.3 43.6 20Z"
-    />
-  </svg>
+              <path
+                fill="#1976D2"
+                d="M43.6 20H42V20H24V28H35.3C34.5 30.3 33.1 32.2 31.2 33.6L37.3 38.8C36.9 39.2 44 34 44 24C44 22.7 43.9 21.3 43.6 20Z"
+              />
+            </svg>
 
-  <span>Continue with Google</span>
+            <span>Continue with Google</span>
 
-  <span className="google-signup-arrow">→</span>
-</button>
+            <span className="google-signup-arrow">→</span>
+          </button>
+
           <div className="signup-login">
             <span>Already have an account?</span>
 

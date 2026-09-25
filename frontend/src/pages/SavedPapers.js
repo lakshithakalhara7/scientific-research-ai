@@ -12,6 +12,8 @@ import {
   removeSavedPaper,
 } from "../services/savedPapers";
 
+import DashboardLayout from "../components/DashboardLayout";
+
 import "./SavedPapers.css";
 
 
@@ -166,115 +168,9 @@ function SavedPapers() {
 
   return (
 
-    <div className="saved-page">
+    <DashboardLayout activePage="saved">
 
-      {/* SIDEBAR */}
-
-      <aside className="saved-sidebar">
-
-        <div
-          className="saved-brand"
-          onClick={() =>
-            navigate("/research")
-          }
-        >
-
-          <img
-            src="/resqmind-logo.jpeg"
-            alt="ResoMind"
-          />
-
-          <div>
-            <strong>
-              Reso<span>Mind</span>
-            </strong>
-
-            <small>
-              AI Research Workspace
-            </small>
-          </div>
-
-        </div>
-
-
-        <button
-          type="button"
-          className="saved-new-button"
-          onClick={() =>
-            navigate("/research")
-          }
-        >
-          ＋ New Research
-        </button>
-
-
-        <nav className="saved-nav">
-
-          <button
-            type="button"
-            onClick={() =>
-              navigate("/research")
-            }
-          >
-            <span>⌕</span>
-            Discover
-          </button>
-
-
-          <button
-            type="button"
-            onClick={() =>
-              navigate(
-                "/premium-library"
-              )
-            }
-          >
-            <span>▥</span>
-            Research Library
-          </button>
-
-
-          <button
-            type="button"
-            onClick={() =>
-              navigate(
-                "/research-history"
-              )
-            }
-          >
-            <span>◷</span>
-            Research History
-          </button>
-
-
-          <button
-            type="button"
-            className="active"
-          >
-            <span>♥</span>
-            Saved Papers
-          </button>
-
-        </nav>
-
-
-        <div className="saved-sidebar-bottom">
-
-          <button
-            type="button"
-            onClick={() =>
-              navigate("/settings")
-            }
-          >
-            ⚙ Settings
-          </button>
-
-        </div>
-
-      </aside>
-
-
-      {/* MAIN */}
+      <div className="saved-page">
 
       <main className="saved-main">
 
@@ -541,9 +437,11 @@ function SavedPapers() {
 
           )}
 
-      </main>
+        </main>
 
-    </div>
+      </div>
+
+    </DashboardLayout>
 
   );
 

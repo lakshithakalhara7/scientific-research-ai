@@ -1,11 +1,11 @@
 /* =========================================================
-   SAVED PAPERS PAGE
+   SAVED PAPERS PAGE — uses shared DashboardLayout / Sidebar
 ========================================================= */
 
 .saved-page {
   min-height: 100vh;
   width: 100%;
-  display: flex;
+  display: block;
   background: #f7f9ff;
   color: #171717;
   font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont,
@@ -14,208 +14,14 @@
 
 
 /* =========================================================
-   SIDEBAR
-========================================================= */
-
-.saved-sidebar {
-  width: 300px;
-  min-width: 300px;
-  height: 100vh;
-  position: fixed;
-  top: 0;
-  left: 0;
-  z-index: 20;
-
-  display: flex;
-  flex-direction: column;
-
-  padding: 28px 22px 22px;
-
-  background: #ffffff;
-  border-right: 1px solid #e5eaf5;
-
-  box-sizing: border-box;
-}
-
-
-/* BRAND */
-
-.saved-brand {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-
-  margin-bottom: 30px;
-
-  cursor: pointer;
-}
-
-.saved-brand img {
-  width: 52px;
-  height: 52px;
-  object-fit: cover;
-
-  border-radius: 14px;
-  border: 1px solid #e4e8f5;
-}
-
-.saved-brand div {
-  display: flex;
-  flex-direction: column;
-}
-
-.saved-brand strong {
-  font-size: 21px;
-  font-weight: 800;
-  color: #171717;
-  line-height: 1.1;
-}
-
-.saved-brand strong span {
-  color: #6157f5;
-}
-
-.saved-brand small {
-  margin-top: 5px;
-
-  color: #171717;
-  font-size: 13px;
-}
-
-
-/* NEW RESEARCH */
-
-.saved-new-button {
-  width: 100%;
-  min-height: 48px;
-
-  border: 0;
-  border-radius: 12px;
-
-  margin-bottom: 26px;
-
-  background: linear-gradient(
-    135deg,
-    #4c9cff,
-    #6555ef
-  );
-
-  color: white;
-  font-size: 14px;
-  font-weight: 700;
-
-  cursor: pointer;
-
-  box-shadow: 0 8px 20px rgba(89, 91, 239, 0.18);
-
-  transition:
-    transform 0.2s ease,
-    box-shadow 0.2s ease;
-}
-
-.saved-new-button:hover {
-  transform: translateY(-1px);
-
-  box-shadow: 0 11px 24px rgba(89, 91, 239, 0.25);
-}
-
-
-/* NAVIGATION */
-
-.saved-nav {
-  display: flex;
-  flex-direction: column;
-  gap: 7px;
-}
-
-.saved-nav button,
-.saved-sidebar-bottom button {
-  width: 100%;
-
-  display: flex;
-  align-items: center;
-  gap: 14px;
-
-  min-height: 49px;
-
-  padding: 0 15px;
-
-  border: 0;
-  border-radius: 11px;
-
-  background: transparent;
-
-  color: #171717;
-  font-size: 15px;
-  font-weight: 600;
-
-  text-align: left;
-  cursor: pointer;
-
-  transition:
-    background 0.2s ease,
-    color 0.2s ease;
-}
-
-.saved-nav button span {
-  width: 20px;
-
-  color: #171717;
-  font-size: 18px;
-
-  text-align: center;
-}
-
-.saved-nav button:hover,
-.saved-sidebar-bottom button:hover {
-  background: #f4f6ff;
-  color: #5365f6;
-}
-
-.saved-nav button.active {
-  position: relative;
-
-  background: #f0f2ff;
-  color: #5365f6;
-}
-
-.saved-nav button.active::before {
-  content: "";
-
-  position: absolute;
-
-  left: 0;
-  top: 8px;
-  bottom: 8px;
-
-  width: 3px;
-
-  border-radius: 0 4px 4px 0;
-
-  background: #5365f6;
-}
-
-
-/* SIDEBAR BOTTOM */
-
-.saved-sidebar-bottom {
-  margin-top: auto;
-
-  padding-top: 20px;
-
-  border-top: 1px solid #edf0f7;
-}
-
-
-/* =========================================================
    MAIN
 ========================================================= */
 
 .saved-main {
-  width: calc(100% - 300px);
+  width: 100%;
   min-height: 100vh;
 
-  margin-left: 300px;
+  margin-left: 0;
 
   padding: 46px 6% 70px;
 
@@ -753,20 +559,9 @@
 
 
 @media (max-width: 850px) {
-
-  .saved-sidebar {
-    width: 230px;
-    min-width: 230px;
-
-    padding-left: 15px;
-    padding-right: 15px;
-  }
-
-  .saved-main {
-    width: calc(100% - 230px);
-
-    margin-left: 230px;
-
+.saved-main {
+    width: 100%;
+    margin-left: 0;
     padding-left: 25px;
     padding-right: 25px;
   }
@@ -780,20 +575,7 @@
 
 
 @media (max-width: 680px) {
-
-  .saved-page {
-    display: block;
-  }
-
-  .saved-sidebar {
-    position: relative;
-
-    width: 100%;
-    min-width: 0;
-    height: auto;
-  }
-
-  .saved-main {
+.saved-main {
     width: 100%;
 
     margin-left: 0;
@@ -813,4 +595,24 @@
     grid-template-columns: 1fr;
   }
 
+}
+
+.saved-page {
+  background: var(--app-bg);
+  color: var(--text-primary);
+}
+
+.saved-main {
+  background: var(--app-bg);
+}
+
+.saved-card {
+  background: var(--card-bg);
+  border-color: var(--border-color);
+}
+
+.saved-card h3,
+.saved-description,
+.saved-author {
+  color: var(--text-primary);
 }

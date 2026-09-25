@@ -11,6 +11,8 @@ import {
   supabase,
 } from "../services/supabase";
 
+import DashboardLayout from "../components/DashboardLayout";
+
 import "./Settings.css";
 
 
@@ -354,254 +356,8 @@ function Settings() {
 
   return (
 
-    <div className="settings-page">
-
-
-      {/* =================================================
-          SIDEBAR
-      ================================================= */}
-
-      <aside className="settings-sidebar">
-
-
-        {/* BRAND */}
-
-        <div
-          className="settings-brand"
-          onClick={() =>
-            navigate("/research")
-          }
-        >
-
-          <div className="settings-logo">
-
-            <img
-              src="/resqmind-logo.jpeg"
-              alt="ResoMind"
-            />
-
-          </div>
-
-
-          <div>
-
-            <strong>
-              Reso<span>Mind</span>
-            </strong>
-
-            <small>
-              AI Research Workspace
-            </small>
-
-          </div>
-
-        </div>
-
-
-        {/* NEW RESEARCH */}
-
-        <button
-          type="button"
-          className="settings-new-research"
-          onClick={() =>
-            navigate("/research")
-          }
-        >
-
-          <span>＋</span>
-
-          New Research
-
-        </button>
-
-
-        {/* NAVIGATION */}
-
-        <nav className="settings-navigation">
-
-
-          <button
-            type="button"
-            onClick={() =>
-              navigate("/research")
-            }
-          >
-
-            <span>⌕</span>
-
-            Discover
-
-          </button>
-
-
-          <button
-            type="button"
-            onClick={() =>
-              navigate("/premium")
-            }
-          >
-
-            <span>▥</span>
-
-            <div className="settings-nav-label">
-
-              Research Library
-
-              <small>
-                PRO
-              </small>
-
-            </div>
-
-          </button>
-
-
-          <button
-            type="button"
-            onClick={() =>
-              navigate(
-                "/research-history"
-              )
-            }
-          >
-
-            <span>◷</span>
-
-            Research History
-
-          </button>
-
-
-          <button
-            type="button"
-            onClick={() =>
-              navigate(
-                "/saved-papers"
-              )
-            }
-          >
-
-            <span>♡</span>
-
-            Saved Papers
-
-          </button>
-
-        </nav>
-
-
-        <div className="settings-sidebar-title">
-
-          RESEARCH TOOLS
-
-        </div>
-
-
-        <nav className="settings-navigation">
-
-          <button
-            type="button"
-            onClick={() =>
-              navigate("/research")
-            }
-          >
-
-            <span>▤</span>
-
-            Paper Analyzer
-
-          </button>
-
-
-          <button
-            type="button"
-            onClick={() =>
-              navigate("/research")
-            }
-          >
-
-            <span>♢</span>
-
-            Source Verification
-
-          </button>
-
-
-          <button
-            type="button"
-            onClick={() =>
-              navigate("/research")
-            }
-          >
-
-            <span>▥</span>
-
-            Research Insights
-
-          </button>
-
-
-          <button
-            type="button"
-            onClick={() =>
-              navigate("/research")
-            }
-          >
-
-            <span>✦</span>
-
-            AI Assistant
-
-          </button>
-
-        </nav>
-
-
-        {/* SETTINGS ACTIVE */}
-
-        <nav className="settings-navigation settings-bottom-navigation">
-
-          <button
-            type="button"
-            className="active"
-          >
-
-            <span>⚙</span>
-
-            Settings
-
-          </button>
-
-        </nav>
-
-
-        {/* USER CARD */}
-
-        <div className="settings-user-card">
-
-          <div className="settings-user-avatar">
-
-            {initial}
-
-          </div>
-
-
-          <div>
-
-            <strong>
-              {fullName ||
-                "Researcher"}
-            </strong>
-
-            <span>
-              Researcher
-            </span>
-
-          </div>
-
-        </div>
-
-      </aside>
+    <DashboardLayout activePage="settings">
+      <div className="settings-page">
 
 
       {/* =================================================
@@ -1374,9 +1130,10 @@ function Settings() {
 
         </main>
 
-      </div>
+        </div>
 
-    </div>
+      </div>
+    </DashboardLayout>
 
   );
 

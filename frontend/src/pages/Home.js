@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "../services/supabase";
 import { searchResearch } from "../services/api";
+import Sidebar from "../components/Sidebar";
 
 import "./Home.css";
 /* =========================================================
@@ -414,6 +415,21 @@ function Home() {
   };
 
   /* =========================================================
+     PUBLIC SIDEBAR
+  ========================================================= */
+
+  const handlePublicNewResearch = () => {
+    setQuery("");
+    setSearchError("");
+
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    });
+  };
+
+
+  /* =========================================================
      UI
   ========================================================= */
 
@@ -422,7 +438,7 @@ function Home() {
       className={`home-page ${
         sidebarOpen
           ? "home-sidebar-expanded"
-          : "home-sidebar-collapsed"
+          : "home-sidebar-collapsed sidebar-collapsed"
       }`}
     >
       {/* =====================================================
@@ -445,209 +461,18 @@ function Home() {
       </div>
 
       {/* =====================================================
-          SIDEBAR
+          SHARED PUBLIC SIDEBAR
       ====================================================== */}
 
-      <aside
-        className={`home-sidebar ${
-          sidebarOpen
-            ? "home-sidebar-open"
-            : "home-sidebar-closed"
-        }`}
-      >
-        {/* SIDEBAR HEADER */}
-
-        <div className="home-sidebar-header">
-          <button
-            type="button"
-            className="home-brand"
-            onClick={() => navigate("/")}
-          >
-            <div className="home-brand-logo-frame">
-              <img
-                src="/resqmind-logo.jpeg"
-                alt="ResQMind"
-                className="home-brand-logo"
-              />
-            </div>
-
-            {sidebarOpen && (
-              <div className="home-brand-copy">
-                <strong>ResoMind</strong>
-                <span>AI Research Intelligence</span>
-              </div>
-            )}
-          </button>
-
-          <button
-            type="button"
-            className="home-collapse-button"
-            onClick={() =>
-              setSidebarOpen((current) => !current)
-            }
-            aria-label={
-              sidebarOpen
-                ? "Collapse sidebar"
-                : "Expand sidebar"
-            }
-          >
-            <span>{sidebarOpen ? "‹" : "›"}</span>
-          </button>
-        </div>
-
-        {/* NEW RESEARCH */}
-
-        <button
-          type="button"
-          className="home-new-research"
-          onClick={() => {
-            setQuery("");
-            navigate("/");
-          }}
-        >
-          <span className="home-menu-icon">
-            <PlusIcon />
-          </span>
-
-          {sidebarOpen && <span>New Research</span>}
-        </button>
-
-        {/* =================================================
-            MAIN NAVIGATION
-        ================================================== */}
-
-        <nav className="home-sidebar-nav">
-          <button
-            type="button"
-            className="home-sidebar-item active"
-            onClick={() => navigate("/")}
-          >
-            <span className="home-sidebar-icon">
-              <SearchIcon />
-            </span>
-
-            {sidebarOpen && <span>Discover</span>}
-          </button>
-
-          <button
-            type="button"
-            className="home-sidebar-item"
-          >
-            <span className="home-sidebar-icon">
-              <BookIcon />
-            </span>
-
-            {sidebarOpen && <span>Library</span>}
-          </button>
-
-          <button
-            type="button"
-            className="home-sidebar-item"
-          >
-            <span className="home-sidebar-icon">
-              <HistoryIcon />
-            </span>
-
-            {sidebarOpen && <span>Search History</span>}
-          </button>
-
-          <button
-            type="button"
-            className="home-sidebar-item"
-          >
-            <span className="home-sidebar-icon">
-              <StarIcon />
-            </span>
-
-            {sidebarOpen && <span>Saved Papers</span>}
-          </button>
-        </nav>
-
-        <div className="home-sidebar-divider" />
-
-        {/* =================================================
-            RESEARCH TOOLS
-        ================================================== */}
-
-        {sidebarOpen && (
-          <p className="home-sidebar-label">
-            RESEARCH TOOLS
-          </p>
-        )}
-
-        <nav className="home-sidebar-nav home-tools-nav">
-          <button
-            type="button"
-            className="home-sidebar-item"
-          >
-            <span className="home-sidebar-icon">
-              <FileIcon />
-            </span>
-
-            {sidebarOpen && <span>Paper Analyzer</span>}
-          </button>
-
-          <button
-            type="button"
-            className="home-sidebar-item"
-          >
-            <span className="home-sidebar-icon">
-              <LinkIcon />
-            </span>
-
-            {sidebarOpen && (
-              <span>Source Verification</span>
-            )}
-          </button>
-
-          <button
-            type="button"
-            className="home-sidebar-item"
-          >
-            <span className="home-sidebar-icon">
-              <ChartIcon />
-            </span>
-
-            {sidebarOpen && (
-              <span>Research Insights</span>
-            )}
-          </button>
-        </nav>
-
-        {/* =================================================
-            SIDEBAR BOTTOM
-        ================================================== */}
-
-        <div className="home-sidebar-bottom">
-          <button
-            type="button"
-            className="home-sidebar-item"
-          >
-            <span className="home-sidebar-icon">
-              <SettingsIcon />
-            </span>
-
-            {sidebarOpen && <span>Settings</span>}
-          </button>
-
-          {sidebarOpen && (
-            <div className="home-assistant-card">
-              <div className="home-assistant-icon">
-                <SparklesIcon />
-              </div>
-
-              <div>
-                <strong>ResQMind AI</strong>
-
-                <p>
-                  Research smarter with intelligent
-                  scientific agents.
-                </p>
-              </div>
-            </div>
-          )}
-        </div>
-      </aside>
+      <Sidebar
+        collapsed={!sidebarOpen}
+        onToggle={() =>
+          setSidebarOpen((current) => !current)
+        }
+        activePage="discover"
+        publicMode
+        onNewResearch={handlePublicNewResearch}
+      />
 
       {/* =====================================================
           MAIN CONTENT

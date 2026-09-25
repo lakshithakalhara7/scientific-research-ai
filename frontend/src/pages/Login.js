@@ -364,6 +364,7 @@ function Login() {
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(true);
   const [loading, setLoading] = useState(false);
+  const [loginError, setLoginError] = useState("");
 
 
   /* =========================================================
@@ -373,6 +374,7 @@ function Login() {
   const handleLogin = async (event) => {
     event.preventDefault();
 
+    setLoginError("");
     setLoading(true);
 
     try {
@@ -404,10 +406,25 @@ function Login() {
         error
       );
 
-      alert(
-        error.message ||
-          "Unable to sign in. Please check your email and password."
-      );
+      const rawMessage =
+        String(error?.message || "").toLowerCase();
+
+      if (rawMessage.includes("invalid login credentials")) {
+        setLoginError(
+          "Email or password is incorrect. Please check your details and try again."
+        );
+      } else if (
+        rawMessage.includes("email not confirmed") ||
+        rawMessage.includes("email not verified")
+      ) {
+        setLoginError(
+          "Please verify your email address before signing in."
+        );
+      } else {
+        setLoginError(
+          "We couldn't sign you in right now. Please try again."
+        );
+      }
     } finally {
       setLoading(false);
     }
@@ -515,9 +532,13 @@ function Login() {
                     type="email"
                     placeholder="you@example.com"
                     value={email}
-                    onChange={(event) =>
-                      setEmail(event.target.value)
-                    }
+                    onChange={(event) => {
+                      setEmail(event.target.value);
+
+                      if (loginError) {
+                        setLoginError("");
+                      }
+                    }}
                     required
                   />
 
@@ -548,11 +569,15 @@ function Login() {
                     }
                     placeholder="Enter your password"
                     value={password}
-                    onChange={(event) =>
+                    onChange={(event) => {
                       setPassword(
                         event.target.value
-                      )
-                    }
+                      );
+
+                      if (loginError) {
+                        setLoginError("");
+                      }
+                    }}
                     required
                   />
 
@@ -577,6 +602,29 @@ function Login() {
 
                 </div>
               </div>
+
+
+              {/* Login Error */}
+
+              {loginError && (
+                <div
+                  className="login-error-message"
+                  role="alert"
+                  aria-live="polite"
+                >
+                  <span
+                    className="login-error-icon"
+                    aria-hidden="true"
+                  >
+                    !
+                  </span>
+
+                  <div>
+                    <strong>Sign in failed</strong>
+                    <p>{loginError}</p>
+                  </div>
+                </div>
+              )}
 
 
               {/* Options */}

@@ -13,6 +13,7 @@ import "./Research.css";
 
 import PdfUpload from "../components/PdfUpload";
 import ResearchResults from "../components/ResearchResults";
+import DashboardLayout from "../components/DashboardLayout";
 
 import {
   uploadDocument,
@@ -246,10 +247,6 @@ function Research() {
     setUserInitial,
   ] = useState("U");
 
-  const [
-    sidebarCollapsed,
-    setSidebarCollapsed,
-  ] = useState(false);
 
   const [
     profileOpen,
@@ -598,319 +595,37 @@ function Research() {
   ========================================================= */
 
   return (
-    <div
-      className={`research-app-shell ${
-        sidebarCollapsed
-          ? "sidebar-collapsed"
-          : ""
-      }`}
+    <DashboardLayout
+      activePage="discover"
+      onNewResearch={focusResearch}
+      onPaperAnalyzer={() => {
+        setSearchError("");
+        setShowPdfUpload(true);
+      }}
+      onSourceVerification={() => {
+        if (results) {
+          document
+            .querySelector(".verification-card")
+            ?.scrollIntoView({
+              behavior: "smooth",
+            });
+        } else {
+          focusResearch();
+        }
+      }}
+      onResearchInsights={() => {
+        if (results) {
+          document
+            .querySelector(".research-results")
+            ?.scrollIntoView({
+              behavior: "smooth",
+            });
+        } else {
+          focusResearch();
+        }
+      }}
+      onAIAssistant={focusResearch}
     >
-
-      {/* =====================================================
-          SIDEBAR
-      ===================================================== */}
-
-      <aside className="research-sidebar">
-
-        {/* COLLAPSE / EXPAND */}
-
-        <button
-          type="button"
-          className="sidebar-collapse-btn"
-          onClick={() =>
-            setSidebarCollapsed(
-              (previous) =>
-                !previous
-            )
-          }
-          title={
-            sidebarCollapsed
-              ? "Expand sidebar"
-              : "Collapse sidebar"
-          }
-          aria-label={
-            sidebarCollapsed
-              ? "Expand sidebar"
-              : "Collapse sidebar"
-          }
-        >
-          {sidebarCollapsed
-            ? "›"
-            : "‹"}
-        </button>
-
-
-        {/* BRAND */}
-
-        <button
-          type="button"
-          className="sidebar-brand"
-          onClick={() =>
-            navigate("/research")
-          }
-          title="ResoMind"
-        >
-          <div className="brand-mark-wrap">
-            <img
-              src="/resqmind-logo.jpeg"
-              alt="ResoMind"
-              className="brand-mark"
-            />
-          </div>
-
-          <div>
-            <strong>
-              Reso
-              <span>Mind</span>
-            </strong>
-
-            <small>
-              AI Research Workspace
-            </small>
-          </div>
-        </button>
-
-
-        {/* NEW RESEARCH */}
-
-        <button
-          type="button"
-          className="new-research-btn"
-          onClick={focusResearch}
-          title="New Research"
-        >
-          <Icon
-            name="plus"
-            size={22}
-          />
-
-          <span>
-            New Research
-          </span>
-        </button>
-
-
-        {/* MAIN NAVIGATION */}
-
-        <nav
-          className="sidebar-nav"
-          aria-label="Main navigation"
-        >
-
-          <button
-            type="button"
-            className="active"
-            onClick={focusResearch}
-            title="Discover"
-          >
-            <Icon name="search" />
-
-            <span>
-              Discover
-            </span>
-          </button>
-
-
-          <button
-            type="button"
-            onClick={() => navigate("/premium")}
-            title="Research Library - Premium"
-            className="premium-library-nav"
-          >
-             <Icon name="book" />
-
-            <span className="premium-library-label">
-            Research Library
-
-            <small className="pro-badge">
-              PRO
-            </small>
-             </span>
-          </button>
-
-
-          <button
-            type="button"
-            onClick={() => navigate("/research-history")}
-            title="Research History"
-          >
-            <Icon
-              name="history"
-              size={18}
-            />
-
-            <span>
-              Research History
-            </span>
-          </button>
-
-
-          <button
-            type="button"
-            onClick={() => navigate("/saved-papers")}
-            title="Saved Papers"
-          >
-            <Icon
-              name="bookmark"
-              size={18}
-            />
-
-            <span>
-              Saved Papers
-            </span>
-          </button>
-
-        </nav>
-
-
-        {/* RESEARCH TOOLS LABEL */}
-
-        <div className="sidebar-section-label">
-          RESEARCH TOOLS
-        </div>
-
-
-        {/* RESEARCH TOOLS */}
-
-        <nav
-          className="sidebar-nav sidebar-tools"
-          aria-label="Research tools"
-        >
-
-          <button
-            type="button"
-            onClick={() => {
-              setSearchError("");
-              setShowPdfUpload(true);
-            }}
-            title="Paper Analyzer"
-          >
-            <Icon name="file" />
-
-            <span>
-              Paper Analyzer
-            </span>
-          </button>
-
-
-          <button
-            type="button"
-            onClick={() => {
-              if (results) {
-                document
-                  .querySelector(
-                    ".verification-card"
-                  )
-                  ?.scrollIntoView({
-                    behavior:
-                      "smooth",
-                  });
-              } else {
-                focusResearch();
-              }
-            }}
-            title="Source Verification"
-          >
-            <Icon name="shield" />
-
-            <span>
-              Source Verification
-            </span>
-          </button>
-
-
-          <button
-            type="button"
-            onClick={() => {
-              if (results) {
-                document
-                  .querySelector(
-                    ".research-results"
-                  )
-                  ?.scrollIntoView({
-                    behavior:
-                      "smooth",
-                  });
-              } else {
-                focusResearch();
-              }
-            }}
-            title="Research Insights"
-          >
-            <Icon name="chart" />
-
-            <span>
-              Research Insights
-            </span>
-          </button>
-
-
-          <button
-            type="button"
-            onClick={focusResearch}
-            title="AI Assistant"
-          >
-            <Icon name="sparkle" />
-
-            <span>
-              AI Assistant
-            </span>
-          </button>
-
-        </nav>
-
-
-        {/* SIDEBAR BOTTOM */}
-
-        <div className="sidebar-bottom">
-
-          <button
-            type="button"
-            className="settings-btn"
-            title="Settings"
-            onClick={() =>
-              navigate("/settings")
-            }
-          >
-            <Icon name="settings" />
-
-            <span>
-              Settings
-            </span>
-          </button>
-
-          <div className="sidebar-ai-card">
-
-            <div className="sidebar-ai-icon">
-              <Icon
-                name="sparkle"
-                size={18}
-              />
-            </div>
-
-            <div>
-              <strong>
-                ResoMind AI
-              </strong>
-
-              <span>
-                Research smarter with
-                intelligent AI agents.
-              </span>
-            </div>
-
-          </div>
-
-        </div>
-
-      </aside>
-
-
-      {/* =====================================================
-          WORKSPACE
-      ===================================================== */}
-
-      <div className="research-workspace">
 
         {/* TOP BAR */}
 
@@ -1780,8 +1495,6 @@ function Research() {
 
         </main>
 
-      </div>
-
 
       {/* =====================================================
           PDF MODAL
@@ -1802,7 +1515,7 @@ function Research() {
 
       )}
 
-    </div>
+    </DashboardLayout>
   );
 }
 

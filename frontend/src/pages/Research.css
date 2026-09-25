@@ -197,13 +197,13 @@ button { cursor: pointer; }
 .hero-bot { position:absolute; z-index:3; right:6.5%; top:108px; width:155px; height:190px; filter:drop-shadow(0 22px 24px rgba(72,113,206,.16)); }
 .bot-head { position:absolute; left:30px; top:18px; width:92px; height:73px; border-radius:42px 42px 34px 34px; background:linear-gradient(145deg,#fff,#dbe9fb); border:3px solid #cfdcf1; box-shadow:inset -9px -7px 13px rgba(101,142,203,.12); }
 .bot-head::before { content:""; position:absolute; inset:14px 13px 15px; border-radius:23px; background:linear-gradient(160deg,#314a75,#0e1f3e); box-shadow:inset 0 0 11px rgba(0,204,255,.22); }
-.bot-eye { position:absolute; z-index:2; top:32px; width:10px; height:18px; border-radius:7px; background:#21d9ef; box-shadow:0 0 12px #27dff5; }
+.bot-eye { position:absolute; z-index:2; top:32px; width:10px; height:18px; border-radius:7px; background:#21d9ef; box-shadow:0 0 12px #f4f6f7; animation: bodyCoreGlow 2.2s ease-in-out infinite;}
 .bot-eye:first-of-type { left:38px; } .bot-eye:last-of-type { right:38px; }
 .bot-body { position:absolute; left:50px; top:87px; width:56px; height:58px; display:grid; place-items:center; color:#557bf7; border-radius:22px 22px 28px 28px; background:linear-gradient(145deg,#fff,#e5edf9); border:2px solid #d4dfef; }
 .bot-arm { position:absolute; top:93px; width:24px; height:52px; border-radius:15px; background:linear-gradient(145deg,#f9fcff,#d9e6f7); border:2px solid #d0ddee; }
 .bot-arm.left { left:29px; transform:rotate(26deg); } .bot-arm.right { right:27px; transform:rotate(-32deg); }
-.bot-antenna { position:absolute; left:75px; top:3px; width:4px; height:18px; background:#b7c7df; }
-.bot-antenna i { position:absolute; top:-5px; left:-3px; width:10px; height:10px; border-radius:50%; background:#6672ef; box-shadow:0 0 0 3px #e8ebff; }
+.bot-antenna { position:absolute; left:75px; top:3px; width:4px; height:18px; background:#b7c7df;animation: bodyCoreGlow 2.2s ease-in-out infinite; }
+.bot-antenna i { position:absolute; top:-5px; left:-3px; width:10px; height:10px; border-radius:50%; background:#6672ef; box-shadow:0 0 0 3px #4bf3f9;animation: bodyCoreGlow 2.2s ease-in-out infinite; }
 .bot-shadow { position:absolute; left:34px; bottom:1px; width:90px; height:16px; border-radius:50%; background:rgba(65,121,223,.22); filter:blur(9px); }
 
 .hero-orbit { position:absolute; z-index:1; border:1px solid rgba(87,113,191,.13); border-radius:50%; pointer-events:none; }
@@ -3359,4 +3359,736 @@ button { cursor: pointer; }
   .results-heading h2 {
     font-size: 22px !important;
   }
+}
+
+/* =========================================================
+   RESOMIND RESEARCH PAGE - GLOBAL DARK THEME
+   PASTE THIS AT THE VERY BOTTOM OF Research.css
+========================================================= */
+
+
+/* =========================================================
+   MAIN PAGE BACKGROUND
+========================================================= */
+
+[data-resomind-theme="dark"] .research-app-shell,
+[data-resomind-theme="dark"] .research-workspace,
+[data-resomind-theme="dark"] .workspace-content {
+  background: #0f1724 !important;
+  color: #edf2f8 !important;
+}
+
+
+/* =========================================================
+   TOP BAR
+========================================================= */
+
+[data-resomind-theme="dark"] .workspace-topbar {
+  background: rgba(21, 30, 46, 0.96) !important;
+  border-color: #2b374a !important;
+}
+
+[data-resomind-theme="dark"] .online-status,
+[data-resomind-theme="dark"] .user-meta span,
+[data-resomind-theme="dark"] .user-chevron {
+  color: #a6b1c2 !important;
+}
+
+[data-resomind-theme="dark"] .user-meta strong {
+  color: #edf2f8 !important;
+}
+
+[data-resomind-theme="dark"] .user-avatar {
+  color: #c7ceff !important;
+  background: #202b48 !important;
+}
+
+
+/* =========================================================
+   PROFILE DROPDOWN
+========================================================= */
+
+[data-resomind-theme="dark"] .profile-dropdown {
+  background: #182335 !important;
+  border-color: #2b374a !important;
+
+  box-shadow:
+    0 16px 40px
+    rgba(0, 0, 0, 0.32) !important;
+}
+
+[data-resomind-theme="dark"] .profile-dropdown strong,
+[data-resomind-theme="dark"] .profile-dropdown-header strong {
+  color: #edf2f8 !important;
+}
+
+[data-resomind-theme="dark"] .profile-dropdown-header span {
+  color: #a6b1c2 !important;
+}
+
+[data-resomind-theme="dark"] .profile-dropdown-divider {
+  background: #2b374a !important;
+}
+
+[data-resomind-theme="dark"] .profile-logout-btn {
+  color: #b7c2d2 !important;
+}
+
+[data-resomind-theme="dark"] .profile-logout-btn:hover {
+  color: #ff8a96 !important;
+  background: #32212a !important;
+}
+
+
+/* =========================================================
+   HERO AREA
+========================================================= */
+
+[data-resomind-theme="dark"] .discover-hero {
+  background:
+    radial-gradient(
+      circle at 48% 35%,
+      rgba(99, 102, 241, 0.14),
+      transparent 28%
+    ),
+    radial-gradient(
+      circle at 75% 25%,
+      rgba(59, 130, 246, 0.10),
+      transparent 22%
+    ),
+    linear-gradient(
+      180deg,
+      #101927 0%,
+      #0f1724 58%,
+      #111a28 100%
+    ) !important;
+}
+
+[data-resomind-theme="dark"] .discover-hero::before {
+  opacity: 0.2 !important;
+}
+
+[data-resomind-theme="dark"] .discover-hero h1 {
+  color: #f1f5f9 !important;
+}
+
+[data-resomind-theme="dark"] .hero-subtitle {
+  color: #a6b1c2 !important;
+}
+
+[data-resomind-theme="dark"] .research-status {
+  color: #aab2ff !important;
+
+  background:
+    rgba(30, 41, 59, 0.78) !important;
+
+  border-color: #36415a !important;
+}
+
+
+/* =========================================================
+   SEARCH BOX
+========================================================= */
+
+[data-resomind-theme="dark"] .research-search-box {
+  background:
+    rgba(24, 35, 53, 0.97) !important;
+
+  border-color: #344057 !important;
+
+  box-shadow:
+    0 18px 48px
+    rgba(0, 0, 0, 0.25) !important;
+}
+
+[data-resomind-theme="dark"]
+.research-search-box:focus-within {
+  border-color: #5968dd !important;
+
+  box-shadow:
+    0 20px 50px
+    rgba(0, 0, 0, 0.30),
+    0 0 0 4px
+    rgba(99, 102, 241, 0.08) !important;
+}
+
+[data-resomind-theme="dark"]
+.research-search-box textarea {
+  color: #edf2f8 !important;
+  background: transparent !important;
+}
+
+[data-resomind-theme="dark"]
+.research-search-box textarea::placeholder {
+  color: #8390a3 !important;
+}
+
+[data-resomind-theme="dark"]
+.research-search-icon {
+  color: #9aa8bd !important;
+}
+
+[data-resomind-theme="dark"]
+.search-attachment {
+  color: #b1bdce !important;
+  background: #1b2638 !important;
+  border-color: #344057 !important;
+}
+
+[data-resomind-theme="dark"]
+.search-attachment:hover {
+  color: #aab2ff !important;
+  background: #202c42 !important;
+}
+
+
+/* =========================================================
+   SEARCH SUGGESTIONS
+========================================================= */
+
+[data-resomind-theme="dark"]
+.search-suggestions > span {
+  color: #8f9bad !important;
+}
+
+[data-resomind-theme="dark"]
+.search-suggestions button {
+  color: #bac4d3 !important;
+
+  background:
+    rgba(24, 35, 53, 0.9) !important;
+
+  border-color: #344057 !important;
+}
+
+[data-resomind-theme="dark"]
+.search-suggestions button:hover {
+  color: #b7bdff !important;
+
+  background: #202b41 !important;
+
+  border-color: #5968dd !important;
+}
+
+
+/* =========================================================
+   QUICK TOOL CARDS
+========================================================= */
+
+[data-resomind-theme="dark"]
+.quick-tool-card {
+  color: #edf2f8 !important;
+
+  background:
+    rgba(24, 35, 53, 0.95) !important;
+
+  border-color: #2d394e !important;
+
+  box-shadow:
+    0 9px 25px
+    rgba(0, 0, 0, 0.20) !important;
+}
+
+[data-resomind-theme="dark"]
+.quick-tool-card:hover {
+  border-color: #4c5872 !important;
+
+  box-shadow:
+    0 14px 30px
+    rgba(0, 0, 0, 0.28) !important;
+}
+
+[data-resomind-theme="dark"]
+.quick-tool-card strong {
+  color: #edf2f8 !important;
+}
+
+[data-resomind-theme="dark"]
+.quick-tool-card span {
+  color: #9eabbd !important;
+}
+
+[data-resomind-theme="dark"]
+.quick-arrow {
+  color: #aab5c7 !important;
+  background: #202b3e !important;
+}
+
+
+/* =========================================================
+   TRUSTED SOURCES
+========================================================= */
+
+[data-resomind-theme="dark"]
+.trust-line {
+  background:
+    linear-gradient(
+      90deg,
+      transparent,
+      #334057,
+      transparent
+    ) !important;
+}
+
+[data-resomind-theme="dark"]
+.trust-label,
+[data-resomind-theme="dark"]
+.source-logos {
+  color: #8390a3 !important;
+}
+
+
+/* =========================================================
+   PDF UPLOAD SUCCESS
+========================================================= */
+
+[data-resomind-theme="dark"]
+.pdf-upload-success {
+  background: #152c29 !important;
+  border-color: #27564c !important;
+}
+
+[data-resomind-theme="dark"]
+.pdf-upload-success-content strong {
+  color: #d9f7ee !important;
+}
+
+[data-resomind-theme="dark"]
+.pdf-upload-success-content p {
+  color: #9fc7bc !important;
+}
+
+[data-resomind-theme="dark"]
+.pdf-upload-success-icon {
+  color: #58d8b8 !important;
+  background: #1c4239 !important;
+}
+
+
+/* =========================================================
+   PROCESSING / LOADING
+========================================================= */
+
+[data-resomind-theme="dark"]
+.research-processing,
+[data-resomind-theme="dark"]
+.research-loading-card {
+  color: #edf2f8 !important;
+
+  background:
+    rgba(24, 35, 53, 0.96) !important;
+
+  border-color: #2b374a !important;
+
+  box-shadow:
+    0 15px 40px
+    rgba(0, 0, 0, 0.24) !important;
+}
+
+[data-resomind-theme="dark"]
+.research-processing h3,
+[data-resomind-theme="dark"]
+.research-loading-card h3 {
+  color: #edf2f8 !important;
+}
+
+[data-resomind-theme="dark"]
+.research-processing > p,
+[data-resomind-theme="dark"]
+.research-loading-card > p,
+[data-resomind-theme="dark"]
+.processing-steps span,
+[data-resomind-theme="dark"]
+.loading-step,
+[data-resomind-theme="dark"]
+.agent-step {
+  color: #a6b1c2 !important;
+}
+
+
+/* =========================================================
+   ERROR BOX
+========================================================= */
+
+[data-resomind-theme="dark"]
+.research-error {
+  background: #321d26 !important;
+
+  border-color:
+    rgba(255, 100, 120, 0.24) !important;
+}
+
+[data-resomind-theme="dark"]
+.research-error strong {
+  color: #ffadb8 !important;
+}
+
+[data-resomind-theme="dark"]
+.research-error p {
+  color: #e797a3 !important;
+}
+
+
+/* =========================================================
+   MAIN RESULTS AREA
+========================================================= */
+
+[data-resomind-theme="dark"]
+.research-results {
+  color: #edf2f8 !important;
+
+  background: #151e2e !important;
+
+  border-color: #2b374a !important;
+
+  box-shadow:
+    0 12px 35px
+    rgba(0, 0, 0, 0.25) !important;
+}
+
+
+/* IMPORTANT:
+   Your current Research.css forces result text
+   to black using !important.
+   These rules override those old rules.
+*/
+
+[data-resomind-theme="dark"]
+.research-results p,
+
+[data-resomind-theme="dark"]
+.research-results li,
+
+[data-resomind-theme="dark"]
+.research-results h1,
+
+[data-resomind-theme="dark"]
+.research-results h2,
+
+[data-resomind-theme="dark"]
+.research-results h3,
+
+[data-resomind-theme="dark"]
+.research-results h4,
+
+[data-resomind-theme="dark"]
+.research-results h5,
+
+[data-resomind-theme="dark"]
+.research-results h6,
+
+[data-resomind-theme="dark"]
+.research-results strong,
+
+[data-resomind-theme="dark"]
+.research-results b,
+
+[data-resomind-theme="dark"]
+.research-results small {
+  color: #edf2f8 !important;
+}
+
+
+/* =========================================================
+   RESULT HEADER
+========================================================= */
+
+[data-resomind-theme="dark"]
+.results-heading h2 {
+  color: #edf2f8 !important;
+}
+
+[data-resomind-theme="dark"]
+.results-heading > div:first-child > span {
+  color: #8ca2ff !important;
+}
+
+
+/* =========================================================
+   QUERY RESULT CARD
+========================================================= */
+
+[data-resomind-theme="dark"]
+.query-result-card {
+  background: #1a2537 !important;
+  border-color: #2f3c52 !important;
+}
+
+[data-resomind-theme="dark"]
+.query-result-card h3 {
+  color: #edf2f8 !important;
+}
+
+[data-resomind-theme="dark"]
+.query-label {
+  color: #8ca2ff !important;
+}
+
+
+/* =========================================================
+   AGENT CARDS
+========================================================= */
+
+[data-resomind-theme="dark"]
+.agent-card {
+  background: #1a2537 !important;
+
+  border-color: #2f3c52 !important;
+
+  box-shadow:
+    0 8px 22px
+    rgba(0, 0, 0, 0.16) !important;
+}
+
+[data-resomind-theme="dark"]
+.agent-card:hover {
+  border-color: #53617d !important;
+}
+
+[data-resomind-theme="dark"]
+.agent-card strong {
+  color: #edf2f8 !important;
+}
+
+[data-resomind-theme="dark"]
+.agent-card p {
+  color: #a6b1c2 !important;
+}
+
+
+/* =========================================================
+   GENERIC RESULT CARDS
+   Helps cover nested cards inside ResearchResults
+========================================================= */
+
+[data-resomind-theme="dark"]
+.research-results [class*="card"] {
+  background-color: #1a2537 !important;
+  border-color: #2f3c52 !important;
+}
+
+[data-resomind-theme="dark"]
+.research-results [class*="panel"] {
+  background-color: #1a2537 !important;
+  border-color: #2f3c52 !important;
+}
+
+
+/* =========================================================
+   DIVIDERS
+========================================================= */
+
+[data-resomind-theme="dark"]
+.research-results hr {
+  background: #2b374a !important;
+}
+
+
+/* =========================================================
+   LINKS
+========================================================= */
+
+[data-resomind-theme="dark"]
+.research-results a {
+  color: #8ca2ff !important;
+}
+
+[data-resomind-theme="dark"]
+.research-results a:hover {
+  color: #b5bcff !important;
+}
+
+
+/* =========================================================
+   RESPONSIBLE AI NOTICE
+========================================================= */
+
+[data-resomind-theme="dark"]
+.responsible-notice {
+  background: #152825 !important;
+  border-color: #275047 !important;
+}
+
+[data-resomind-theme="dark"]
+.responsible-notice strong {
+  color: #d7f3eb !important;
+}
+
+[data-resomind-theme="dark"]
+.responsible-notice p {
+  color: #a5c6bd !important;
+}
+
+
+/* =========================================================
+   SHARED SIDEBAR
+   This also works even though Sidebar has its own CSS file.
+========================================================= */
+
+[data-resomind-theme="dark"]
+.research-sidebar {
+  background: #151e2e !important;
+  border-color: #2b374a !important;
+
+  box-shadow:
+    5px 0 24px
+    rgba(0, 0, 0, 0.16) !important;
+}
+
+[data-resomind-theme="dark"]
+.sidebar-brand strong {
+  color: #edf2f8 !important;
+}
+
+[data-resomind-theme="dark"]
+.sidebar-brand small {
+  color: #929fb1 !important;
+}
+
+[data-resomind-theme="dark"]
+.sidebar-nav button,
+[data-resomind-theme="dark"]
+.settings-btn,
+[data-resomind-theme="dark"]
+.sidebar-logout {
+  color: #aab5c7 !important;
+}
+
+[data-resomind-theme="dark"]
+.sidebar-nav button:hover,
+[data-resomind-theme="dark"]
+.settings-btn:hover,
+[data-resomind-theme="dark"]
+.sidebar-logout:hover {
+  color: #aeb5ff !important;
+  background: #1e2a3d !important;
+}
+
+[data-resomind-theme="dark"]
+.sidebar-nav button.active {
+  color: #9ba8ff !important;
+
+  background:
+    linear-gradient(
+      90deg,
+      #1c2940,
+      #1a2537
+    ) !important;
+
+  box-shadow:
+    inset 3px 0 0
+    #7180ff !important;
+}
+
+[data-resomind-theme="dark"]
+.sidebar-section-label {
+  color: #7f8da2 !important;
+}
+
+[data-resomind-theme="dark"]
+.sidebar-ai-card {
+  background:
+    linear-gradient(
+      145deg,
+      #192438,
+      #172235
+    ) !important;
+
+  border-color: #2b374a !important;
+}
+
+[data-resomind-theme="dark"]
+.sidebar-ai-card strong {
+  color: #edf2f8 !important;
+}
+
+[data-resomind-theme="dark"]
+.sidebar-ai-card span {
+  color: #98a5b7 !important;
+}
+
+[data-resomind-theme="dark"]
+.sidebar-ai-icon {
+  color: #a3a9ff !important;
+  background: #242e50 !important;
+}
+
+
+/* =========================================================
+   SIDEBAR COLLAPSE BUTTON
+========================================================= */
+
+[data-resomind-theme="dark"]
+.sidebar-collapse-btn {
+  color: #b6c0cf !important;
+  background: #1b2638 !important;
+  border-color: #344057 !important;
+}
+
+
+/* =========================================================
+   PRO BADGE
+========================================================= */
+
+[data-resomind-theme="dark"]
+.pro-badge {
+  color: #b5b9ff !important;
+
+  border-color: #4a4d80 !important;
+
+  background:
+    linear-gradient(
+      135deg,
+      #272742,
+      #202b48
+    ) !important;
+}
+
+
+/* =========================================================
+   SCROLLBAR
+========================================================= */
+
+[data-resomind-theme="dark"]
+.research-sidebar {
+  scrollbar-color:
+    #47546a
+    transparent !important;
+}
+
+[data-resomind-theme="dark"]
+.research-sidebar::-webkit-scrollbar-thumb {
+  background: #47546a !important;
+}
+
+[data-resomind-theme="dark"]
+.research-sidebar::-webkit-scrollbar-thumb:hover {
+  background: #5b697f !important;
+}
+
+
+/* =========================================================
+   SMOOTH THEME CHANGE
+========================================================= */
+
+.research-app-shell,
+.research-workspace,
+.workspace-topbar,
+.discover-hero,
+.research-search-box,
+.quick-tool-card,
+.research-results,
+.query-result-card,
+.agent-card,
+.research-processing,
+.research-loading-card,
+.responsible-notice,
+.research-sidebar,
+.profile-dropdown {
+  transition:
+    background 0.25s ease,
+    background-color 0.25s ease,
+    color 0.25s ease,
+    border-color 0.25s ease,
+    box-shadow 0.25s ease;
 }

@@ -8,6 +8,8 @@ import {
   useNavigate,
 } from "react-router-dom";
 
+import DashboardLayout from "../components/DashboardLayout";
+
 import "./PremiumLibrary.css";
 
 import {
@@ -361,250 +363,14 @@ const handleSavePaper = async (paper) => {
     setSavingPaperId(null);
   }
 };
-
-  /* =======================================================
-     OPEN SAVED PAPERS
-  ======================================================= */
-
-  const handleOpenSavedPapers =
-    () => {
-
-      navigate(
-        "/saved-papers"
-      );
-
-    };
-
-
-  /* =======================================================
+/* =======================================================
      PAGE
   ======================================================= */
 
   return (
 
-    <div className="premium-library-page">
-
-
-      {/* =================================================
-          SIDEBAR
-      ================================================= */}
-
-      <aside className="premium-library-sidebar">
-
-
-        {/* BRAND */}
-
-        <div
-          className="library-brand"
-          onClick={() =>
-            navigate("/research")
-          }
-        >
-
-          <div className="library-brand-logo">
-
-            <img
-              src="/resqmind-logo.jpeg"
-              alt="ResoMind"
-            />
-
-          </div>
-
-
-          <div>
-
-            <strong>
-              Reso<span>Mind</span>
-            </strong>
-
-            <small>
-              AI Research Workspace
-            </small>
-
-          </div>
-
-        </div>
-
-
-        {/* NEW RESEARCH */}
-
-        <button
-          type="button"
-          className="library-new-research"
-          onClick={() =>
-            navigate("/research")
-          }
-        >
-
-          <span>
-            ＋
-          </span>
-
-          New Research
-
-        </button>
-
-
-        {/* MAIN NAVIGATION */}
-
-        <nav className="library-navigation">
-
-
-          <button
-            type="button"
-            onClick={() =>
-              navigate("/research")
-            }
-          >
-
-            <span>
-              ⌕
-            </span>
-
-            Discover
-
-          </button>
-
-
-          <button
-            type="button"
-            className="active"
-          >
-
-            <span>
-              ▥
-            </span>
-
-            <div className="library-nav-label">
-
-              Research Library
-
-              <small>
-                PRO
-              </small>
-
-            </div>
-
-          </button>
-
-
-          <button
-            type="button"
-            onClick={() =>
-              navigate(
-                "/research-history"
-              )
-            }
-          >
-
-            <span>
-              ◷
-            </span>
-
-            Research History
-
-          </button>
-
-
-          <button
-            type="button"
-            onClick={
-              handleOpenSavedPapers
-            }
-          >
-
-            <span>
-              ♡
-            </span>
-
-            Saved Papers
-
-          </button>
-
-        </nav>
-
-
-        {/* PREMIUM LABEL */}
-
-        <div className="library-sidebar-title">
-
-          PREMIUM
-
-        </div>
-
-
-        {/* PREMIUM TOOLS */}
-
-        <nav className="library-navigation">
-
-          <button
-            type="button"
-          >
-
-            <span>
-              ▤
-            </span>
-
-            Browse Papers
-
-          </button>
-
-
-          <button
-            type="button"
-          >
-
-            <span>
-              ✦
-            </span>
-
-            AI Paper Analysis
-
-          </button>
-
-
-          <button
-            type="button"
-          >
-
-            <span>
-              ♢
-            </span>
-
-            Source Verification
-
-          </button>
-
-        </nav>
-
-
-        {/* PREMIUM CARD */}
-
-        <div className="library-premium-card">
-
-          <div className="library-premium-icon">
-
-            ✦
-
-          </div>
-
-
-          <div>
-
-            <strong>
-              Premium Researcher
-            </strong>
-
-            <span>
-              Your Premium access
-              is active.
-            </span>
-
-          </div>
-
-        </div>
-
-      </aside>
+    <DashboardLayout activePage="library">
+      <div className="premium-library-page">
 
 
       {/* =================================================
@@ -1178,7 +944,8 @@ const handleSavePaper = async (paper) => {
 
       </div>
 
-    </div>
+      </div>
+    </DashboardLayout>
 
   );
 
