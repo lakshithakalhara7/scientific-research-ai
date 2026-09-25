@@ -1,4 +1,8 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import {
+  BrowserRouter,
+  Routes,
+  Route,
+} from "react-router-dom";
 
 import Home from "./pages/Home";
 import Login from "./pages/Login";
@@ -12,14 +16,16 @@ import ResearchHistory from "./pages/ResearchHistory";
 import SavedPapers from "./pages/SavedPapers";
 import Settings from "./pages/Settings";
 
+import ThemeManager from "./components/ThemeManager";
+
 import "./App.css";
 
 function App() {
   return (
     <BrowserRouter>
+      <ThemeManager />
 
       <Routes>
-
         <Route
           path="/"
           element={<Home />}
@@ -39,10 +45,12 @@ function App() {
           path="/research"
           element={<Research />}
         />
-         <Route
-           path="/premium"
+
+        <Route
+          path="/premium"
           element={<Premium />}
         />
+
         <Route
           path="/payment"
           element={<Payment />}
@@ -57,22 +65,22 @@ function App() {
           path="/premium-library"
           element={<PremiumLibrary />}
         />
+
         <Route
           path="/research-history"
           element={<ResearchHistory />}
         />
+
         <Route
           path="/saved-papers"
           element={<SavedPapers />}
         />
 
         <Route
-        path="/settings"
-        element={<Settings />}
+          path="/settings"
+          element={<Settings />}
         />
-
       </Routes>
-      
     </BrowserRouter>
   );
 }

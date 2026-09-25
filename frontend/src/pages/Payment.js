@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import DashboardLayout from "../components/DashboardLayout";
 import "./Payment.css";
 
 function Payment() {
@@ -139,7 +140,8 @@ function Payment() {
   };
 
   return (
-    <div className="payment-page">
+    <DashboardLayout activePage="library">
+      <div className="payment-page">
 
       {/* =====================================
           HEADER
@@ -539,7 +541,8 @@ function Payment() {
 
       </main>
 
-    </div>
+      </div>
+    </DashboardLayout>
   );
 }
 

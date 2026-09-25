@@ -1,0 +1,59 @@
+:root {
+  --sidebar-w: 310px;
+  --topbar-h: 70px;
+}
+
+.research-app-shell {
+  min-height: 100vh;
+  color: #171717;
+  background: #f7f9fd;
+  font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+}
+
+.research-app-shell svg {
+  display: block;
+}
+
+.research-workspace {
+  min-height: 100vh;
+  margin-left: var(--sidebar-w);
+  background: #fbfcff;
+  transition: margin-left 0.28s ease;
+}
+
+.sidebar-collapsed {
+  --sidebar-w: 86px;
+}
+
+.sidebar-collapsed .research-workspace {
+  margin-left: 86px;
+}
+
+@media (max-width: 1250px) {
+  .research-app-shell {
+    --sidebar-w: 270px;
+  }
+}
+
+@media (max-width: 950px) {
+  .research-app-shell {
+    --sidebar-w: 84px;
+  }
+
+  .research-workspace,
+  .sidebar-collapsed .research-workspace {
+    margin-left: 84px;
+  }
+}
+
+@media (max-width: 720px) {
+  .research-app-shell {
+    --sidebar-w: 0px;
+    --topbar-h: 62px;
+  }
+
+  .research-workspace,
+  .sidebar-collapsed .research-workspace {
+    margin-left: 0;
+  }
+}

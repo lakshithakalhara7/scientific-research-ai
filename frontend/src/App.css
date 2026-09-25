@@ -2257,3 +2257,240 @@ button {
   }
 
 }
+
+/* =========================================================
+   GLOBAL RESOMIND THEME
+   Applied by ThemeManager via:
+   <html data-resomind-theme="light|dark">
+========================================================= */
+
+:root {
+  color-scheme: light;
+
+  --app-bg: #f7f9fd;
+  --surface: #ffffff;
+  --surface-soft: #f8faff;
+  --surface-elevated: #ffffff;
+
+  --text-primary: #171717;
+  --text-secondary: #64748b;
+  --text-muted: #94a3b8;
+
+  --border-color: #e2e8f0;
+  --border-soft: #e5e7eb;
+
+  --sidebar-bg: #ffffff;
+  --topbar-bg: rgba(255, 255, 255, 0.94);
+  --card-bg: #ffffff;
+  --input-bg: #ffffff;
+
+  --accent: #6366f1;
+  --accent-soft: #eef2ff;
+
+  --shadow-color: rgba(15, 23, 42, 0.08);
+}
+
+[data-resomind-theme="dark"] {
+  color-scheme: dark;
+
+  --app-bg: #0f1724;
+  --surface: #151e2e;
+  --surface-soft: #182335;
+  --surface-elevated: #1b2739;
+
+  --text-primary: #edf2f8;
+  --text-secondary: #b0bccd;
+  --text-muted: #8f9bad;
+
+  --border-color: #2b374a;
+  --border-soft: #263246;
+
+  --sidebar-bg: #151e2e;
+  --topbar-bg: rgba(21, 30, 46, 0.95);
+  --card-bg: #182335;
+  --input-bg: #1b2638;
+
+  --accent: #818cf8;
+  --accent-soft: #202b48;
+
+  --shadow-color: rgba(0, 0, 0, 0.28);
+}
+
+html,
+body,
+#root {
+  min-height: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--app-bg);
+  color: var(--text-primary);
+  transition:
+    background 0.25s ease,
+    color 0.25s ease;
+}
+
+/* =========================================================
+   GLOBAL DARK THEME OVERRIDES
+   Home / Login / legacy Research Dashboard in App.css
+========================================================= */
+
+[data-resomind-theme="dark"] .modern-home,
+[data-resomind-theme="dark"] .research-dashboard {
+  color: var(--text-primary);
+  background:
+    radial-gradient(
+      circle at 50% -20%,
+      rgba(99, 102, 241, 0.10),
+      transparent 35%
+    ),
+    var(--app-bg);
+}
+
+[data-resomind-theme="dark"] .modern-navbar,
+[data-resomind-theme="dark"] .dashboard-header {
+  background: var(--topbar-bg);
+  border-color: var(--border-color);
+}
+
+[data-resomind-theme="dark"] .modern-brand strong,
+[data-resomind-theme="dark"] .dashboard-brand strong,
+[data-resomind-theme="dark"] .home-hero h1,
+[data-resomind-theme="dark"] .how-section h2,
+[data-resomind-theme="dark"] .responsible-section h2,
+[data-resomind-theme="dark"] .feature-item strong,
+[data-resomind-theme="dark"] .agent-box strong,
+[data-resomind-theme="dark"] .dashboard-intro h1,
+[data-resomind-theme="dark"] .workspace-section-header h2,
+[data-resomind-theme="dark"] .workspace-tool h3,
+[data-resomind-theme="dark"] .processing-agent strong,
+[data-resomind-theme="dark"] .research-query-result h3 {
+  color: var(--text-primary);
+}
+
+[data-resomind-theme="dark"] .modern-brand span,
+[data-resomind-theme="dark"] .dashboard-brand span,
+[data-resomind-theme="dark"] .desktop-nav a,
+[data-resomind-theme="dark"] .hero-description,
+[data-resomind-theme="dark"] .example-area > span,
+[data-resomind-theme="dark"] .feature-item p,
+[data-resomind-theme="dark"] .how-section > p,
+[data-resomind-theme="dark"] .agent-box small,
+[data-resomind-theme="dark"] .responsible-section p,
+[data-resomind-theme="dark"] .modern-footer,
+[data-resomind-theme="dark"] .dashboard-nav a,
+[data-resomind-theme="dark"] .dashboard-intro p,
+[data-resomind-theme="dark"] .workspace-section-header > small,
+[data-resomind-theme="dark"] .workspace-tool p,
+[data-resomind-theme="dark"] .processing-agent p,
+[data-resomind-theme="dark"] .research-query-result p,
+[data-resomind-theme="dark"] .workspace-notice p {
+  color: var(--text-secondary);
+}
+
+[data-resomind-theme="dark"] .hero-badge,
+[data-resomind-theme="dark"] .hero-search,
+[data-resomind-theme="dark"] .example-list button,
+[data-resomind-theme="dark"] .feature-item,
+[data-resomind-theme="dark"] .agent-box,
+[data-resomind-theme="dark"] .responsible-section,
+[data-resomind-theme="dark"] .dashboard-search,
+[data-resomind-theme="dark"] .workspace-tool,
+[data-resomind-theme="dark"] .agent-processing,
+[data-resomind-theme="dark"] .research-query-result,
+[data-resomind-theme="dark"] .workspace-notice {
+  background: var(--card-bg);
+  border-color: var(--border-color);
+  box-shadow: 0 16px 45px var(--shadow-color);
+}
+
+[data-resomind-theme="dark"] .search-top textarea,
+[data-resomind-theme="dark"] .dashboard-search textarea {
+  color: var(--text-primary);
+  background: transparent;
+}
+
+[data-resomind-theme="dark"] .search-top textarea::placeholder,
+[data-resomind-theme="dark"] .dashboard-search textarea::placeholder {
+  color: var(--text-muted);
+}
+
+[data-resomind-theme="dark"] .responsible-points span,
+[data-resomind-theme="dark"] .workspace-tool-icon,
+[data-resomind-theme="dark"] .processing-icon,
+[data-resomind-theme="dark"] .workspace-notice > div {
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+
+[data-resomind-theme="dark"] .responsible-points span,
+[data-resomind-theme="dark"] .modern-footer strong {
+  color: var(--text-primary);
+}
+
+[data-resomind-theme="dark"] .how-section,
+[data-resomind-theme="dark"] .modern-footer,
+[data-resomind-theme="dark"] .processing-agent {
+  border-color: var(--border-color);
+}
+
+/* Login page: keep right visual intentionally dark, theme the left form panel */
+[data-resomind-theme="dark"] .login-panel {
+  background: var(--app-bg);
+  color: var(--text-primary);
+}
+
+[data-resomind-theme="dark"] .login-back,
+[data-resomind-theme="dark"] .login-heading p,
+[data-resomind-theme="dark"] .login-benefits p,
+[data-resomind-theme="dark"] .login-note,
+[data-resomind-theme="dark"] .login-footer,
+[data-resomind-theme="dark"] .google-arrow {
+  color: var(--text-secondary);
+}
+
+[data-resomind-theme="dark"] .login-heading h1 {
+  color: var(--text-primary);
+}
+
+[data-resomind-theme="dark"] .login-card,
+[data-resomind-theme="dark"] .google-login {
+  background: var(--card-bg);
+  border-color: var(--border-color);
+  color: var(--text-primary);
+}
+
+[data-resomind-theme="dark"] .login-divider span {
+  background: var(--border-color);
+}
+
+[data-resomind-theme="dark"] .login-benefits div > span {
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+
+/* Smooth visual transition for themed surfaces */
+.modern-home,
+.research-dashboard,
+.modern-navbar,
+.dashboard-header,
+.hero-search,
+.feature-item,
+.agent-box,
+.responsible-section,
+.dashboard-search,
+.workspace-tool,
+.agent-processing,
+.research-query-result,
+.workspace-notice,
+.login-panel,
+.login-card,
+.google-login {
+  transition:
+    background 0.25s ease,
+    color 0.25s ease,
+    border-color 0.25s ease,
+    box-shadow 0.25s ease;
+}
+

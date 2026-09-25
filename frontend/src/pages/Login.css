@@ -3179,3 +3179,460 @@ body {
   }
 }
 
+/* =========================================================
+   RESOMIND LOGIN — INLINE ERROR + GLOBAL DARK THEME
+   Keep this block at the VERY BOTTOM of Login.css
+========================================================= */
+
+/* =========================================================
+   THEMED LOGIN ERROR
+   Replaces the browser/localhost alert popup
+========================================================= */
+
+.login-error-message {
+  width: 100%;
+
+  display: flex;
+  align-items: flex-start;
+
+  gap: 11px;
+
+  margin:
+    -2px 0
+    16px;
+
+  padding:
+    12px 14px;
+
+  position: relative;
+  z-index: 3;
+
+  border:
+    1px solid #f2c6cd;
+
+  border-radius:
+    12px;
+
+  background:
+    rgba(255, 244, 246, 0.92);
+
+  box-shadow:
+    0 8px 24px
+    rgba(161, 45, 63, 0.06);
+
+  animation:
+    loginErrorAppear
+    0.24s ease;
+}
+
+.login-error-icon {
+  width: 25px;
+  height: 25px;
+
+  flex: 0 0 25px;
+
+  display: grid;
+  place-items: center;
+
+  margin-top: 1px;
+
+  border-radius: 50%;
+
+  color: #ffffff;
+
+  background:
+    linear-gradient(
+      135deg,
+      #ef5f72,
+      #d9465f
+    );
+
+  box-shadow:
+    0 5px 14px
+    rgba(217, 70, 95, 0.18);
+
+  font-size: 14px;
+  font-weight: 800;
+}
+
+.login-error-message > div {
+  min-width: 0;
+}
+
+.login-error-message strong {
+  display: block;
+
+  color: #8f2438;
+
+  font-size: 13px;
+  font-weight: 750;
+
+  line-height: 1.35;
+}
+
+.login-error-message p {
+  margin:
+    3px 0 0;
+
+  color: #5f2631;
+
+  font-size: 12px;
+
+  line-height: 1.5;
+}
+
+@keyframes loginErrorAppear {
+  from {
+    opacity: 0;
+    transform: translateY(-5px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+
+/* =========================================================
+   LIGHT THEME
+   Explicit so it works with ThemeManager
+========================================================= */
+
+[data-resomind-theme="light"] .research-login-page {
+  color: #10213d;
+}
+
+[data-resomind-theme="light"] .login-heading h1,
+[data-resomind-theme="light"] .form-field label,
+[data-resomind-theme="light"] .remember-option,
+[data-resomind-theme="light"] .create-account > span,
+[data-resomind-theme="light"] .right-heading h1,
+[data-resomind-theme="light"] .right-heading p,
+[data-resomind-theme="light"] .feature-copy strong,
+[data-resomind-theme="light"] .feature-copy span {
+  color: #171717;
+}
+
+
+/* =========================================================
+   DARK THEME
+========================================================= */
+
+[data-resomind-theme="dark"] html,
+[data-resomind-theme="dark"] body {
+  background: #020817 !important;
+}
+
+[data-resomind-theme="dark"] .research-login-page {
+  color: #f3f6fb !important;
+
+  background:
+    radial-gradient(
+      circle at 9% 20%,
+      rgba(39, 76, 255, 0.25),
+      transparent 30%
+    ),
+    radial-gradient(
+      circle at 88% 15%,
+      rgba(31, 104, 255, 0.20),
+      transparent 29%
+    ),
+    radial-gradient(
+      circle at 79% 75%,
+      rgba(100, 55, 255, 0.13),
+      transparent 34%
+    ),
+    linear-gradient(
+      115deg,
+      #07142d 0%,
+      #030c20 45%,
+      #020817 100%
+    ) !important;
+}
+
+
+/* Background decoration */
+[data-resomind-theme="dark"] .background-glow {
+  opacity: 0.55 !important;
+}
+
+[data-resomind-theme="dark"] .bg-glow-left {
+  background:
+    rgba(44, 80, 255, 0.30) !important;
+}
+
+[data-resomind-theme="dark"] .bg-glow-center {
+  background:
+    rgba(25, 111, 255, 0.13) !important;
+}
+
+[data-resomind-theme="dark"] .bg-glow-right {
+  background:
+    rgba(56, 71, 255, 0.24) !important;
+}
+
+[data-resomind-theme="dark"] .shooting-line {
+  background:
+    linear-gradient(
+      90deg,
+      transparent,
+      rgba(52, 137, 255, 0.14),
+      rgba(69, 177, 255, 0.82),
+      transparent
+    ) !important;
+
+  box-shadow:
+    0 0 10px
+    rgba(0, 140, 255, 0.65),
+    0 0 30px
+    rgba(45, 74, 255, 0.35) !important;
+}
+
+[data-resomind-theme="dark"] .page-stars span {
+  background:
+    #6ebcff !important;
+
+  box-shadow:
+    0 0 8px
+    #459fff,
+    0 0 16px
+    rgba(85, 82, 255, 0.70) !important;
+}
+
+
+/* Login glass panel */
+[data-resomind-theme="dark"] .login-panel {
+  background:
+    linear-gradient(
+      145deg,
+      rgba(13, 29, 65, 0.90),
+      rgba(5, 15, 38, 0.93)
+    ) !important;
+
+  border:
+    1px solid
+    rgba(90, 126, 255, 0.36) !important;
+
+  box-shadow:
+    0 28px 80px
+    rgba(0, 0, 0, 0.35),
+    0 0 50px
+    rgba(50, 77, 255, 0.09),
+    inset 0 1px 0
+    rgba(255, 255, 255, 0.045) !important;
+
+  backdrop-filter:
+    blur(25px)
+    saturate(120%) !important;
+
+  -webkit-backdrop-filter:
+    blur(25px)
+    saturate(120%) !important;
+}
+
+[data-resomind-theme="dark"] .login-panel::before {
+  background:
+    radial-gradient(
+      circle at 17% 0%,
+      rgba(64, 116, 255, 0.15),
+      transparent 36%
+    ) !important;
+}
+
+
+/* Main text */
+[data-resomind-theme="dark"] .login-heading h1,
+[data-resomind-theme="dark"] .right-heading h1 {
+  color: #f4f7fb !important;
+}
+
+[data-resomind-theme="dark"] .login-heading p,
+[data-resomind-theme="dark"] .right-heading p {
+  color: #c4cedd !important;
+}
+
+[data-resomind-theme="dark"] .form-field label {
+  color: #e1e7f0 !important;
+}
+
+[data-resomind-theme="dark"] .remember-option,
+[data-resomind-theme="dark"] .create-account > span {
+  color: #c3cede !important;
+}
+
+[data-resomind-theme="dark"] .feature-copy strong {
+  color: #edf3fb !important;
+}
+
+[data-resomind-theme="dark"] .feature-copy span {
+  color: #bdc8da !important;
+}
+
+[data-resomind-theme="dark"] .intelligence-badge {
+  color: #dbe8ff !important;
+
+  background:
+    rgba(10, 28, 60, 0.68) !important;
+
+  border:
+    1px solid
+    rgba(69, 137, 255, 0.30) !important;
+}
+
+
+/* Inputs */
+[data-resomind-theme="dark"] .field-input input {
+  color: #f2f5f9 !important;
+
+  background:
+    rgba(5, 18, 43, 0.76) !important;
+
+  border:
+    1px solid
+    rgba(92, 126, 194, 0.45) !important;
+
+  box-shadow:
+    inset 0 1px 0
+    rgba(255, 255, 255, 0.025) !important;
+}
+
+[data-resomind-theme="dark"] .field-input input::placeholder {
+  color: #8ea0bb !important;
+}
+
+[data-resomind-theme="dark"] .field-input input:focus {
+  color: #ffffff !important;
+
+  background:
+    rgba(6, 22, 52, 0.94) !important;
+
+  border-color:
+    #4b8fff !important;
+
+  box-shadow:
+    0 0 0 4px
+    rgba(65, 114, 255, 0.10),
+    0 10px 30px
+    rgba(0, 0, 0, 0.16) !important;
+}
+
+[data-resomind-theme="dark"] .field-icon,
+[data-resomind-theme="dark"] .show-password {
+  color: #91a8ce !important;
+}
+
+[data-resomind-theme="dark"] .show-password:hover {
+  color: #62adff !important;
+}
+
+
+/* Remember checkbox */
+[data-resomind-theme="dark"] .checkbox-design {
+  border:
+    1px solid
+    rgba(94, 134, 215, 0.55) !important;
+
+  background:
+    rgba(9, 29, 62, 0.88) !important;
+}
+
+
+/* Links */
+[data-resomind-theme="dark"] .forgot-button,
+[data-resomind-theme="dark"] .create-account button {
+  color: #63adff !important;
+}
+
+[data-resomind-theme="dark"] .forgot-button:hover,
+[data-resomind-theme="dark"] .create-account button:hover {
+  color: #91c6ff !important;
+}
+
+
+/* Inline error in dark mode */
+[data-resomind-theme="dark"] .login-error-message {
+  background:
+    rgba(87, 26, 40, 0.44) !important;
+
+  border:
+    1px solid
+    rgba(255, 107, 128, 0.31) !important;
+
+  box-shadow:
+    0 8px 24px
+    rgba(0, 0, 0, 0.12) !important;
+}
+
+[data-resomind-theme="dark"] .login-error-message strong {
+  color: #ffb3bf !important;
+}
+
+[data-resomind-theme="dark"] .login-error-message p {
+  color: #f3ccd3 !important;
+}
+
+
+/* Divider */
+[data-resomind-theme="dark"] .login-divider p {
+  color: #aab8ce !important;
+}
+
+[data-resomind-theme="dark"] .login-divider span {
+  background:
+    linear-gradient(
+      90deg,
+      transparent,
+      rgba(107, 144, 219, 0.50)
+    ) !important;
+}
+
+[data-resomind-theme="dark"] .login-divider span:last-child {
+  background:
+    linear-gradient(
+      90deg,
+      rgba(107, 144, 219, 0.50),
+      transparent
+    ) !important;
+}
+
+
+/* Right-side feature cards if the current CSS styles them as light */
+[data-resomind-theme="dark"] .right-feature {
+  border-color:
+    rgba(89, 126, 198, 0.28) !important;
+
+  background:
+    rgba(8, 26, 57, 0.56) !important;
+}
+
+[data-resomind-theme="dark"] .feature-icon {
+  border-color:
+    rgba(75, 129, 229, 0.26) !important;
+}
+
+
+/* =========================================================
+   MOBILE ERROR SPACING
+========================================================= */
+
+@media (max-width: 700px) {
+  .login-error-message {
+    padding:
+      11px 12px;
+
+    margin-bottom:
+      14px;
+  }
+
+  .login-error-message strong {
+    font-size:
+      12px;
+  }
+
+  .login-error-message p {
+    font-size:
+      11px;
+  }
+}
+

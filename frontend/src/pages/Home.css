@@ -772,3 +772,258 @@
   }
 
 }
+
+/* =========================================================
+   SHARED SIDEBAR INTEGRATION - HOME / LOGGED-OUT PAGE
+   The visual sidebar is now the same Sidebar.jsx used by
+   Research, History, Saved Papers and Settings.
+========================================================= */
+
+.home-page {
+  --sidebar-w: 310px;
+  --sidebar-width: 310px;
+  --sidebar-closed-width: 86px;
+}
+
+.home-page.home-sidebar-collapsed {
+  --sidebar-w: 86px;
+}
+
+/* The shared Sidebar is fixed, so keep Home content aligned to it. */
+.home-page .home-main {
+  width: calc(100% - var(--sidebar-width));
+  margin-left: var(--sidebar-width);
+}
+
+.home-page.home-sidebar-collapsed .home-main {
+  width: calc(100% - var(--sidebar-closed-width));
+  margin-left: var(--sidebar-closed-width);
+}
+
+/* Old Home sidebar styles can stay above this block.
+   They are no longer used because Home.js now renders Sidebar.jsx. */
+
+@media (max-width: 1250px) {
+  .home-page {
+    --sidebar-w: 270px;
+    --sidebar-width: 270px;
+  }
+}
+
+@media (max-width: 950px) {
+  .home-page,
+  .home-page.home-sidebar-collapsed {
+    --sidebar-w: 84px;
+    --sidebar-width: 84px;
+    --sidebar-closed-width: 84px;
+  }
+
+  .home-page .home-main,
+  .home-page.home-sidebar-collapsed .home-main {
+    width: calc(100% - 84px) !important;
+    margin-left: 84px !important;
+  }
+}
+
+@media (max-width: 720px) {
+  .home-page,
+  .home-page.home-sidebar-collapsed {
+    --sidebar-w: 0px;
+    --sidebar-width: 0px;
+    --sidebar-closed-width: 0px;
+  }
+
+  .home-page .home-main,
+  .home-page.home-sidebar-collapsed .home-main {
+    width: 100% !important;
+    margin-left: 0 !important;
+  }
+}
+
+/* =========================================================
+   RESOMIND HOME — MODERN CHATGPT-LIKE UI OVERRIDES
+   - Larger readable typography
+   - Gray/ash body text changed to near-black
+   - Cleaner cards and spacing
+   - Modern search / hero treatment
+   - Shared Sidebar.jsx remains unchanged
+   Keep this block at the VERY BOTTOM of Home.css
+========================================================= */
+
+.home-page {
+  --home-ink: #171717;
+  --home-heading: #172641;
+  --home-blue: #2563eb;
+  --home-violet: #6258f5;
+  --home-line: #dfe7f1;
+  --home-soft-line: #e9eef5;
+  --home-card: rgba(255, 255, 255, 0.96);
+  --home-soft: #f7faff;
+  color: var(--home-ink) !important;
+  background:
+    radial-gradient(circle at 10% 8%, rgba(56,189,248,.10), transparent 26%),
+    radial-gradient(circle at 88% 18%, rgba(99,102,241,.08), transparent 28%),
+    linear-gradient(180deg,#fff 0%,#f9fbff 52%,#fff 100%) !important;
+  font-family: Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif !important;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+.home-bg-grid {
+  opacity: .28 !important;
+  background-image:
+    linear-gradient(rgba(37,99,235,.035) 1px, transparent 1px),
+    linear-gradient(90deg,rgba(37,99,235,.035) 1px,transparent 1px) !important;
+  background-size: 72px 72px !important;
+}
+.home-glow-one{opacity:.72}.home-glow-two{opacity:.55}.home-glow-three{opacity:.48}.home-particle{opacity:.48}
+
+/* HEADER */
+.home-header {
+  height:72px !important;
+  padding:0 34px !important;
+  background:rgba(255,255,255,.90) !important;
+  border-bottom:1px solid var(--home-soft-line) !important;
+  backdrop-filter:blur(18px) !important;
+  -webkit-backdrop-filter:blur(18px);
+  position:sticky !important;
+  top:0;
+  z-index:25;
+  box-shadow:0 1px 0 rgba(15,23,42,.02);
+}
+.home-header-right{gap:12px !important}
+.home-system-status{min-height:38px !important;padding:0 12px !important;color:var(--home-ink) !important;font-size:13px !important;font-weight:500 !important}
+.home-signin-button,.home-signup-button{height:42px !important;padding:0 18px !important;border-radius:11px !important;font-size:14px !important;font-weight:650 !important}
+.home-signin-button{color:var(--home-ink) !important;background:#fff !important;border:1px solid #dfe6ef !important}
+.home-signin-button:hover{color:var(--home-blue) !important;border-color:#c4d4ee !important;box-shadow:0 8px 20px rgba(37,99,235,.08)}
+.home-signup-button{background:linear-gradient(110deg,#2e8df4,#5865f2,#38bdf8) !important;box-shadow:0 10px 25px rgba(37,99,235,.20) !important}
+
+/* HERO */
+.home-hero{max-width:1120px !important;margin:64px auto 0 !important;padding:0 34px !important}
+.home-hero-logo{width:150px !important;height:150px !important;margin-bottom:16px !important}
+.home-hero-badge{margin-bottom:22px !important;padding:8px 14px !important;color:var(--home-blue) !important;background:rgba(255,255,255,.93) !important;border:1px solid #dce5f1 !important;border-radius:999px !important;box-shadow:0 8px 24px rgba(47,83,145,.06) !important;font-size:12px !important;font-weight:750 !important}
+.home-hero h1{max-width:900px;margin-left:auto !important;margin-right:auto !important;color:var(--home-heading) !important;font-size:clamp(54px,6vw,84px) !important;line-height:.98 !important;letter-spacing:-4px !important;font-weight:800 !important}
+.home-hero h1 span{background:linear-gradient(90deg,#407dff,#645bf4,#4f8ef7) !important;-webkit-background-clip:text !important;background-clip:text !important;color:transparent !important}
+.home-hero-description{max-width:740px !important;margin:24px auto 36px !important;color:var(--home-ink) !important;font-size:17px !important;line-height:1.65 !important;font-weight:400 !important}
+
+/* SEARCH */
+.home-search-shell{max-width:940px;margin-left:auto;margin-right:auto;border:1px solid #dbe4ef !important;border-radius:24px !important;background:rgba(255,255,255,.97) !important;box-shadow:0 20px 55px rgba(33,56,95,.09),0 4px 14px rgba(15,23,42,.035) !important;backdrop-filter:blur(18px) !important}
+.home-search-shell:focus-within{border-color:#aebcf5 !important;box-shadow:0 25px 65px rgba(42,68,115,.12),0 0 0 4px rgba(79,70,229,.05) !important;transform:translateY(-1px) !important}
+.home-search-main{min-height:82px !important;padding:12px 12px 12px 22px !important}
+.home-search-icon{width:24px !important;height:24px !important;margin-right:14px !important;color:#171717 !important}
+.home-search-main textarea{min-height:28px !important;color:var(--home-ink) !important;font-size:16px !important;line-height:1.55 !important;font-weight:400 !important}
+.home-search-main textarea::placeholder{color:#171717 !important;opacity:.66;font-size:16px !important}
+.home-attach-button{width:44px !important;height:44px !important;color:#171717 !important;border-radius:12px !important}
+.home-attach-button:hover{color:var(--home-blue) !important;background:#f1f6ff !important}
+.home-research-button{width:50px !important;height:50px !important;border-radius:14px !important;background:linear-gradient(135deg,#348ef2,#6258f5) !important;box-shadow:0 9px 24px rgba(76,86,220,.23) !important}
+.home-search-footer{min-height:42px !important;padding:0 20px !important;color:var(--home-ink) !important;border-top:1px solid #e7edf5 !important;font-size:13px !important}
+.home-enter-hint{color:var(--home-ink) !important}.home-enter-hint kbd{padding:4px 7px !important;color:var(--home-ink) !important;background:#f4f7fb !important;border:1px solid #dfe6ef !important;font-size:11px !important}
+
+/* SECTIONS */
+.home-explore-section,.home-capabilities{max-width:1100px !important;margin:88px auto 0 !important;padding:0 34px !important}
+.home-section-heading{margin-bottom:24px !important}
+.home-section-eyebrow{margin-bottom:8px !important;color:var(--home-blue) !important;font-size:11px !important;font-weight:800 !important;letter-spacing:1.5px !important}
+.home-section-heading h2{color:var(--home-heading) !important;font-size:28px !important;line-height:1.25 !important;font-weight:750 !important;letter-spacing:-.7px !important}
+.home-section-heading p{color:var(--home-ink) !important;font-size:15px !important;line-height:1.5 !important}
+
+/* SUGGESTIONS */
+.home-suggestion-grid{gap:16px !important}
+.home-suggestion-card{min-height:94px;gap:16px !important;padding:20px !important;color:var(--home-ink) !important;background:var(--home-card) !important;border:1px solid #e0e8f2 !important;border-radius:18px !important;box-shadow:0 10px 28px rgba(35,61,105,.055) !important}
+.home-suggestion-card:hover{transform:translateY(-3px) !important;background:#fff !important;border-color:#c6d5ea !important;box-shadow:0 18px 38px rgba(35,61,105,.10) !important}
+.home-suggestion-icon{width:48px !important;height:48px !important;flex:0 0 48px !important;border-radius:13px !important;font-size:19px !important}
+.home-suggestion-copy strong{margin-bottom:6px !important;color:var(--home-ink) !important;font-size:16px !important;line-height:1.35 !important;font-weight:700 !important}
+.home-suggestion-copy p{color:var(--home-ink) !important;font-size:14px !important;line-height:1.5 !important;white-space:normal !important}
+.home-card-arrow{color:#171717 !important}
+
+/* CAPABILITIES */
+.home-capability-grid{gap:16px !important}
+.home-capability-card{min-height:230px;padding:24px !important;background:var(--home-card) !important;border:1px solid #e0e8f2 !important;border-radius:20px !important;box-shadow:0 12px 32px rgba(35,61,105,.055) !important}
+.home-capability-card:hover{transform:translateY(-4px) !important;border-color:#c8d6eb !important;box-shadow:0 20px 42px rgba(35,61,105,.10) !important}
+.home-capability-icon{width:46px !important;height:46px !important;margin-bottom:20px !important;border-radius:13px !important}.home-capability-icon svg{width:21px !important;height:21px !important}
+.home-feature-number{color:#171717 !important;opacity:.34;font-size:12px !important}
+.home-capability-card h3{color:var(--home-ink) !important;font-size:18px !important;line-height:1.35 !important;font-weight:700 !important}
+.home-capability-card p{color:var(--home-ink) !important;font-size:15px !important;line-height:1.65 !important}
+
+/* CTA */
+.home-bottom-cta{width:calc(100% - 68px) !important;max-width:1032px !important;min-height:210px !important;margin:90px auto 0 !important;padding:34px 38px !important;border:1px solid #d8e5f3 !important;border-radius:26px !important;background:linear-gradient(115deg,#eef7ff 0%,#fff 52%,#edf5ff 100%) !important;box-shadow:0 22px 58px rgba(37,99,235,.08) !important}
+.home-cta-logo{width:66px !important;height:66px !important;flex-basis:66px !important}.home-cta-content>div>span{color:var(--home-blue) !important;font-size:11px !important;font-weight:800 !important}.home-cta-content h2{color:var(--home-heading) !important;font-size:30px !important;line-height:1.16 !important}.home-cta-button{height:48px !important;padding:0 20px !important;border-radius:13px !important;font-size:14px !important}
+
+/* FOOTER */
+.home-footer{width:calc(100% - 68px) !important;max-width:1032px !important;margin:40px auto 0 !important;padding:24px 2px 18px !important;color:var(--home-ink) !important;border-top:1px solid #e4eaf2 !important;font-size:13px !important}
+.home-footer-brand span{color:var(--home-ink) !important;font-size:15px !important}.home-footer-brand small{color:var(--home-ink) !important;font-size:12px !important}.home-footer p,.home-footer-copy{color:var(--home-ink) !important;font-size:13px !important}
+
+/* LOADING */
+.home-research-loading{width:min(680px,92%) !important;padding:20px 26px !important;border:1px solid #dce5f1 !important;border-radius:18px !important;background:rgba(255,255,255,.96) !important;box-shadow:0 16px 42px rgba(44,68,108,.08) !important}
+.home-loading-content strong{color:var(--home-ink) !important;font-size:16px !important}.home-loading-content p{color:var(--home-ink) !important;font-size:14px !important;line-height:1.55 !important}.home-loading-steps span{color:var(--home-ink) !important;font-size:12px !important}
+
+/* ERROR */
+.home-search-error{width:min(680px,92%) !important;padding:14px 18px !important}.home-search-error strong{font-size:14px !important}.home-search-error p{color:#171717 !important;font-size:13px !important;line-height:1.5 !important}
+
+/* RESPONSIVE */
+@media (max-width:950px){
+  .home-hero{padding:0 24px !important}
+  .home-explore-section,.home-capabilities{padding:0 24px !important}
+  .home-suggestion-grid,.home-capability-grid{grid-template-columns:1fr !important}
+}
+@media (max-width:720px){
+  .home-header{height:66px !important;padding:0 18px !important}
+  .home-hero{margin-top:44px !important;padding:0 18px !important}
+  .home-hero-logo{width:96px !important;height:96px !important}
+  .home-hero h1{font-size:clamp(44px,12vw,62px) !important;letter-spacing:-2.5px !important}
+  .home-hero-description{font-size:16px !important}
+  .home-search-main{min-height:74px !important;padding:10px 10px 10px 16px !important}
+  .home-search-main textarea,.home-search-main textarea::placeholder{font-size:15px !important}
+  .home-search-footer{font-size:12px !important}
+  .home-explore-section,.home-capabilities{margin-top:64px !important;padding:0 18px !important}
+  .home-section-heading{align-items:flex-start !important;flex-direction:column !important}
+  .home-bottom-cta{width:calc(100% - 36px) !important;margin-top:64px !important;padding:28px 24px !important}
+  .home-footer{width:calc(100% - 36px) !important}
+}
+@media (max-width:520px){
+  .home-signin-button{display:none !important}
+  .home-signup-button{height:38px !important;padding:0 14px !important;font-size:13px !important}
+  .home-hero h1{font-size:46px !important}
+  .home-hero-description{font-size:15px !important}
+  .home-search-footer>span:first-child{display:none}
+  .home-search-footer{justify-content:flex-end}
+  .home-cta-content{align-items:flex-start}.home-cta-content h2{font-size:25px !important}
+}
+
+/* DARK THEME COMPATIBILITY */
+[data-resomind-theme="dark"] .home-page{
+  --home-ink:#edf2f8;--home-heading:#f3f6fb;--home-card:#182335;--home-soft:#151e2e;
+  background:radial-gradient(circle at 10% 8%,rgba(56,189,248,.08),transparent 27%),radial-gradient(circle at 88% 18%,rgba(99,102,241,.12),transparent 30%),#0f1724 !important;
+  color:#edf2f8 !important;
+}
+[data-resomind-theme="dark"] .home-header{background:rgba(21,30,46,.95) !important;border-color:#2b374a !important}
+[data-resomind-theme="dark"] .home-system-status,
+[data-resomind-theme="dark"] .home-hero-description,
+[data-resomind-theme="dark"] .home-search-main textarea,
+[data-resomind-theme="dark"] .home-search-footer,
+[data-resomind-theme="dark"] .home-section-heading h2,
+[data-resomind-theme="dark"] .home-section-heading p,
+[data-resomind-theme="dark"] .home-suggestion-copy strong,
+[data-resomind-theme="dark"] .home-suggestion-copy p,
+[data-resomind-theme="dark"] .home-capability-card h3,
+[data-resomind-theme="dark"] .home-capability-card p,
+[data-resomind-theme="dark"] .home-footer,
+[data-resomind-theme="dark"] .home-footer-brand span,
+[data-resomind-theme="dark"] .home-footer-brand small,
+[data-resomind-theme="dark"] .home-footer p,
+[data-resomind-theme="dark"] .home-footer-copy,
+[data-resomind-theme="dark"] .home-loading-content strong,
+[data-resomind-theme="dark"] .home-loading-content p,
+[data-resomind-theme="dark"] .home-loading-steps span{color:#edf2f8 !important}
+[data-resomind-theme="dark"] .home-search-main textarea::placeholder{color:#a6b1c2 !important;opacity:1}
+[data-resomind-theme="dark"] .home-search-shell,
+[data-resomind-theme="dark"] .home-suggestion-card,
+[data-resomind-theme="dark"] .home-capability-card,
+[data-resomind-theme="dark"] .home-research-loading{background:#182335 !important;border-color:#2b374a !important}
+[data-resomind-theme="dark"] .home-signin-button{color:#edf2f8 !important;background:#182335 !important;border-color:#2b374a !important}
+[data-resomind-theme="dark"] .home-search-icon,
+[data-resomind-theme="dark"] .home-attach-button,
+[data-resomind-theme="dark"] .home-card-arrow{color:#edf2f8 !important}
+[data-resomind-theme="dark"] .home-bottom-cta{background:linear-gradient(115deg,#182335,#151e2e) !important;border-color:#2b374a !important}
+[data-resomind-theme="dark"] .home-cta-content h2{color:#f3f6fb !important}
+[data-resomind-theme="dark"] .home-enter-hint kbd{color:#edf2f8 !important;background:#202b3e !important;border-color:#334057 !important}
+
