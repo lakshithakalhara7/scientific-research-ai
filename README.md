@@ -401,10 +401,10 @@ Replace the placeholders with the actual names and student IDs before final subm
 
 | Member | Name / Student ID | Main Contribution |
 |---|---|---|
-| Member 1 | **[Name / ID]** | PDF ingestion, NLP preprocessing, indexing, Retrieval Agent, BM25 retrieval, backend/database integration |
-| Member 2 | **[Name / ID]** | Analysis Agent and Gemini-based structured analysis |
-| Member 3 | **[Name / ID]** | Verification Agent and claim/evidence verification |
-| Member 4 | **[Name / ID]** | Frontend interface and user experience |
+| Member 1 | **[IT23858466]** | PDF upload backend , extraction , Chuncking, NLP preprocessing, indexing, Retrieval Agent,Database integration |
+| Member 2 | **[IT23838420]** | LLM integration , Summarization/Comparisson , Prompts , Structured outputs , Analysis Agent and Gemini-based structured analysis |
+| Member 3 | **[IT23842526]** | Verification Agent , Source checking , Hallucination handling , Authentication / Privacy |
+| Member 4 | **[IT23832930]** | UI , Research input , PDF upload UI , Result/Source display , API integration , End to end testing |
 
 ## Academic Context
 
